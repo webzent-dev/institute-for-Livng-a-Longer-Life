@@ -12,7 +12,11 @@ class IndexController extends Controller
      */
     public function index()
     {
-       
+        return view('front.pages.home');
+    }
+     public function introVideos()
+    {
+        return view('front.pages.intro-videos');
     }
 
     /**
