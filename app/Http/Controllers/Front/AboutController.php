@@ -12,7 +12,15 @@ class AboutController extends Controller
      */
     public function index()
     {
-        //
+         
+    }
+    public function aboutZeines()
+    {
+        return view('front.pages.about-dr-zeines');
+    }
+    public function collaborators()
+    {
+        return view('front.pages.collaborators');
     }
 
     /**

@@ -1,0 +1,253 @@
+{{-- resources/views/intro-videos.blade.php --}}
+@extends('front.layouts.app')
+
+@section('content')
+
+        @php
+            $videos = [
+                [
+                    'id' => 1,
+                    'title' => 'Welcome to Your Wellness Journey',
+                    'duration' => '8:45',
+                    'instructor' => 'Dr. Victor Zeines',
+                    'category' => 'Getting Started',
+                    'description' => 'An introduction to the Institute and what you can expect from your membership.',
+                    'featured' => true,
+                ],
+                [
+                    'id' => 2,
+                    'title' => 'The Science of Longevity',
+                    'duration' => '12:30',
+                    'instructor' => 'Dr. Victor Zeines',
+                    'category' => 'Foundation',
+                    'description' => 'Understanding the biological mechanisms of aging and how to slow them down.',
+                    'featured' => true,
+                ],
+                [
+                    'id' => 3,
+                    'title' => 'Nutrition Fundamentals for Longevity',
+                    'duration' => '15:20',
+                    'instructor' => 'Dr. Sarah Chen',
+                    'category' => 'Nutrition',
+                    'description' => 'Key nutritional principles that support cellular health and longevity.',
+                    'featured' => false,
+                ],
+                [
+                    'id' => 4,
+                    'title' => 'Movement for Life',
+                    'duration' => '10:15',
+                    'instructor' => 'Dr. Michael Rodriguez',
+                    'category' => 'Exercise',
+                    'description' => 'Essential movement patterns to maintain strength and mobility at any age.',
+                    'featured' => false,
+                ],
+                [
+                    'id' => 5,
+                    'title' => 'Stress and Your Health',
+                    'duration' => '14:00',
+                    'instructor' => 'Dr. Jennifer Park',
+                    'category' => 'Mind-Body',
+                    'description' => 'How chronic stress affects aging and simple techniques to manage it.',
+                    'featured' => false,
+                ],
+                [
+                    'id' => 6,
+                    'title' => 'Sleep Optimization Basics',
+                    'duration' => '11:45',
+                    'instructor' => 'Dr. Emily Thompson',
+                    'category' => 'Sleep',
+                    'description' => 'Understanding sleep architecture and strategies for better rest.',
+                    'featured' => false,
+                ],
+            ];
+        @endphp
+
+<div class="min-h-screen flex flex-col">
+    
+ 
+
+    <main class="flex-1">
+
+        {{-- HERO SECTION --}}
+        <section class="gradient-subtle py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h1 class="text-4xl lg:text-6xl font-bold text-foreground mb-6">
+                            Introduction Videos
+                        </h1>
+                        <p class="text-xl text-muted-foreground">
+                            Start your wellness journey with these foundational videos from Dr. Zeines 
+                            and our expert collaborators. Learn the essential principles of healthy living.
+                        </p>
+                    </div>
+
+                    <div class="relative">
+                        <div class="aspect-video rounded-2xl overflow-hidden shadow-strong">
+                            <img 
+                                src="{{ asset('assets/video-learning.jpg') }}"
+                                alt="Modern video learning platform for wellness education"
+                                class="w-full h-full object-cover"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {{-- Featured Videos --}}
+        <section class="py-12 bg-background">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-foreground mb-8">Featured Videos</h2>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-12">
+                    @foreach ($videos as $video)
+                        @if ($video['featured'])
+                            <x-card class="border-2 border-primary shadow-medium hover:shadow-strong transition-all">
+
+                                    <x-card-header>
+                                        <div class="aspect-video bg-gradient-to-tr  from-green-100 to-amber-100 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+
+                                            {{-- Play button --}}
+                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                <div class="w-20 h-20 rounded-full bg-emerald-500  gradient-primary flex items-center justify-center shadow-strong cursor-pointer hover:scale-110 transition-transform">
+                                                    <i data-lucide="play" class="w-10 h-10 text-white text-primary-foreground ml-1"></i>
+                                                </div>
+                                            </div>
+ 
+                                            @if ($video['featured'])
+                                                <x-badge class="absolute top-4 left-4 gradient-accent text-accent-foreground border-0">
+                                                    Featured
+                                                </x-badge>
+                                            @endif
+
+                                             
+                                                <x-badge class="bg-gray-200 text-black absolute top-4 right-4 gradient-accent text-accent-foreground border-0 hover:text-white hover:bg-emerald-500">
+                                                    {{ $video['duration'] }}
+                                                </x-badge>
+
+                                        </div>
+ 
+                                        <h2 class="text-2xl mb-2 font-bold text-teal-950">{{ $video['title'] }}</h2>
+                                        <div class="flex items-center text-sm text-muted-foreground text-neutral-500">
+                                            <i data-lucide="user" class="h-4 w-4 mr-1"></i>
+                                            {{ $video['instructor']}}
+                                            <span class="mx-2">•</span>
+                                            <span class="bg-gray-200 px-3 py-1 rounded-full text-sm font-semibold  text-teal-950">{{ $video ['category'] }}</span>
+                                        </div>
+                                    </x-card-header>
+
+                                    <x-card-content>
+                                        <p class="text-muted-foreground mb-4 text-neutral-500">
+                                            {{ $video['description'] }}
+                                        </p>
+
+                                        
+                                        <button class="  w-full   font-semibold  px-2 py-3 rounded-md  bg-emerald-500 hover:bg-orange-600 text-white  flex items-center justify-center">
+                                                <i data-lucide="play" class="h-5 w-5   mr-2"></i>
+                                                <span class="ml-2">Watch Now </span>
+                                            </button>
+
+
+                                    </x-card-content>
+
+                            </x-card>
+                        @endif 
+
+
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        {{-- All Videos --}}
+        <section class="py-12 bg-background">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-foreground mb-8">More Introduction Videos</h2>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach ($videos as $video)
+                     
+                            <x-card class="border-2   hover:border-primary transition-all shadow-soft hover:shadow-medium">
+                                <x-card-header class="pb-4 ">
+                                    <div class="aspect-video bg-gradient-to-tr  from-green-50 to-amber-100  rounded-lg mb-4 flex items-center justify-center relative">
+                                        <div class="w-16 h-16 rounded-full gradient-primary flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
+                                            <i data-lucide="play" class="h-8 w-8 text-primary-foreground ml-1"></i>
+                                        </div>
+
+                                        <x-badge class="absolute top-3 right-3 bg-background/80 backdrop-blur-sm flex items-center">
+                                            <i data-lucide="clock" class="h-3 w-3 mr-1"></i>
+                                            {{ $video['duration'] }}
+                                        </x-badge>
+                                    </div>
+                                </x-card-header>
+
+                                <x-card-content class="space-y-3">
+
+                                    <div>
+                                        <h3 class="text-xl  font-bold text-teal-950   text-foreground mb-2 line-clamp-2">
+                                            {{ $video['title'] }}
+                                        </h3>
+
+                                      
+
+                                        <div class="flex items-center text-sm text-muted-foreground text-neutral-500">
+                                            <i data-lucide="user" class="h-3 w-3 mr-1"></i>
+                                            {{ $video['instructor']}}
+                                            
+                                            <span class="bg-gray-200 px-3 py-1 rounded-full text-sm font-semibold  text-teal-950">{{ $video ['category'] }}</span>
+                                        </div>
+
+                                        
+                                    </div>
+
+                                    <p class="text-sm text-muted-foreground line-clamp-2">
+                                        {{ $video['description'] }}
+                                    </p>
+
+                                     
+                                    <button class="  w-full   font-semibold  px-2 py-3 rounded-md  bg-emerald-500 hover:bg-orange-600 text-white  flex items-center justify-center">
+                                                <i data-lucide="play" class="h-5 w-5   mr-2"></i>
+                                                <span class="ml-2">Watch Now </span>
+                                            </button>
+
+                                </x-card-content>
+
+                            </x-card>   
+
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        {{-- CTA Section --}}
+        <section class="py-20 gradient-subtle">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <x-card class="shadow-strong">
+                    <div class="p-8 lg:p-12">
+                        <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-6">
+                            Ready for More?
+                        </h2>
+
+                        <p class="text-xl text-muted-foreground mb-8">
+                            Become a member to access our complete video library with hundreds of 
+                            hours of expert content on health, nutrition, exercise, and longevity.
+                        </p>
+
+                        
+
+                        <button class="  w-full   font-semibold  px-2 py-3 rounded-md  bg-emerald-500 hover:bg-orange-600 text-white  flex items-center justify-center">
+                                                <i data-lucide="external-link" class="h-5 w-5   mr-2"></i>
+                                                <span class="ml-2">Explore Membership Plans </span>
+                         </button>
+                    </div>
+                </x-card>
+            </div>
+        </section>
+
+    </main>
+
+ 
+
+</div>
+@endsection
