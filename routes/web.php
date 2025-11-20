@@ -23,4 +23,3 @@ Route::resource('index', IndexController::class);
 Route::resource('about', AboutController::class);
 Route::resource('testimonial', TestimonialsController::class);
 Route::resource('faq', FAQController::class);
-

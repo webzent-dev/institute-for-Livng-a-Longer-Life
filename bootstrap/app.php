@@ -10,9 +10,22 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware) {
-        //
-    })
+   ->withMiddleware(function (Illuminate\Foundation\Application $app) {
+    return [
+        'web' => [
+                \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+
+        'api' => [
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+
+        'middleware' => [
+            'type' => \App\Http\Middleware\UserTypeMiddleware::class,
+        ],
+    ];
+})
+
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
