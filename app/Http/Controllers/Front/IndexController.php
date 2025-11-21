@@ -18,7 +18,10 @@ class IndexController extends Controller
     {
         return view('front.pages.intro-videos');
     }
-
+    public function membership()
+    {
+        return view('front.pages.membership');
+    }
     /**
      * Show the form for creating a new resource.
      */
