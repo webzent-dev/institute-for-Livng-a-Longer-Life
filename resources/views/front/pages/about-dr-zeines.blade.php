@@ -70,7 +70,7 @@
             </div>
         </section>
 
-        {{-- BIOGRAPHY SECTION (converted 1:1) --}}
+        {{-- BIOGRAPHY SECTION  --}}
         <section class="py-20 gradient-subtle bg-stone-50 ">
             <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-1 gap-4 item-center justify-center">
                 <x-card class=" max-w-4xl mx-auto shadow-strong equal-height">
@@ -102,7 +102,7 @@
                 
         </section>
 
-        {{-- PHILOSOPHY (same UI) --}}
+        {{-- PHILOSOPHY   --}}
         <section class="py-20 bg-background">
             <div class="max-w-7xl mx-auto px-4">
 
