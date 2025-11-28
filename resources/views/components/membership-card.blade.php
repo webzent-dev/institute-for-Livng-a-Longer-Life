@@ -122,7 +122,7 @@
 
                                  
                                     <form x-data="membershipForm()" @submit.prevent="submitForm" class="space-y-3">
-
+                                        {{-- NAME FIELDS --}}
                                         <div class="grid grid-cols-2 gap-4 m-0 p-0">
                                             <div class="space-y-1 m-0 p-0">
                                                  <input class="input-base "  :class="{ 'border-red-500': errors.firstName, 'border-green-500': form.firstName && !errors.firstName }" placeholder="First Name" x-model="form.firstName"  @input="clearError('firstName')">
