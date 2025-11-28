@@ -16,7 +16,8 @@ use App\Models\User;
 Route::get('/', [IndexController::class, 'index'] );    
 Route::get('/about-dr-zeines',[AboutController::class, 'aboutZeines'] );
 Route::get('/collaborators',[AboutController::class, 'collaborators'] ); 
-Route::get('/intro-videos',[IndexController::class, 'introVideos'] );   
+Route::get('/intro-videos',[IndexController::class, 'introVideos'] );  
+Route::get('/membership',[IndexController::class, 'membership'] ); 
 
 
 Route::resource('index', IndexController::class);
