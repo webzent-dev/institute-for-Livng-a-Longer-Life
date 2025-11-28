@@ -1,5 +1,6 @@
  @extends('front.layouts.app')  
 
+
 @section('content')
 <div class="min-h-screen flex flex-col">
    
@@ -39,7 +40,7 @@
                                 'name' => 'Essential Membership',
                                 'price' => '$29',
                                 'period' => '/Month',
-                                'url' => '#',
+                                
                                 'description' => 'Perfect for those starting their wellness journey',
                                 'features' => [
                                     'Access to all foundational video lessons',
@@ -59,7 +60,7 @@
                                 'name' => 'Premium Membership',
                                 'price' => '$79',
                                 'period' => '/Month',
-                                'url' => '#',
+                                
                                 'description' => 'Our most popular plan for dedicated health enthusiasts',
                                 'popular' => true,
                                 'features' => [
@@ -82,7 +83,7 @@
                                 'name' => 'Elite Membership',
                                 'price' => '$149',
                                 'period' => '/Month',
-                                'url' => '#',
+                                
                                 'description' => 'Complete wellness transformation with personalized care',
                                 'features' => [
                                     'Everything in Premium',
@@ -115,8 +116,7 @@
            
               
         </div>
-
-        {{-- Additional Info --}}
+ 
         <div class="mt-20 text-center">
           <div class="max-w-4xl mx-auto shadow-medium bg-card rounded-2xl">
             <div class="p-8">
@@ -152,23 +152,13 @@
   </main>
 
  
-
-  {{-- Modal component (mount once) --}}
-  {{-- <x-membership-modal /> --}}
-  {{-- Toast container (mount once) --}}
-  {{-- <x-toasts /> --}}
 </div>
+
+ 
 
 @endsection
 
-{{-- @push('scripts') --}}
-<script>
-    
-  // make sure Alpine is available (layout should load alpine)
-  // Expose a global function to open the modal with plan data.
-//   window.openMembershipModal = function(plan) {
-//     window.dispatchEvent(new CustomEvent('open-membership-modal', { detail: plan }));
-//   };
- </script>
+ 
+ 
 
-{{-- @endpush --}}
+ 

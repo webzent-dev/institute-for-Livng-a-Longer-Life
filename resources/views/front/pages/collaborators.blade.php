@@ -96,11 +96,12 @@
                         <div class="flex flex-col card border-2 bg-emerald-50 rounded-2xl {{ $c['featured'] ? 'border-primary shadow-medium' : 'shadow-soft' }} hover:border-primary py-4 ">
                             <div class="card-header px-6 py-4">
                                 <div class="flex justify-between items-start mb-4">
-                                    <div class="w-8 h-8 p-8 rounded-full gradient-primary bg-emerald-500 flex items-center justify-center">
+                                    {{-- <div class="w-8 h-8 p-8 rounded-full gradient-primary bg-emerald-500 flex items-center justify-center">
                                         <span class="text-2xl font-bold text-primary-foreground">
                                             {{ collect(explode(' ', $c['name']))->map(fn($w) => $w[0])->join('') }}
                                         </span>
-                                    </div>
+                                    </div> --}}
+                                    <x-ui.avatar name="{{ $c['name'] }}"  size="4" />
  
 
                                     @if ($c['featured'])

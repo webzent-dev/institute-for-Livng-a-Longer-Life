@@ -1,7 +1,7 @@
 
 <footer class="bg-white border-t border-gray-200 font-jakarta">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8">
       <!-- Brand -->
       <div class="col-span-1 md:col-span-2 text-center md:text-left">
           <div class="mb-4 flex justify-center md:justify-start">
@@ -77,7 +77,7 @@
       </div>
     </div>
 
-    <div class="border-t border-gray-200 mt-8 pt-8 text-center  text-sm">
+    <div class="border-t border-gray-200  py-8  text-center  text-sm">
       <p>&copy; <span id="year"></span> Institute for Living Longer. Designed by <a href="https://www.webzent.com" class=" hover:text-green-600 transition-colors text-amber-500 font-semibold">Webzent Technologies Pvt. Ltd.</a></p>
     </div>
   </div>

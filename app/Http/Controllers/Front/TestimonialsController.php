@@ -12,7 +12,7 @@ class TestimonialsController extends Controller
      */
     public function index()
     {
-        //
+        return view('front.pages.testimonials');
     }
 
     /**
