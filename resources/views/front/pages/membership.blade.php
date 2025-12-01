@@ -32,7 +32,7 @@
       </div>
     </section>
 
-    {{-- Membership Cards --}}
+    {{-- Membership Card Arrays --}}
 
         @php
                 $plans = [
@@ -150,7 +150,6 @@
       </div>
     </section>
   </main>
-
  
 </div>
 
