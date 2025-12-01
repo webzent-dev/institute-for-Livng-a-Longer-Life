@@ -1,6 +1,6 @@
 import './bootstrap';
 
-// import carousel from './carousel';
+// import carousel from './js/carousel';
 // Alpine.data('carousel', carousel);
 
 // import '../css/app.css';
