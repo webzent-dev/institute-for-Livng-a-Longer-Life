@@ -115,6 +115,8 @@
                     </p>
                 </div>
 
+
+
                 @php
                 $principles = [
                     ['01','Prevention First','Focus on preventing disease rather than just treating symptoms'],
@@ -125,6 +127,8 @@
                     ['06','Community Support','Harness the power of community for lasting transformation'],
                 ];
                 @endphp
+
+
 
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
 
