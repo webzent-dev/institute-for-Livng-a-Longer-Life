@@ -204,6 +204,22 @@
     @apply bg-card rounded-lg border border-border shadow-soft hover:shadow-medium transition-shadow duration-300;
   }
 
+/* Shared button styles */
+.btn-base {
+    @apply h-11 rounded-md px-8 w-full mt-8 flex items-center justify-center;
+}
+
+/* Popular Plan Button (same gradient UI you already use) */
+.btn-popular {
+    @apply gradient-primary text-white font-semibold shadow-md hover:opacity-90;
+}
+
+/* Default Button */
+.btn-default {
+    @apply border border-gray-300 hover:bg-gray-100 text-gray-700;
+}
+
+
   .card-benefit {
     @apply border-2 border-border hover:border-emerald-500 transition-all duration-300 p-6 rounded-lg shadow-soft hover:shadow-medium bg-white;
   }
@@ -226,7 +242,7 @@
 
   /* Forms */
   .input-base {
-    @apply w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors;
+    @apply w-full px-3 py-2 border border-input rounded-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors;
   }
 
   .label-base {
@@ -334,3 +350,4 @@
     @apply h-full;
   }
 }
+
