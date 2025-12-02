@@ -186,15 +186,20 @@
                     <div class="p-8 text-center">
                         <h2 class="text-3xl font-bold text-foreground mb-4">Looking for Quick Answers?</h2>
                         <p class="text-muted-foreground mb-6">Check out our frequently asked questions or explore our resources</p>
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                            <a href="/faq">
-                                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground h-11 rounded-md px-8">
-                                    View FAQ
-                                </button>
-                            </a><a href="/help-center">
-                                        <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground h-11 rounded-md px-8">Help Center
-                                            </button>
-                                        </a></div></div> 
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center ">
+                            <div class="max-w-xl">
+                                  <x-button-use href="/faq" label="View FAQ" variant="outline" /> 
+                            </div>
+                            <div class="max-w-xl"> 
+
+                            <x-button-use href="/help-center" label="Help Center" variant="outline" />
+                            </div>
+                          
+                                
+                        </div>
+                    </div> 
+                                        
+                         
                 </x-card>
             </div>
         </section>

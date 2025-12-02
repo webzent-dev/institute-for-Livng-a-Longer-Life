@@ -72,7 +72,7 @@
             ];
         @endphp
 
-        <section class="py-20 bg-background">
+        <section class="py-10 bg-background">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 <div class="text-center mb-12">
@@ -83,66 +83,9 @@
                         Hear directly from our members about their transformation journeys
                     </p>
                 </div>
-
-                {{-- carousel --}}
-                {{-- <x-ui.carousel :items="[
-                foreach($videoTestimonials as $video){
-                    '<img src=\"/img/1.jpg\" class=\"h-64 w-full object-cover\">',
-                    }
-                    '<img src=\"/img/1.jpg\" class=\"h-64 w-full object-cover\">',
-                    '<img src=\"/img/2.jpg\" class=\"h-64 w-full object-cover\">',
-                    '<img src=\"/img/3.jpg\" class=\"h-64 w-full object-cover\">',
-                ]" /> --}}
-
-
-
-                {{-- @if($event_details->eventadditionalimages->count() > 0) --}}
-  <div class="max-w-6xl mx-auto px-6 mt-10">
-    <h2 class="text-2xl font-bold mb-4">Additional Images</h2>
+               <x-ui.carousel :items="$videoTestimonials" autoplay="true" speed="3000" />
  
-    <div class="relative overflow-hidden w-full rounded-lg shadow-lg">
-        <div id="carousel" class="flex transition-transform duration-500 ease-in-out">
-            {{-- @foreach($event_details->eventadditionalimages as $img)
-                <div class="min-w-full">
-                    <img src="{{ asset($img->additional_image_path) }}"
-                         alt="Event Image"
-                         class="w-full h-80 object-cover rounded-lg">
-                </div>
-            @endforeach --}}
-            @foreach ($videoTestimonials as $video)
-                    <div class="min-w-full px-4">
-                            <a href="{{ $video['videoUrl'] }}" target="_blank" class="block">
-                                                        <div class="aspect-video bg-secondary rounded-lg overflow-hidden mb-4 relative group">
-                                                            <img src="{{ $video['thumbnail'] }}" 
-                                                                alt="{{ $video['quote'] }}"
-                                                                class="w-full h-full object-cover" />
-                                                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <div class="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center">
-                                                                    <div class="w-0 h-0 border-l-[16px] border-l-primary-foreground border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent ml-1"></div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                    <p class="text-lg font-semibold text-foreground italic">
-                                                        "{{ $video['quote'] }}"
-                                                    </p>
-                                                    <p class="text-muted-foreground">- {{ $video['name'] }}</p>
-                                                </div>
-            @endforeach
-
-        </div>
-
- 
-        <button onclick="prevSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 p-3 rounded-full shadow">
-            ◀
-        </button>
- 
-        <button onclick="nextSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 p-3 rounded-full shadow">
-            ▶
-        </button>
-    </div>
-  </div>
-  {{-- @endif --}}
+         
 
 
 
@@ -306,18 +249,13 @@
                         </p>
 
                         <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <div class="mx-w-xl">
+                                <x-button-use href="/membership" :isPapular="true" label="Get Started Today" />
+                            </div>
+                            <div class="mx-w-xs">
+                                <x-button-use href="/intro-videos" variant="outline"    label="Watch Intro Videos"  />
+                            </div>
 
-                            <a href="/membership">
-                                <button class="gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold h-11 px-8 rounded-md">
-                                    Get Started Today
-                                </button>
-                            </a>
-
-                            <a href="/intro-videos">
-                                <button class="border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground h-11 px-8 rounded-md">
-                                    Watch Intro Videos
-                                </button>
-                            </a>
 
                         </div>
 
