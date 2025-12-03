@@ -83,8 +83,8 @@
                             <div class="aspect-video relative">
                                 <img src="${escapeHtml(thumb)}" alt="${escapeHtml(item.title ?? item.name ?? '')}" class="w-full h-full object-cover">
                                 <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity ">
-                                    <div class="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center">
-                                        <div class="w-0 h-0 border-l-[20px] border-l-black border-t-[12px] border-t-transparent border-b-[12px] border-b-transparent ml-1"></div>
+                                    <div class="w-14 h-14 bg-primary rounded-full flex items-center justify-center">
+                                        <div class="w-0 h-0 border-l-[20px] border-l-white border-t-[12px] border-t-transparent border-b-[12px] border-b-transparent ml-1"></div>
                                     </div>
                                 </div>
                             </div>

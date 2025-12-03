@@ -157,9 +157,9 @@
                                         
 
                                         <div class="grid grid-cols-1 gap-2 ">
-                                            <x-ui.button type="submit" full="true" class="btn-hero lg py-3 flex items-center justify-center gap-2">
+                                            <x-button-use type="submit" full="true" class="btn-hero lg py-3 flex items-center justify-center gap-2">
                                             <i data-lucide="send" class="w-5 h-5"></i>
-                                            Send Message</x-ui.button>
+                                            Send Message</x-button-use>
                                             
                                         </div>
                                        

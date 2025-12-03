@@ -84,11 +84,7 @@
                     </p>
                 </div>
                <x-ui.carousel :items="$videoTestimonials" autoplay="true" speed="3000" />
- 
-         
-
-
-
+  
             </div>
         </section>
  
@@ -178,61 +174,156 @@
                     'result' => 'Increased vitality'
                 ],
             ];
+           
+           // Pagination 
+           $perPage = 3;
+           $page = request()->get('page', 1);
+           $totalPages = ceil(count($testimonials)/$perPage);
+           // Slice testimonials for current page
+           $paginated = array_slice($testimonials, ($page - 1) * $perPage, $perPage);
+             
         @endphp
 
-        <section class="py-20 gradient-subtle">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                    @foreach ($testimonials as $t)
-                        <x-card class="flex flex-col border-2 hover:border-primary transition-all shadow-soft hover:shadow-medium">
-                            <x-card-content class="flex-1 p-6 space-y-4">
+            {{-- Testimonials --}}
+            <section class="py-12 gradient-subtle">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            
+                            <div  class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                                {{-- Rating --}}
-                                <div class="flex items-center space-x-1">
-                                    @for ($i = 0; $i < $t['rating']; $i++)
-                                        {{-- <x-heroicon-s-star class="h-5 w-5 text-accent fill-accent" /> --}}
-                                        <i data-lucide="star"        class="lucide-star h-5 w-5 text-accent fill-accent"></i>
-                                    @endfor
-                                </div>
+                                @foreach ($testimonials as $testimonial)
+                                    <x-card class="testimonial-card flex flex-col border-2 hover:border-primary transition-all shadow-soft hover:shadow-medium">
+                                        <x-card-content class="flex-1 p-6 space-y-4">
 
-                                {{-- Quote --}}
-                                <div class="relative">
-                                    {{-- <x-heroicon-s-quote class="absolute -top-2 -left-2 h-8 w-8 text-primary/20" /> --}}
-                                    <i data-lucide="quote" class="absolute -top-2 -left-2 h-8 w-8 text-primary/20"></i>
-                                    <p class="text-muted-foreground italic pl-6">
-                                        "{{ $t['quote'] }}"
-                                    </p>
-                                </div>
+                                            {{-- Rating --}}
+                                            <div class="flex items-center space-x-1">
+                                                @for ($i = 0; $i < $testimonial['rating']; $i++)
+                                                    {{-- <x-heroicon-s-star class="h-5 w-5 text-accent fill-accent" /> --}}
+                                                    <i data-lucide="star" class="lucide-star h-5 w-5 text-accent fill-accent"></i>
+                                                @endfor
+                                            </div>
 
-                                {{-- Result --}}
-                                <div class="p-3 bg-primary/10 rounded-lg border border-primary/20">
-                                    <p class="text-sm font-semibold text-primary">
-                                        Result: {{ $t['result'] }}
-                                    </p>
-                                </div>
+                                            {{-- Quote --}}
+                                            <div class="relative">
+                                                {{-- <x-heroicon-s-quote class="absolute -top-2 -left-2 h-8 w-8 text-primary/20" /> --}}
+                                                <i data-lucide="quote" class="absolute -top-2 -left-2 h-8 w-8 text-primary/20"></i>
+                                                <p class="text-muted-foreground italic pl-6">
+                                                    "{{ $testimonial['quote'] }}"
+                                                </p>
+                                            </div>
 
-                                {{-- Author --}}
-                                <div class="flex items-center space-x-3 pt-4 border-t border-border">
-                                     
-                                        <x-ui.avatar name="{{ $t['name'] }}"  size="3" />
-                                      
-                                    <div>
-                                        <p class="font-semibold text-foreground">{{ $t['name'] }}</p>
-                                        <p class="text-sm text-muted-foreground">
-                                            Age {{ $t['age'] }} • {{ $t['location'] }}
-                                        </p>
-                                    </div>
-                                </div>
+                                            {{-- Result --}}
+                                            <div class="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                                                <p class="text-sm font-semibold text-primary">
+                                                    Result: {{ $testimonial['result'] }}
+                                                </p>
+                                            </div>
 
-                            </x-card-content>
-                        </x-card>
-                    @endforeach
+                                            {{-- Author --}}
+                                            <div class="flex items-center space-x-3 pt-4 border-t border-border">
+                                                
+                                                    <x-ui.avatar name="{{ $testimonial['name'] }}"  size="3" />
+                                                
+                                                <div>
+                                                    <p class="font-semibold text-foreground">{{ $testimonial['name'] }}</p>
+                                                    <p class="text-sm text-muted-foreground">
+                                                        Age {{ $testimonial['age'] }} • {{ $testimonial['location'] }}
+                                                    </p>
+                                                </div>
+                                            </div>
 
-                </div>
+                                        </x-card-content>
+                                    </x-card>
+                                @endforeach
+
+                            </div>
+                            {{-- Pagination --}}
+                            <div class="flex justify-center mt-6">
+                                <nav id="pagination" class="flex items-center space-x-2 text-sm"></nav>
+                            </div>
+                        </div>
+            </section>
+
+            {{-- Pagination --}}
+            <div class="flex justify-center mt-6">
+                <nav id="pagination" class="flex items-center space-x-2 text-sm"></nav>
             </div>
-        </section>
+
+            {{-- JavaScript Pagination Logic --}}
+            <script>
+                let currentPage = 1;
+                const perPage = {{ $perPage }};
+                const totalPages = {{ $totalPages }};
+                const cards = document.querySelectorAll(".testimonial-card");
+
+                // Render testimonials for this page
+                function renderPage() {
+                    const start = (currentPage - 1) * perPage;
+                    const end = start + perPage;
+
+                    cards.forEach((card, index) => {
+                        card.classList.toggle("hidden", !(index >= start && index < end));
+                    });
+
+                    renderPagination();
+                }
+
+                // Creates pagination number buttons with "..." ellipsis
+                function renderPagination() {
+                    const container = document.getElementById("pagination");
+                    container.innerHTML = "";
+
+                    // Helper to create button
+                    const btn = (label, page, active = false, disabled = false) => {
+                        const button = document.createElement("button");
+                        button.textContent = label;
+                        button.className =
+                            "px-3 py-1 border rounded-md hover:bg-primary " +
+                            (active ? "bg-primary text-white" : "hover:bg-gray-200") +
+                            (disabled ? " opacity-50 cursor-not-allowed" : "");
+
+                        if (!disabled && page) {
+                            button.onclick = () => {
+                                currentPage = page;
+                                renderPage();
+                            };
+                        }
+
+                        container.appendChild(button);
+                    };
+
+                    // Previous
+                    btn("Previous", currentPage - 1, false, currentPage === 1);
+
+                    // Always show first page
+                    btn("1", 1, currentPage === 1);
+
+                    // Show "..."
+                    if (currentPage > 3) container.innerHTML += "<span>...</span>";
+
+                    // Middle pages
+                    for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                        if (i > 1 && i < totalPages) {
+                            btn(i, i, currentPage === i);
+                        }
+                    }
+
+                    // Show "..."
+                    if (currentPage < totalPages - 2) container.innerHTML += "<span>...</span>";
+
+                    // Always show last page
+                    if (totalPages > 1) {
+                        btn(totalPages, totalPages, currentPage === totalPages);
+                    }
+
+                    // Next
+                    btn("Next", currentPage + 1, false, currentPage === totalPages);
+                }
+
+                // Initial load
+                renderPage();
+            </script>
+
 
         {{-- CTA --}}
         <section class="py-20 gradient-subtle">

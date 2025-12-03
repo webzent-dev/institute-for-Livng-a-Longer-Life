@@ -287,6 +287,10 @@
   .premium-feature {
     @apply gradient-accent text-accent-foreground hover:opacity-90 shadow-medium font-semibold inline-block bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full ml-2;
   }
+  .iconbg {
+    @apply w-8 h-8 rounded-sm bg-primary hover:bg-accent flex items-center justify-center flex-shrink-0 text-white text-sm font-semibold;
+    display: inline-flex;
+  }
 }
 
 /* Utilities Layer */
