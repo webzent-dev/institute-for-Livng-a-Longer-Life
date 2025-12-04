@@ -325,35 +325,19 @@
             </script>
 
 
-        {{-- CTA --}}
-        <section class="py-20 gradient-subtle">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <x-card class="shadow-strong">
-                    <x-card-content class="p-8 lg:p-12">
-                        <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-6">
-                            Ready to Write Your Success Story?
-                        </h2>
-
-                        <p class="text-xl text-muted-foreground mb-8">
-                            Join thousands of members who are already transforming their lives. 
-                            Start your journey to better health today.
-                        </p>
-
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                            <div class="mx-w-xl">
-                                <x-button-use href="/membership" :isPapular="true" label="Get Started Today" />
-                            </div>
-                            <div class="mx-w-xs">
-                                <x-button-use href="/intro-videos" variant="outline"    label="Watch Intro Videos"  />
-                            </div>
-
-
-                        </div>
-
-                    </x-card-content>
-                </x-card>
-            </div>
-        </section>
+        {{-- CTA bookmark-check --}}
+             <x-ui.cta-section 
+                icon="bookmark-check"
+                align="center"
+                title="Ready to Write Your Success Story?"
+                subtitle="Join thousands of members who are already transforming their lives. 
+                            Start your journey to better health today."
+                
+                :buttons="[
+                    ['route' => 'membership',   'label' => 'Get Started Today', 'variant' => 'outline', 'icon' => 'send'],
+                    ['route' => 'intro-videos', 'label' => 'Watch Intro Videos', 'variant' => 'outline', 'icon' => 'tv-minimal'],
+                ]"
+            />  
 
     </main>
 

@@ -17,15 +17,15 @@ use App\Models\User;
 // });
 
 Route::get('/', [IndexController::class, 'index'] );    
-Route::get('/about-dr-zeines',[AboutController::class, 'aboutZeines'] );
-Route::get('/collaborators',[AboutController::class, 'collaborators'] ); 
-Route::get('/intro-videos',[IndexController::class, 'introVideos'] );  
-Route::get('/membership',[IndexController::class, 'membership'] ); 
+Route::get('/about-dr-zeines',[AboutController::class, 'aboutZeines'] )->name('about-dr-zeines');
+Route::get('/collaborators',[AboutController::class, 'collaborators'] )->name('collaborators'); 
+Route::get('/intro-videos',[IndexController::class, 'introVideos'] )->name('intro-videos');  
+Route::get('/membership',[IndexController::class, 'membership'] )->name('membership'); 
 Route::post('/membership/register', [MembershipController::class, 'register'])->name('membership.register');
-Route::get('/auth', [LoginController::class, 'showLoginForm']);
-Route::get('/contact', [ContactController::class, 'index'] );
-Route::get('/testimonials', [TestimonialsController::class, 'index'] );
-// Route::get('/faq', [FAQController::class, 'index'] );
+Route::get('/auth', [LoginController::class, 'showLoginForm'])->name('auth');
+Route::get('/contact', [ContactController::class, 'index'] )->name('contact');
+Route::get('/testimonials', [TestimonialsController::class, 'index'] )->name('testimonials');
+Route::get('/faq', [FAQController::class, 'index'] )->name('faq');
 
 // Route::post('/login', [LoginController::class, 'login']);
 Route::resource('index', IndexController::class);

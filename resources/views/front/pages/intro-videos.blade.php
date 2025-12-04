@@ -220,30 +220,20 @@
             </div>
         </section>
 
-        {{-- CTA Section --}}
-        <section class="py-20 gradient-subtle">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <x-card class="shadow-strong">
-                    <div class="p-8 lg:p-12">
-                        <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-6">
-                            Ready for More?
-                        </h2>
-
-                        <p class="text-xl text-muted-foreground mb-8">
-                            Become a member to access our complete video library with hundreds of 
-                            hours of expert content on health, nutrition, exercise, and longevity.
-                        </p>
-
-                        
-
-                        <button class="  w-full   font-semibold  px-2 py-3 rounded-md  bg-emerald-500 hover:bg-orange-600 text-white  flex items-center justify-center">
-                                                <i data-lucide="external-link" class="h-5 w-5   mr-2"></i>
-                                                <span class="ml-2">Explore Membership Plans </span>
-                         </button>
-                    </div>
-                </x-card>
-            </div>
-        </section>
+        {{-- CTA  --}}
+             <x-ui.cta-section 
+                icon="check-circle"
+                align="center"
+                title="Ready for More?"
+                subtitle="Become a member to access our complete video library with hundreds of 
+                            hours of expert content on health, nutrition, exercise, and longevity."
+                
+                :buttons="[
+                    ['route' => 'membership',   'label' => 'Explore Membership Plans', 'variant' => 'outline', 'icon' => 'external-link'],
+                    
+                ]"
+            /> 
+        
 
     </main>
 

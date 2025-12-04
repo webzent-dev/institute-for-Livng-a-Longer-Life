@@ -187,32 +187,20 @@
         </section>
 
         {{-- CTA --}}
-        <section class="py-20 gradient-subtle  bg-gradient-to-t from-emerald-200 to-white ">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <div class="bg-card p-8 lg:p-12 rounded-2xl shadow-strong bg-white ">
-                    <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-6">
-                        Interested in Becoming a Collaborator?
-                    </h2>
+            <x-ui.cta-section 
+                icon="user-star"
+                align="center"
+                title=" Interested in Becoming a Collaborator?"
+                subtitle="Join our network of expert practitioners and share your knowledge with our growing community. 
+                        Manage your own store, create courses, and make a meaningful impact on people's lives."
+                
+                :buttons="[
+                    ['route' => 'contact',   'label' => 'Apply to Collaborate', 'variant' => 'outline', 'icon' => 'external-link'],
+                     
+                ]"
+            /> 
 
-                    <p class="text-xl text-muted-foreground mb-8">
-                        Join our network of expert practitioners and share your knowledge with our growing community. 
-                        Manage your own store, create courses, and make a meaningful impact on people's lives.
-                    </p>
-                    <div class="justify-center flex">
-                            <a href="{{ url('/contact') }}" class="btn hero text-lg px-6 py-3 ">
-                                <button class="btn-hero w-full sm:w-auto font-semibold  px-2 py-3 rounded-md  flex items-center justify-center bg-emerald-500 hover:bg-orange-600 text-white">
-                                    
-                                    <i data-lucide="external-link" class="h-5 w-5 t  mr-2"></i>
-
-                                    Apply to Collaborate
-                                </button>
-                            </a>
-                    </div>
-                    
-                </div>
-            </div>
-        </section>
-
+ 
 
     </main>
 

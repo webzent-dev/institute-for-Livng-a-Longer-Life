@@ -7,7 +7,7 @@
     'size'      => 'md',
     'variant'   => 'primary',
     'isPopular' => false,
-    'class'     => '',
+    'class'     => 'font-semibold',
     'icon'      => null,          // optional lucide icon
 ])
 
@@ -38,7 +38,7 @@
 
     // Final classes
     $classes = collect([
-        'rounded-md flex items-center justify-center gap-2 transition-all duration-150 select-none',
+        'rounded-md flex items-center justify-center font-semibold gap-2 transition-all duration-150 select-none',
         $sizes[$size] ?? $sizes['md'],
         $variantClasses,
         $class
