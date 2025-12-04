@@ -183,7 +183,7 @@
         <p class="text-2xl font-semibold text-emerald-500  mb-8 ">Victor Zeines</p>
         {{-- <a href="#" class="btn-hero inline-flex items-center justify-center"> --}}
           <div class="max-w-64 mx-auto">
-              <a href="#" class=" sm:w-auto flex items-center justify-center font-semibold px-5 py-3 rounded-md bg-emerald-500 border-2 hover:bg-orange-600  text-white  ">
+              <a href="/membership" class=" sm:w-auto flex items-center justify-center font-semibold px-5 py-3 rounded-md bg-emerald-500 border-2 hover:bg-orange-600  text-white  ">
           Join Our Community
           <i data-lucide="arrow-right" class="ml-2 w-5 h-5"></i>
         </a>
