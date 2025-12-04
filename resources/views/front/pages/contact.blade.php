@@ -179,31 +179,21 @@
                 
                 <x-maps-grid />
 
-                 {{-- FAQ Section --}}
-        <section class="py-20 gradient-subtle">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <x-card class="shadow-strong">
-                    <div class="p-8 text-center">
-                        <h2 class="text-3xl font-bold text-foreground mb-4">Looking for Quick Answers?</h2>
-                        <p class="text-muted-foreground mb-6">Check out our frequently asked questions or explore our resources</p>
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center ">
-                            <div class="max-w-xl">
-                                  <x-button-use href="/faq" label="View FAQ" variant="outline" /> 
-                            </div>
-                            <div class="max-w-xl"> 
+            {{-- FAQ Section k --}}
 
-                            <x-button-use href="/help-center" label="Help Center" variant="outline" />
-                            </div>
-                          
-                                
-                        </div>
-                    </div> 
-                                        
-                         
-                </x-card>
-            </div>
-        </section>
+            <x-ui.cta-section 
+                icon="view"
+                align="center"
+                title="Looking for Quick Answers?"
+                subtitle="Check out our frequently asked questions or explore our resources"
+                
+                :buttons="[
+                    ['route' => 'faq.index',   'label' => 'View FAQs', 'variant' => 'outline', 'icon' => 'badge-question-mark'],
+                    ['href' => '/help-center', 'label' => 'Visit Help Center', 'variant' => 'outline', 'icon' => 'headset'],
+                ]"
+            /> 
 
+ 
 
 
     </main>
