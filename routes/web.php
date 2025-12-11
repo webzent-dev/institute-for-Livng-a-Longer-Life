@@ -30,6 +30,7 @@ Route::get('/testimonials', [TestimonialsController::class, 'index'] )->name('te
 Route::get('/faq', [FAQController::class, 'index'] )->name('faq');
 Route::get('/help-center', [HelpCenterController::class, 'helpcenter'] )->name('help-center');
 Route::get('/shop', [ShopController::class, 'index'] )->name('shop');
+Route::get('/products/filter', [ShopController::class, 'filter'])->name('products.filter');  
 
 // Route::post('/login', [LoginController::class, 'login']);
 Route::resource('index', IndexController::class);

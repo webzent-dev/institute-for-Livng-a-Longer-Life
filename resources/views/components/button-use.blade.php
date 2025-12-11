@@ -22,7 +22,7 @@
 
     // Variants
     $variants = [
-        'primary' => 'bg-primary text-white hover:bg-primary/90',
+        'primary' => 'bg-primary text-white hover:bg-accent',
         'outline' => 'border-2 border-primary text-primary hover:bg-primary hover:text-white',
         'danger'  => 'bg-red-600 text-white hover:bg-red-700',
         'success' => 'bg-green-600 text-white hover:bg-green-700',
