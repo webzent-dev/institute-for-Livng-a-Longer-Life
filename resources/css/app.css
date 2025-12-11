@@ -25,7 +25,8 @@
     --muted-foreground: 160 10% 45%;
 
     /* Accent */
-    --accent: 43 96% 56%;
+    /* --accent: 38 92% 51%; */
+    --accent: 38 92% 51%;
     --accent-foreground: 160 15% 20%;
 
     /* Destructive */
@@ -96,7 +97,67 @@
 }
 
 /* Base Styles */
-@layer base {
+
+@font-face {
+    font-family: 'Bellota Text';
+    src: url('/fonts/BellotaText-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Bellota Text';
+    src: url('/fonts/BellotaText-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Red Hat Display';
+    src: url('/fonts/RedHatDisplay-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Red Hat Display';
+    src: url('/fonts/RedHatDisplay-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Red Hat Display';
+    src: url('/fonts/RedHatDisplay-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Red Hat Display';
+    src: url('/fonts/RedHatDisplay-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+/* Global Tailwind Base Override */
+/* @layer base {
+    h1, h2, h3, h4, h5, h6 {
+        @apply font-heading;
+    }
+
+    body, p, li, a, span, input, button, textarea, label {
+        @apply font-body;
+    }
+} */
+
+
+/* @layer base {
   * {
     @apply border-border;
   }
@@ -119,7 +180,7 @@
   h6 {
     @apply font-semibold;
   }
-}
+} */
 
 /* Gradient Utilities */
 .gradient-primary {
@@ -309,6 +370,10 @@
   }
 
   /* Responsive Text */
+ 
+
+
+
   .text-clamp-sm {
     font-size: clamp(0.875rem, 2.5vw, 1.25rem);
   }

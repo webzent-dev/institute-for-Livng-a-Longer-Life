@@ -7,8 +7,7 @@
     <title>@yield('title', 'Living Longer Institute')</title>
    {{-- <link rel="icon" type="image/png" href="{{ asset('assets/logo.png') }}"> --}}
  
-    {{-- Fonts --}}
-    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700&display=swap" rel="stylesheet" />
+     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
  
  <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script> 
     {{-- Load Vite compiled CSS & JS --}}
@@ -21,6 +20,8 @@
     <script src="{{ asset('js/login.js') }}"></script>
 
 {{-- cdn --}}
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/alpinejs" defer></script>

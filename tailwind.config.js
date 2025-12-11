@@ -1,4 +1,6 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
+const plugin = require('tailwindcss/plugin')
+
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -19,8 +21,16 @@ export default {
         },
         extend: {
             fontFamily: {
-                sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+                sans: ['Bellota Text', 'Bellota Text', 'Red Hat Display'],
+                heading: ["Bellota Text", "normal", "sans-serif"],
+                body: ["Red Hat Display", "sans-serif"],
             },
+            fontSize: {
+                        h1: ["50px", { lineHeight: "1.2", fontWeight: "700" }],
+                        h2: ["36px", { lineHeight: "1.3", fontWeight: "600" }],
+                        h3: ["28px", { lineHeight: "1.3", fontWeight: "600" }],
+                        p:  ["16px", { lineHeight: "1.6" }],
+                    },
             colors: {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
@@ -100,7 +110,61 @@ export default {
             },
         },
     },
-    plugins: [],
+    plugins: [
+        plugin(function({ addUtilities }) {
+            addUtilities({
+                '.section-base': {
+                    paddingTop: '3rem',      // 12
+                    paddingBottom: '3rem',
+                },
+                '@screen md': {
+                    '.section-base': {
+                        paddingTop: '4rem', // 16
+                        paddingBottom: '4rem',
+                    },
+                },
+                '@screen lg': {
+                    '.section-base': {
+                        paddingTop: '6rem', // 24
+                        paddingBottom: '6rem',
+                    },
+                },
+                '@screen xl': {
+                    '.section-base': {
+                        paddingTop: '7rem', // 28
+                        paddingBottom: '7rem',
+                    },
+                },
+                '@screen 2xl': {
+                    '.section-base': {
+                        paddingTop: '8rem', // 32
+                        paddingBottom: '8rem',
+                    },
+                },
+
+                // Container utility inside config
+                '.container-base': {
+                    maxWidth: '1380px',
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
+                    paddingLeft: '1rem',
+                    paddingRight: '1rem',
+                },
+                '@screen sm': {
+                    '.container-base': {
+                        paddingLeft: '1.5rem',
+                        paddingRight: '1.5rem',
+                    },
+                },
+                '@screen lg': {
+                    '.container-base': {
+                        paddingLeft: '2rem',
+                        paddingRight: '2rem',
+                    },
+                },
+            })
+        })
+    ],
 };
 
  
