@@ -1,73 +1,82 @@
 @extends('front.layouts.app')
 @section('content')
 <div class="min-h-screen flex flex-col">
- 
+    <section class="gradient-subtle pt-16">
+        <div class="max-w-7xl mx-auto py-10 px-4">
+                <div class="text-center mb-16 ">
+                    <h1 class="text-4xl lg:text-6xl font-bold text-foreground mb-4">
+                        Wellness Store
+                    </h1>
+                    <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
+                        Premium products curated by our expert collaborators.
+                        Members enjoy exclusive discounts on all items.
+                    </p>
+                </div>
+                <!-- Search + Category -->
+                <div class="mb-8 flex flex-col md:flex-row gap-4">
+                        <div class="relative flex-1">
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="Search products..."
+                            class="w-full pl-12 pr-12 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-lg"
+                        />
+                        <i class="fas fa-search absolute left-4 top-3 text-gray-500 text-xl"></i>
+
+                        <button id="clearSearch" class="absolute right-3 top-4 text-gray-500 hover:text-gray-700 text-2xl hidden">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                        </div>
+
+                        <select id="categoryFilter" class="px-6 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-lg" >
+                        <option value="all">All Categories</option>
+
+                        {{-- Generate categories automatically (optional) --}}
+                        @foreach($products->pluck('category')->unique() as $cat)
+                            <option value="{{ $cat }}">{{ $cat }}</option>
+                        @endforeach
+                        </select>
+                </div>
+
+                <!-- Price, Rating, Clear -->
+                <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Price -->
+                    <div>
+                    <label class="block text-sm font-medium text-primary mb-2">Price Range</label>
+                    <div class="flex items-center gap-3">
+                        <input type="number" id="minPrice" placeholder="Min" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"/>
+                        <span class="text-gray-500">—</span>
+                        <input type="number" id="maxPrice" placeholder="Max" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"/>
+                    </div>
+                    </div>
+
+                    <!-- Rating -->
+                    <div>
+                    <label class="block text-sm font-medium text-primary mb-2">Minimum Rating</label>
+                    <select id="ratingFilter" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary">
+                        <option value="0">Any Rating</option>
+                        <option value="4">4★ & above</option>
+                        <option value="3">3★ & above</option>
+                        <option value="2">2★ & above</option>
+                        <option value="1">1★ & above</option>
+                    </select>
+                    </div>
+
+                    <!-- Clear All -->
+                    <div class="flex items-end">
+                    <button
+                        id="clearFilters"
+                        class="w-full bg-primary text-white px-8 py-3 rounded-lg hover:bg-amber-500 transition"
+                    >
+                        Clear Filters
+                    </button>
+                    </div>
+                </div>
+        </div>
+    </section>            
+
+<section class="gradient-subtle py-5">
     <div class="max-w-7xl mx-auto py-10 px-4">
-
-  <!-- Search + Category -->
-  <div class="mb-8 flex flex-col md:flex-row gap-4">
-    <div class="relative flex-1">
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="Search products..."
-        class="w-full pl-12 pr-12 py-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg"
-      />
-      <i class="fas fa-search absolute left-4 top-5 text-gray-500 text-xl"></i>
-
-      <button id="clearSearch" class="absolute right-3 top-4 text-gray-500 hover:text-gray-700 text-2xl hidden">
-        <i class="fas fa-times-circle"></i>
-      </button>
-    </div>
-
-    <select
-      id="categoryFilter"
-      class="px-6 py-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg"
-    >
-      <option value="all">All Categories</option>
-
-      {{-- Generate categories automatically (optional) --}}
-      @foreach($products->pluck('category')->unique() as $cat)
-          <option value="{{ $cat }}">{{ $cat }}</option>
-      @endforeach
-    </select>
-  </div>
-
-  <!-- Price, Rating, Clear -->
-  <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-    <!-- Price -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
-      <div class="flex items-center gap-3">
-        <input type="number" id="minPrice" placeholder="Min" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-400"/>
-        <span class="text-gray-500">—</span>
-        <input type="number" id="maxPrice" placeholder="Max" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-400"/>
-      </div>
-    </div>
-
-    <!-- Rating -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Rating</label>
-      <select id="ratingFilter" class="w-full px-4 py-4 border rounded-lg focus:ring-2 focus:ring-yellow-400">
-        <option value="0">Any Rating</option>
-        <option value="4">4★ & above</option>
-        <option value="3">3★ & above</option>
-        <option value="2">2★ & above</option>
-        <option value="1">1★ & above</option>
-      </select>
-    </div>
-
-    <!-- Clear All -->
-    <div class="flex items-end">
-      <button
-        id="clearFilters"
-        class="w-full bg-gray-600 text-white px-8 py-4 rounded-lg hover:bg-gray-700 transition"
-      >
-        Clear Filters
-      </button>
-    </div>
-  </div>
-
   <!-- Active Filter Chips -->
   <div id="activeFilters" class="mb-6 flex flex-wrap gap-2"></div>
 
@@ -192,11 +201,11 @@
                 <p class="col-span-full text-center text-xl text-gray-500 py-12">
                     No products found.
                 </p>`;
-            resultsCount.textContent = "0 results";
+            // resultsCount.textContent = "0 results";
             return;
         }
 
-        resultsCount.textContent = `${list.length} results`;
+        // resultsCount.textContent = `${list.length} results`;
  
 
         // Add event listeners to the product cards.......
@@ -232,7 +241,7 @@
                           </div>
 
 
-                            <p class="text-xs text-gray-500 mb-2">${product.category}</p>
+                            <p class="text-xs text-primary mb-2">${product.category}</p>
                     
                                         <div class="flex items-baseline space-x-2">
                                             <span class="text-2xl font-bold text-foreground">
@@ -308,7 +317,7 @@
 
 @endsection
 
- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
  
 
  
