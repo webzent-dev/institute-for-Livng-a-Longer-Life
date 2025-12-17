@@ -43,7 +43,7 @@
 
       <!-- Quick Links -->
       <div>
-        <h3 class="font-bold  text-gray-800 mb-4">Quick Links</h3>
+        <h3 class="text-2xl font-bold  text-gray-800 mb-4">Quick Links</h3>
         <ul class="space-y-2">
           @foreach ($quickLinks as $link)
             <li>
@@ -58,7 +58,7 @@
 
       <!-- Contact -->
       <div>
-        <h3 class="font-semibold text-gray-800 mb-4">Contact</h3>
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Contact</h3>
         <ul class="space-y-3">
           <li class="flex items-start gap-2">
              <div class="iconbg ">

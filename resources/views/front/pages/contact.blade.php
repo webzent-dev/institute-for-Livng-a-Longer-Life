@@ -175,7 +175,7 @@
             </div>
         </section>
  
-            {{--Maps  --}}
+            {{-- embedded Maps  --}}
                 
                 <x-maps-grid />
 
