@@ -1,5 +1,6 @@
 @extends('front.layouts.app')
 @section('content')
+<meta name="csrf-token" content="{{ csrf_token() }}">
     <div class="min-h-screen flex flex-col pt-20" >
        
 
@@ -37,13 +38,13 @@
 
                             <div>
                                 <label class="mb-3">Email</label>
-                                 <x-form.input model="email" placeholder="Email" type="email" />
+                                 <x-form.input model="email"  name="email" placeholder="Email" type="email" />
                                 
                             </div>
 
                             <div>
                                 <label class="mb-3">Password</label>
-                                 <x-form.password model="password" placeholder="Password" />
+                                 <x-form.password model="password"  name="password" placeholder="Password" />
                                 
                             </div>
                            
@@ -55,6 +56,13 @@
                                         class="w-full bg-green-600 text-white py-2 rounded mt-3">
                                         Sign In
                                     </button>
+
+                                      <p
+                                    x-show="successMsg"
+                                    x-transition
+                                    x-text="successMsg"
+                                    class="text-green-600 font-semibold"
+                                ></p>
                              
                             
 

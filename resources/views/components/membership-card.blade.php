@@ -1,4 +1,5 @@
 
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @props(['plan'])
 
                 @php
@@ -121,119 +122,166 @@
                                    
 
                                  
-                                    <form x-data="membershipForm()" @submit.prevent="submitForm" class="space-y-3">
-                                        {{-- NAME FIELDS --}}
-                                        <div class="grid grid-cols-2 gap-4 m-0 p-0">
-                                            <div class="space-y-1 m-0 p-0">
-                                                 <input class="input-base "  :class="{ 'border-red-500': errors.firstName, 'border-green-500': form.firstName && !errors.firstName }" placeholder="First Name" x-model="form.firstName"  @input="clearError('firstName')">
-                                                 <p class="text-red-500 text-sm" x-text="errors.firstName"></p>
-                                            </div>
-                                               <div class="space-y-1 m-0 p-0">
-                                                 <input class="input-base " :class="{ 'border-red-500': errors.lastName, 'border-green-500': form.lastName && !errors.lastName }" placeholder="Last Name" x-model="form.lastName" @input="clearError('lastName')">
-                                                 <p class="text-red-500 text-sm" x-text="errors.lastName"></p> 
-                                               </div>
-                                        </div>
-                                        <!-- EMAIL -->
-                                        <div>
-                                            <input type="email" class="input-base "
-                                                :class="{'border-red-500': errors.email}"
-                                                placeholder="Email" x-model="form.email" @input="clearError('email')">
-                                            <p class="text-red-500 text-sm" x-text="errors.email"></p>
-                                        </div>
-                                         <!-- PHONE -->
-                                        <div>
-                                            <input type="tel" class="input-base "
-                                                :class="{'border-red-500': errors.phone}"
-                                                placeholder="Phone" x-model="form.phone" @input="clearError('phone')">
-                                            <p class="text-red-500 text-sm" x-text="errors.phone"></p>
-                                        </div>
+                                   <div class="max-w-md mx-auto p-4">
 
-                                        <!-- PASSWORD -->
-                                        <div class="relative">
-                                            <input :type="showPass ? 'text' : 'password'" class="input-base "
-                                                :class="{'border-red-500': errors.password}"
-                                                placeholder="Password" x-model="form.password"  @input="clearError('password')">
-                                                <!-- Eye icon -->
-                                                    <button 
-                                                    type="button" 
-                                                    class="absolute right-3 top-3"
-                                                    @mousedown="showPass = true"
-                                                    @mouseup="showPass = false"
-                                                    @mouseleave="showPass = false"
-                                                >
-                                                    <i data-lucide="eye"
-                                                    :class="showPass ? 'text-green-700' : 'text-gray-400'"
-                                                    class="transition-colors duration-200">
-                                                    </i>
-                                                </button>
-                                            <p class="text-red-500 text-sm" x-text="errors.password"></p>
-                                        </div>
+    {{-- ================= LOGGED IN USER ================= --}}
+     @php
+    $isPopular = isset($plan['popular']) && $plan['popular'] === true;
+    @endphp
+    @auth
+    <div class="flex items-baseline justify-center">
+    <span class="text-5xl font-bold text-foreground">{{ $plan['price'] }}</span>
+    <span class="text-muted-foreground ml-2">{{ $plan['period'] }}</span>
+    </div>
+        <div class="p-5 border rounded-lg bg-gray-50 space-y-3">
+            <h2 class="text-xl font-bold text-green-700">
+                Welcome 👋 {{ auth()->user()->first_name }}
+            </h2>
 
-                                        <!-- CONFIRM PASSWORD -->
-                                        <div class="relative">
-                                            <input :type="showConfirm ? 'text' : 'password'" class="input-base "
-                                                :class="{'border-red-500': errors.confirmPassword}"
-                                                placeholder="Confirm Password" x-model="form.confirmPassword" @input="clearError('confirmPassword')">
-                                                 <!-- Eye icon -->
-                                                <button 
-                                                    type="button" 
-                                                    class="absolute right-3 top-3"
-                                                    @mousedown="showConfirm = true"
-                                                    @mouseup="showConfirm = false"
-                                                    @mouseleave="showConfirm = false"
-                                                >
-                                                    <i data-lucide="eye"
-                                                    :class="showConfirm ? 'text-green-700' : 'text-gray-400'"
-                                                    class="transition-colors duration-200">
-                                                    </i>
-                                                </button>
-                                            <p class="text-red-500 text-sm" x-text="errors.confirmPassword"></p>
-                                        </div>   
+            <div class="text-gray-700 space-y-1">
+                <p><strong>Name:</strong> {{ auth()->user()->first_name }}</p>
+                <p><strong>Email:</strong> {{ auth()->user()->email }}</p>
+            </div>
 
-                                        {{-- <input type="email" class="w-full border p-2 rounded" placeholder="Email" x-model="form.email"> --}}
+            <!-- Logout -->
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button
+                    type="submit"
+                    class="mt-3 w-full border border-red-500 text-red-600 py-2 rounded hover:bg-red-500 hover:text-white transition">
+                    Logout
+                </button>
+            </form>
+            <form method="POST" action="">
+            @csrf
 
-                                        {{-- <input type="tel" class="w-full border p-2 rounded" placeholder="Phone" x-model="form.phone">
-                                        <input type="password" class="w-full border p-2 rounded" placeholder="Password" x-model="form.password">
-                                        <input type="password" class="w-full border p-2 rounded" placeholder="Confirm Password" x-model="form.confirmPassword"> --}}
+            {{-- Selected plan info --}}
+            <input type="hidden" name="plan_name" value="{{ $plan['name'] }}">
+            <input type="hidden" name="price" value="{{ $plan['price'] }}">
+            <input type="hidden" name="period" value="{{ $plan['period'] }}">
+
+            <button
+                type="submit"
+                class="mt-3 w-full bg-primary text-white py-2 rounded hover:opacity-90 transition">
+                Proceed to Checkout 💳
+            </button>
+        </form>
+        </div>
+    @endauth
 
 
-                                        <div class="flex space-x-4 flex-row">
+    {{-- ================= GUEST USER ================= --}}
+    @guest
+        <form x-data="membershipForm()" @submit.prevent="submitForm" class="space-y-3">
 
-                                                <button type="submit"  class="w-1/2 bg-primary text-white py-2 rounded">
-                                                    Register Now
-                                                </button>
+            {{-- NAME --}}
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <input class="input-base"
+                        :class="{ 'border-red-500': errors.firstName }"
+                        placeholder="First Name"
+                        x-model="form.firstName"
+                        @input="clearError('firstName')">
+                    <p class="text-red-500 text-sm" x-text="errors.firstName"></p>
+                </div>
 
-                                                <button type="button" command="close" commandfor="dialog"  class="w-1/2 border py-2 rounded hover:bg-primary border-primary hover:text-primary-foreground">
-                                                    Cancel
-                                                </button>
-                                        </div>
-                                            <!-- SUCCESS MESSAGE -->
-                                            <p x-show="successMsg" class="text-green-600 font-semibold pt-2" x-text="successMsg"></p>
-                                        
-                                    </form>
-                                    
-                                </div>
+                <div>
+                    <input class="input-base"
+                        :class="{ 'border-red-500': errors.lastName }"
+                        placeholder="Last Name"
+                        x-model="form.lastName"
+                        @input="clearError('lastName')">
+                    <p class="text-red-500 text-sm" x-text="errors.lastName"></p>
+                </div>
+            </div>
 
-                                    
-                                </el-dialog-panel>
-                                </div>
-                            </dialog>
-                            </el-dialog>
- 
+            {{-- EMAIL --}}
+            <div>
+                <input type="email" class="input-base"
+                    :class="{ 'border-red-500': errors.email }"
+                    placeholder="Email"
+                    x-model="form.email"
+                    @input="clearError('email')">
+                <p class="text-red-500 text-sm" x-text="errors.email"></p>
+            </div>
 
-                            
+            {{-- PHONE --}}
+            <div>
+                <input type="tel" class="input-base"
+                    :class="{ 'border-red-500': errors.phone }"
+                    placeholder="Phone"
+                    x-model="form.phone"
+                    @input="clearError('phone')">
+                <p class="text-red-500 text-sm" x-text="errors.phone"></p>
+            </div>
 
+            {{-- PASSWORD --}}
+            <div class="relative">
+                <input :type="showPass ? 'text' : 'password'"
+                    class="input-base"
+                    :class="{ 'border-red-500': errors.password }"
+                    placeholder="Password"
+                    x-model="form.password"
+                    @input="clearError('password')">
 
+                <button type="button" class="absolute right-3 top-3"
+                    @mousedown="showPass = true"
+                    @mouseup="showPass = false"
+                    @mouseleave="showPass = false">
+                    <i data-lucide="eye"
+                        :class="showPass ? 'text-green-600' : 'text-gray-400'"></i>
+                </button>
 
-                        </div>
-                    </div>
-                        
+                <p class="text-red-500 text-sm" x-text="errors.password"></p>
+            </div>
 
-              </div>
+            {{-- CONFIRM PASSWORD --}}
+            <div class="relative">
+                <input :type="showConfirm ? 'text' : 'password'"
+                    class="input-base"
+                    :class="{ 'border-red-500': errors.confirmPassword }"
+                    placeholder="Confirm Password"
+                    x-model="form.confirmPassword"
+                    @input="clearError('confirmPassword')">
 
+                <button type="button" class="absolute right-3 top-3"
+                    @mousedown="showConfirm = true"
+                    @mouseup="showConfirm = false"
+                    @mouseleave="showConfirm = false">
+                    <i data-lucide="eye"
+                        :class="showConfirm ? 'text-green-600' : 'text-gray-400'"></i>
+                </button>
 
-              
+                <p class="text-red-500 text-sm" x-text="errors.confirmPassword"></p>
+            </div>
 
+            {{-- BUTTONS --}}
+            <div class="flex gap-3">
+                <button type="submit"
+                    class="w-1/2 bg-primary text-white py-2 rounded">
+                    Register Now
+                </button>
+
+                <button type="button"
+                    class="w-1/2 border border-primary py-2 rounded hover:bg-primary hover:text-white">
+                    Cancel
+                </button>
+            </div>
+
+            {{-- SUCCESS --}}
+            <p x-show="successMsg" class="text-green-600 font-semibold" x-text="successMsg"></p>
+
+        </form>
+    @endguest
+</div>
+</div>
+</el-dialog-panel>
+</div>
+</dialog>
+ </el-dialog>
+ </div>
+</div>
+ </div>
 <script>
 
 function openPlanModal(button) {
@@ -267,19 +315,6 @@ function openPlanModal(button) {
         clearError(field) {
             delete this.errors[field];
         },            
-        // resetForm() {
-        //     this.form = {
-        //         firstName: "",
-        //         lastName: "",
-        //         email: "",
-        //         phone: "",
-        //         password: "",
-        //         confirmPassword: ""
-        //     };
-        //     this.errors = {};
-        //     this.successMsg = "";
-        // },
-
         validate() 
         {
             this.errors = {};
@@ -334,34 +369,47 @@ function openPlanModal(button) {
         },
 
         submitForm() {
-            if (this.validate()) {
-                localStorage.setItem("memberData", JSON.stringify(this.form));
-                this.successMsg = "Form submitted successfully!";
-                console.log("Valid Form:", this.form);
+    if (!this.validate()) {
+        console.log("Validation errors:", this.errors);
+        return;
+    }
 
-
-                //after 30sec close the modal
-                setTimeout(() => {
-                    this.close();
-                    // add the attribute to hide the modal after 30sec
-                    document.getElementById('dialog').classList.add('hidden');
-                }, 30000);
-
-                // Optionally reset the form after submission
-                // this.form = {
-                //     firstName: "",            
-                //     lastName: "",
-                //     email: "",
-                //     phone: "",
-                //     password: "",
-                //     confirmPassword: ""
-                // };  
-                
-
-            } else {
-                console.log("Validation errors:", this.errors);
-            }
+    fetch('//membership/store', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document
+                .querySelector('meta[name="csrf-token"]')
+                .getAttribute('content')
         },
+        body: JSON.stringify(this.form)
+    })
+    .then(async res => {
+        const data = await res.json();
+        if (!res.ok) throw data;
+        return data;
+    })
+    .then(data => {
+        this.successMsg = data.message;
+
+        // 🔥 Redirect after success
+        if (data.redirect) {
+            setTimeout(() => {
+                window.location.href = data.redirect;
+            }, 1500);
+        }
+    })
+    .catch(err => {
+        if (err.errors) {
+            this.errors = err.errors; // Laravel validation errors
+        } else {
+            alert(err.message || 'Something went wrong');
+        }
+    });
+}
+
 
         close() {
             console.log("Modal closed.");

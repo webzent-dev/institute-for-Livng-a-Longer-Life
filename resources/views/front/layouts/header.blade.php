@@ -40,9 +40,50 @@
           <span class="absolute -top-1 -right-1 bg-gradient-to-r from-green-500 to-orange-400 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
         </a>
 
-        <a href="{{ url('/auth') }}" class="ml-4 px-4 py-2 border border-gray-300 rounded-md hover:bg-emerald-500 flex items-center">
-          <i data-lucide="log-in" class="mr-2 h-5 w-5"></i> Login
-        </a>
+        @guest
+    {{-- LOGIN BUTTON --}}
+    <a href="{{ url('/auth') }}"
+       class="ml-4 px-4 py-2 border border-gray-300 rounded-md hover:bg-emerald-500 flex items-center">
+        <i data-lucide="log-in" class="mr-2 h-5 w-5"></i>
+        Login
+    </a>
+@endguest
+
+
+@auth
+<div x-data="{ open: false }" class="relative ml-4">
+
+    <!-- USER BUTTON -->
+    <button
+        @click="open = !open"
+        class="px-4 py-2 border border-gray-300 rounded-md hover:bg-emerald-500 flex items-center"
+    >
+        <i data-lucide="user" class="mr-2 h-5 w-5"></i>
+        {{ auth()->user()->first_name }}
+        <i data-lucide="chevron-down" class="ml-2 h-4 w-4"></i>
+    </button>
+
+    <!-- DROPDOWN -->
+    <div
+        x-show="open"
+        @click.outside="open = false"
+        x-transition
+        class="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-md z-50"
+    >
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button
+                type="submit"
+                class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+            >
+                Logout
+            </button>
+        </form>
+    </div>
+
+</div>
+@endauth
+
 
         <a href="{{ url('/membership') }}" class="ml-4 px-5 py-2 rounded-md  text-white font-semibold hover:opacity-90" style="background-color:#14b989; ">
           Get Membership

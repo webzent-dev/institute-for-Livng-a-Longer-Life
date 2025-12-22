@@ -47,6 +47,10 @@ window.validators = {
             if (value.trim().length < 5) return "Minimum 5 characters";
             return true;
         },
+        gender(value) {
+            if (!value) return "Please select a gender";
+            return true;
+        },
 
     }
 };

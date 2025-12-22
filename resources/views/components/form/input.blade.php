@@ -1,9 +1,10 @@
-@props([ 'model' => '', 'placeholder' => '', 'type' => 'text', 'filter' => null  {{-- ex: filter="name" --}} ])
+@props([ 'model' => '', 'name' => '', 'placeholder' => '', 'type' => 'text', 'filter' => null  {{-- ex: filter="name" --}} ])
 
 
 <div class="space-y-1">
     <input
         type="{{ $type }}"
+        name="{{ $name}}"
         placeholder="{{ $placeholder }}"
         class="input-base"
         x-model="form.{{ $model }}"

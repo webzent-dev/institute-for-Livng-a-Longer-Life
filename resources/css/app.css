@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+
 @layer base {
   :root {
     /* Background & Foreground */
@@ -97,67 +100,13 @@
 }
 
 /* Base Styles */
+@layer base {
+  
+  /* Global font */
+  html, body {
+    font-family: 'Playfair Display', serif !important;
+  }
 
-@font-face {
-    font-family: 'Bellota Text';
-    src: url('/fonts/BellotaText-Regular.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Bellota Text';
-    src: url('/fonts/BellotaText-Bold.woff2') format('woff2');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Red Hat Display';
-    src: url('/fonts/RedHatDisplay-Regular.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Red Hat Display';
-    src: url('/fonts/RedHatDisplay-Medium.woff2') format('woff2');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Red Hat Display';
-    src: url('/fonts/RedHatDisplay-SemiBold.woff2') format('woff2');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Red Hat Display';
-    src: url('/fonts/RedHatDisplay-Bold.woff2') format('woff2');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-}
-/* Global Tailwind Base Override */
-/* @layer base {
-    h1, h2, h3, h4, h5, h6 {
-        @apply font-heading;
-    }
-
-    body, p, li, a, span, input, button, textarea, label {
-        @apply font-body;
-    }
-} */
-
-
-/* @layer base {
   * {
     @apply border-border;
   }
@@ -180,7 +129,9 @@
   h6 {
     @apply font-semibold;
   }
-} */
+}
+
+ 
 
 /* Gradient Utilities */
 .gradient-primary {
@@ -258,13 +209,9 @@
 
   /* Cards */
   .card {
-    @apply bg-card rounded-lg border border-border shadow-soft hover:shadow-medium transition-shadow duration-300;
+    @apply border-2 hover:border-primary transition-all shadow-soft hover:shadow-medium rounded-xl;
   }
-
-  .card-base {
-    @apply bg-card rounded-lg border border-border shadow-soft hover:shadow-medium transition-shadow duration-300;
-  }
-
+ 
 /* Shared button styles */
 .btn-base {
     @apply h-11 rounded-md px-8 w-full mt-8 flex items-center justify-center;
@@ -341,7 +288,10 @@
   }
 
   .heading-3 {
-    @apply text-2xl lg:text-3xl font-semibold;
+    @apply text-xl lg:text-2xl font-semibold;
+  }
+  .heading-4 {
+    @apply text-lg lg:text-xl font-semibold;
   }
 
   /* Premium Feature Badge */
@@ -369,10 +319,13 @@
     @apply grid place-items-center;
   }
 
-  /* Responsive Text */
+  /* Global Animation */
  
+.animate-on-view {
+    @apply opacity-0 motion-safe:animate-slide-up;
+  }
 
-
+  
 
   .text-clamp-sm {
     font-size: clamp(0.875rem, 2.5vw, 1.25rem);

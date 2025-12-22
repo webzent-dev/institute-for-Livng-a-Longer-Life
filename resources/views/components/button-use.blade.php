@@ -1,15 +1,20 @@
 
 @props([
-    'href'      => null,          // if present → render <a>
+    'href'      => null,
     'label'     => null,
-    'type'      => 'button',      // button type
+    'type'      => 'button',
     'id'        => null,
     'size'      => 'md',
     'variant'   => 'primary',
     'isPopular' => false,
     'class'     => 'font-semibold',
-    'icon'      => null,          // optional lucide icon
+    'icon'      => null,
+
+    // ✅ ADD ONLY THESE
+    'method'    => 'get',
+    'onclick'   => null,
 ])
+
 
 @php
     // Size classes
@@ -49,7 +54,32 @@
 {{-- ===================== --}}
 {{--    LINK VERSION        --}}
 {{-- ===================== --}}
-@if($href)
+@if($href && strtolower($method) !== 'get')
+    {{-- FORM LINK (POST, DELETE, etc.) --}}
+    <form
+        method="POST"
+        action="{{ $href }}"
+        class="inline"
+        @if($onclick) onsubmit="{{ $onclick }}" @endif
+    >
+        @csrf
+        @method(strtoupper($method))
+
+        <button
+            type="submit"
+            @if($id) id="{{ $id }}" @endif
+            {{ $attributes->merge(['class' => $classes]) }}
+        >
+            @if($icon)
+                <i data-lucide="{{ $icon }}" class="w-5 h-5"></i>
+            @endif
+
+            {{ $label ?? $slot }}
+        </button>
+    </form>
+
+@elseif($href)
+    {{-- NORMAL LINK --}}
     <a
         href="{{ $href }}"
         @if($id) id="{{ $id }}" @endif
@@ -61,6 +91,7 @@
 
         {{ $label ?? $slot }}
     </a>
+
 
 
 {{-- ===================== --}}

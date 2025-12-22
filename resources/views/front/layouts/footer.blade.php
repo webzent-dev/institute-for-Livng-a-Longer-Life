@@ -43,7 +43,7 @@
 
       <!-- Quick Links -->
       <div>
-        <h3 class="font-bold  text-gray-800 mb-4">Quick Links</h3>
+        <h3 class="text-2xl font-bold  text-gray-800 mb-4">Quick Links</h3>
         <ul class="space-y-2">
           @foreach ($quickLinks as $link)
             <li>
@@ -58,7 +58,7 @@
 
       <!-- Contact -->
       <div>
-        <h3 class="font-semibold text-gray-800 mb-4">Contact</h3>
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Contact</h3>
         <ul class="space-y-3">
           <li class="flex items-start gap-2">
              <div class="iconbg ">
@@ -67,7 +67,7 @@
             <a href="mailto:info@instituteforlivinglonger.com" class="hover:text-green-600 transition-colors">info@instituteforlivinglonger.com</a>
           </li>
           <li class="flex items-start gap-2 ">
-            {{-- <i data-lucide="phone" class="h-4 w-4 mr-2 mt-0.5 flex-shrink-0"></i> --}}
+           
             <div class="iconbg">
               <i data-lucide="map-pin" class="h-6 w-6   "></i>
             </div>
@@ -89,10 +89,7 @@
                                         </p>
                                         </a>
                                     </div>
-              {{-- <div>580 Park Avenue Suite 1E</div>
-              <div>New York, NY 10065</div>
-              <div class="pt-2">3103 Route 28</div>
-              <div>Shokan, NY 12481</div> --}}
+              
             </div>
           </li>
         </ul>
