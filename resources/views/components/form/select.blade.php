@@ -1,10 +1,10 @@
 @props([
     'label' => null,
-    'options' => [],         // array: [ ['value'=>1,'label'=>'Male'], ... ]
-    'multiple' => false,     // multiple select?
-    'checkbox' => false,     // show checkbox inside options?
+    'options' => [],         // [ ['value'=>1,'label'=>'Male'], ... ]
+    'multiple' => false,
+    'checkbox' => false,
     'placeholder' => 'Select...',
-    'search' => false,       // enable search bar?
+    'search' => false,
     'name' => 'select',
     'selected' => [],
     'class' => '',
@@ -16,28 +16,32 @@
         multiple: @js($multiple),
         checkbox: @js($checkbox),
         placeholder: '{{ $placeholder }}',
-        name: '{{ $name }}'
+        name: '{{ $name }}',
+        search: @js($search)
     })"
     class="w-full {{ $class }}">
 
     {{-- Label --}}
     @if($label)
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $label }}</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{ $label }}
+        </label>
     @endif
 
-    {{-- SELECT BOX --}}
+    {{-- Select box --}}
     <div @click="toggleDropdown"
          class="border rounded-xl px-4 py-2 flex items-center justify-between cursor-pointer bg-white">
         <span x-text="displayText()" class="text-gray-700"></span>
         <i data-lucide="chevron-down" class="w-5 h-5 text-gray-500"></i>
     </div>
 
-    {{-- DROPDOWN --}}
+    {{-- Dropdown --}}
     <div x-show="open"
+         x-transition
          @click.away="open=false"
          class="border rounded-xl bg-white mt-2 shadow-lg max-h-60 overflow-y-auto p-2 z-50">
 
-        {{-- SEARCH --}}
+        {{-- Search --}}
         <template x-if="searchEnabled">
             <input type="text"
                    x-model="search"
@@ -45,34 +49,32 @@
                    placeholder="Search..." />
         </template>
 
-        {{-- OPTIONS --}}
+        {{-- Options --}}
         <template x-for="item in filteredOptions()" :key="item.value">
             <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 cursor-pointer"
                  @click="select(item.value)">
 
-                {{-- Checkbox Mode --}}
                 <template x-if="checkbox">
                     <input type="checkbox"
                            :checked="selected.includes(item.value)"
                            class="w-4 h-4">
                 </template>
 
-                <span x-text="item.label" class="text-gray-800"></span>
+                <span x-text="item.label"></span>
             </div>
         </template>
     </div>
 
-    {{-- Hidden input for form --}}
+    {{-- Hidden inputs --}}
     <template x-if="!multiple">
         <input type="hidden" :name="name" :value="selected[0] ?? ''">
     </template>
 
     <template x-if="multiple">
-        <template x-for="v in selected">
+        <template x-for="v in selected" :key="v">
             <input type="hidden" :name="name + '[]'" :value="v">
         </template>
     </template>
-
 </div>
 
 <script>
@@ -85,7 +87,7 @@ function selectComponent(config) {
         checkbox: config.checkbox,
         placeholder: config.placeholder,
         name: config.name,
-        searchEnabled: config.search ?? false,
+        searchEnabled: config.search,
         search: '',
 
         toggleDropdown() {
@@ -94,7 +96,9 @@ function selectComponent(config) {
 
         filteredOptions() {
             if (!this.search) return this.options;
-            return this.options.filter(o => o.label.toLowerCase().includes(this.search.toLowerCase()));
+            return this.options.filter(o =>
+                o.label.toLowerCase().includes(this.search.toLowerCase())
+            );
         },
 
         select(value) {
@@ -109,15 +113,12 @@ function selectComponent(config) {
         },
 
         displayText() {
-            if (this.selected.length === 0) return this.placeholder;
-
-            let selectedLabels = this.options
+            if (!this.selected.length) return this.placeholder;
+            const labels = this.options
                 .filter(o => this.selected.includes(o.value))
                 .map(o => o.label);
-
-            return this.multiple ? selectedLabels.join(', ') : selectedLabels[0];
+            return this.multiple ? labels.join(', ') : labels[0];
         }
     }
 }
 </script>
-
