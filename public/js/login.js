@@ -1,49 +1,121 @@
 
+
 function login() {
+
     return {
-         showPass: "", 
 
-        form: { email: "", password: "",   },
+        showPass: false,
+ 
+        form: {
 
+            email: "",
+
+            password: "",
+
+        },
+ 
         errors: {},
+
         successMsg: "",
 
+        generalError: "",
+ 
         validateField(field) {
-            const rule = validators.rules[field];
-            if (!rule) return;
 
-            // dynamic arguments if needed
+            const rule = validators.rules[field];
+
+            if (!rule) return;
+ 
             const result = rule(this.form[field], this.form);
 
             this.errors[field] = result === true ? "" : result;
-        },
 
-        sanitizeField(field, filter) {
-            if (filter && validators.sanitize[filter]) {
-                this.form[field] = validators.sanitize[filter](this.form[field]);
-            }
         },
-
-        clearError(field) {
-            delete this.errors[field];
-        },
-
+ 
         validateAllFields() {
+
             Object.keys(this.form).forEach(field => this.validateField(field));
+
             return Object.values(this.errors).every(v => !v);
+
         },
+ 
+        async submitForm() {
 
-        submitForm() {
-            this.validateAllFields();
+            this.successMsg = "";
 
-            if (Object.keys(this.errors).length > 0) {
-                this.successMsg = "";
-                return;
+            this.generalError = "";
+
+            this.errors = {};
+ 
+            // 🔍 Client validation
+
+            if (!this.validateAllFields()) return;
+ 
+            try {
+
+                const response = await fetch("/login", {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type": "application/json",
+
+                        "Accept": "application/json",
+
+                        "X-CSRF-TOKEN": document
+
+                            .querySelector('meta[name="csrf-token"]')
+
+                            .getAttribute("content"),
+
+                    },
+
+                    body: JSON.stringify(this.form),
+
+                });
+ 
+                const data = await response.json();
+ 
+                if (!response.ok) {
+
+                    if (response.status === 422) {
+
+                        this.errors = data.errors;
+
+                    } else {
+
+                        this.generalError = data.message || "Invalid credentials";
+
+                    }
+
+                    return;
+
+                }
+ 
+                // ✅ Success
+
+                this.successMsg = data.message || "Login successful!";
+ 
+                // optional redirect
+
+                setTimeout(() => {
+
+                    window.location.href = "/";
+
+                }, 800);
+ 
+            } catch (e) {
+
+                this.generalError = "Server error. Please try again.";
+
             }
 
-            // Success
-            this.successMsg = "Login successful!";
-        } 
-    }
-}
+        }
 
+    }
+
+}
+ 
+ 

@@ -1,5 +1,5 @@
 @props([
-    'variant' => 'primary', // primary | success | danger | warning | gray
+    'variant' => 'primary', 
 ])
 
 @php
@@ -18,16 +18,4 @@ $styles = [
     {{ $slot }}
 </span>
 
-
-
-{{-- Usage Example --}}
-{{-- <x-ui.badge>Active</x-ui.badge>
-<x-ui.badge variant="success">Approved</x-ui.badge>
-<x-ui.badge variant="danger">Rejected</x-ui.badge>
-<x-ui.badge variant="warning">Pending</x-ui.badge>
-<x-ui.badge variant="gray">New</x-ui.badge> --}}
-
-{{-- <x-ui.badge variant="success">Active</x-ui.badge> --}}
-{{-- <x-ui.badge variant="danger">Inactive</x-ui.badge> --}}
-{{-- <x-ui.badge variant="warning">Pending</x-ui.badge> --}}
-{{-- <x-ui.badge variant="gray">New</x-ui.badge> --}}
+ 

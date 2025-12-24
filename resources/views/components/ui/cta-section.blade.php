@@ -1,96 +1,96 @@
 @props([
-    'title' => 'Your CTA Title',
-    'subtitle' => null,
-    'buttons' => [],                 // Array of buttons → full dynamic
-    'cardClass' => 'shadow-strong',  // Extra card classes
-    'align' => 'center',             // left | center
-    'padding' => 'p-10',              
-    'container' => 'max-w-4xl',
-     'icon' => null,               // <— accept icon or null
-    'iconBg' => 'iconbg',   // class for icon color
-    'iconSize' => 'w-10 h-10',
-    'image' => null,   
-    'onclick' => null, 
-    'type' => 'button',
-    
+    'title'      => 'Your CTA Title',
+    'subtitle'   => null,
+    'buttons'    => [],
+    'cardClass'  => 'shadow-strong',
+    'align'      => 'center',
+    'padding'    => 'p-10',
+    'container'  => 'max-w-4xl',
+
+    // Icon settings
+    'icon'       => null,           // Lucide icon name
+    'iconBg'     => 'bg-primary/10',
+    'iconSize'   => 'w-12 h-12',
+
+    // Optional image instead of icon
+    'image'      => null,
 ])
 
-<section class="py-20 gradient-subtle">
+<section class="section-base py-20 gradient-subtle">
     <div class="{{ $container }} mx-auto px-4 sm:px-6 lg:px-8">
-
+        
         <x-card class="{{ $cardClass }}">
 
             <div class="{{ $padding }} text-{{ $align }}">
 
-                 {{-- ICON (OPTIONAL) --}}
-                
+                {{-- ICON (optional) --}}
                 @if($icon)
-                    <div class="iconbg w-20 h-20 rounded-full mb-4 ">
-                    
-                            <i data-lucide="{{ $icon }}" class=" {{ $iconSize }}"  > </i>
-                      
-                    </div>
-                @endif
-                @if($image)
                     <div class="flex justify-center mb-6">
-                       
-                            <img src="{{ $image }}" class="{{ $iconBg }} {{ $iconSize }}" alt="icon">
-                        
+                        <div class="{{ $iconBg }} p-4 rounded-full inline-flex items-center justify-center">
+                            <i data-lucide="{{ $icon }}" class="{{ $iconSize }} text-primary"></i>
+                        </div>
                     </div>
                 @endif
 
-                {{-- TITLE  --}}
+                {{-- IMAGE (optional) --}}
+                @if($image)
+                    <div class="flex justify-center mb-6">
+                        <img src="{{ $image }}" class="{{ $iconSize }}" alt="CTA Image">
+                    </div>
+                @endif
+
+                {{-- TITLE --}}
                 @if($title)
-                    <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-6">
+                    <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-4">
                         {{ $title }}
                     </h2>
                 @endif
 
-                {{-- SUBTITLE  --}}
+                {{-- SUBTITLE --}}
                 @if($subtitle)
                     <p class="text-xl text-muted-foreground mb-8">
                         {{ $subtitle }}
                     </p>
                 @endif
 
+                {{-- CUSTOM SLOT CONTENT (pricing etc.) --}}
+                @if (isset($slot) && trim($slot) !== '')
+                    <div class="mb-8">
+                        {{ $slot }}
+                    </div>
+                @endif
+
                 {{-- BUTTON GROUP --}}
                 <div class="flex flex-col sm:flex-row gap-4 justify-{{ $align == 'center' ? 'center' : 'start' }}">
                     @foreach ($buttons as $btn)
-                        <div class="max-w-xl">
-                           {{-- @foreach($btn as $b) <p> {{ $b }} </p>@endforeach --}}
-                            @php
-                                $href = $btn['href'] ?? null;
+                        
+                        @php
+                            $href = $btn['href'] ?? null;
+                            if(isset($btn['route'])) {
+                                $href = route($btn['route'], $btn['params'] ?? []);
+                            }
 
-                                // If route() is passed, build the URL
-                                if(isset($btn['route'])) {
-                                    $href = route($btn['route'], $btn['params'] ?? []);
-                                }
+                            $label       = $btn['label'] ?? 'Click';
+                            $variant     = $btn['variant'] ?? 'primary';
+                            $iconBtn     = $btn['icon'] ?? null;
+                            $customClass = $btn['class'] ?? '';
+                            $onclick     = $btn['onclick'] ?? null;
+                            $type        = $btn['type'] ?? 'button';
+                        @endphp
 
-                                $label = $btn['label'] ?? 'Click';
-                                $variant = $btn['variant'] ?? 'primary';
-                                $customClass = $btn['class'] ?? '';
-                                $onclick = $btn['onclick'] ?? null;
-                                $class = $btn['class'] ?? '';
-                                $icon = $btn['icon'] ?? null;
-                            @endphp
-                            
-                            <x-button-use
-                                :href="$href" 
-                                :icon="$icon"
-                                :label="$label"
-                                :variant="$variant"
-                                :class="$customClass"
-                                :onclick="$onclick"
-                                :type="($btn['type'] ?? 'button')"
-                            />
-                        </div>
+                        <x-button-use
+                            :href="$href"
+                            :icon="$iconBtn"
+                            :label="$label"
+                            :variant="$variant"
+                            :class="$customClass"
+                            :onclick="$onclick"
+                            :type="$type"
+                        />
                     @endforeach
-                </div> 
+                </div>
+
             </div>
-
         </x-card>
-
     </div>
 </section>
- 
-
