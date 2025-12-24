@@ -107,7 +107,7 @@
                             <x-card-content>
                                      
                                <div x-data="contactForm()" @submit.prevent="submitForm">     
-                                    <form class="space-y-6" method="POST" action="">
+                                    <form class="space-y-6 " method="POST" action="">
                                         @csrf
 
                                         <div class="grid md:grid-cols-2 gap-6">
@@ -175,7 +175,7 @@
             </div>
         </section>
  
-            {{-- embedded Maps  --}}
+         
                 
                 <x-maps-grid />
 

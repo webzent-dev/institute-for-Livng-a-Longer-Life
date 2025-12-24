@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "@tailwindplus/elements": "^1.0.19",
+        "alpinejs": "^3.15.3",
         "chart.js": "^4.5.1"
     }
 }

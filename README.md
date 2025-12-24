@@ -64,3 +64,24 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+## Animation use steps
+Use Everywhere (Examples) 
+ <x-ui.cta-section class="animate-on-view"/>
+ Cards <div class="animate-on-view delay-150">
+Modal <div class="motion-safe:animate-scale">
+Toast <div class="motion-safe:animate-pop">
+STEP 6 — Responsive Animation Control  
+<div class=" opacity-0 motion-safe:animate-slide-up md:motion-safe:animate-slide-left">
+Delay Control (Staggered Animations) 
+<div class="animate-slide-up delay-100"></div>
+<div class="animate-slide-up delay-200"></div>
+<div class="animate-slide-up delay-300"></div>
+
+
+
+
+
+
+

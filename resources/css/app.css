@@ -209,13 +209,9 @@
 
   /* Cards */
   .card {
-    @apply bg-card rounded-lg border border-border shadow-soft hover:shadow-medium transition-shadow duration-300;
+    @apply border-2 hover:border-primary transition-all shadow-soft hover:shadow-medium rounded-xl;
   }
-
-  .card-base {
-    @apply bg-card rounded-lg border border-border shadow-soft hover:shadow-medium transition-shadow duration-300;
-  }
-
+ 
 /* Shared button styles */
 .btn-base {
     @apply h-11 rounded-md px-8 w-full mt-8 flex items-center justify-center;
@@ -292,7 +288,10 @@
   }
 
   .heading-3 {
-    @apply text-2xl lg:text-3xl font-semibold;
+    @apply text-xl lg:text-2xl font-semibold;
+  }
+  .heading-4 {
+    @apply text-lg lg:text-xl font-semibold;
   }
 
   /* Premium Feature Badge */
@@ -320,10 +319,13 @@
     @apply grid place-items-center;
   }
 
-  /* Responsive Text */
+  /* Global Animation */
  
+.animate-on-view {
+    @apply opacity-0 motion-safe:animate-slide-up;
+  }
 
-
+  
 
   .text-clamp-sm {
     font-size: clamp(0.875rem, 2.5vw, 1.25rem);

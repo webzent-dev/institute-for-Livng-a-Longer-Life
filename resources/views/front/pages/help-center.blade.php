@@ -122,14 +122,14 @@
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 
                     @foreach ($helpTopics as $topic)
-                        <x-card class="border-2 hover:border-primary transition-all shadow-soft hover:shadow-medium">
+                        <x-card class="">
 
                             <x-card-header>
-                                <div class="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center mb-4">
+                                <div class="w-14 h-14 iconbg mb-4">
                                     <i data-lucide="{{ $topic['icon'] }}" class="h-7 w-7 text-primary-foreground" ></i>
                                 </div>
 
-                                <x-card-title class="text-xl mb-2">
+                                <x-card-title class="heading-4 mb-2">
                                     {{ $topic['title'] }}
                                 </x-card-title>
 
@@ -166,7 +166,7 @@
                 <x-card class="shadow-strong">
 
                     <x-card-header class="text-center">
-                        <x-card-title class="text-3xl mb-4">Quick Start Guide</x-card-title>
+                        <x-card-title class="text-3xl  mb-4">Quick Start Guide</x-card-title>
                         <p class="text-muted-foreground">
                             New to the platform? Follow these simple steps to get started
                         </p>
@@ -204,7 +204,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-foreground mb-4">Need More Help?</h2>
+                    <h2 class="text-3xl font-bold text-foreground mb-4">Need More Help<span class="text-primary">?</sapan></h2>
                     <p class="text-xl text-muted-foreground">Our support team is ready to assist you</p>
                 </div>
 

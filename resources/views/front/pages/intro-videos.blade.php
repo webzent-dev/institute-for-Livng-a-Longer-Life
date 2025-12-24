@@ -103,7 +103,7 @@
                 <div class="grid md:grid-cols-2 gap-8 mb-12">
                     @foreach ($videos as $video)
                         @if ($video['featured'])
-                            <x-card class="border-2 border-primary shadow-medium hover:shadow-strong transition-all">
+                            <x-card class="">
 
                                     <x-card-header>
                                         <div class="aspect-video bg-gradient-to-tr  from-green-100 to-amber-100 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
@@ -168,7 +168,7 @@
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach ($videos as $video)
                      
-                            <x-card class="border-2   hover:border-primary transition-all shadow-soft hover:shadow-medium">
+                            <x-card class="">
                                 <x-card-header class="pb-4 ">
                                     <div class="aspect-video bg-gradient-to-tr  from-green-50 to-amber-100  rounded-lg mb-4 flex items-center justify-center relative">
                                         <div class="w-16 h-16 rounded-full gradient-primary flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">

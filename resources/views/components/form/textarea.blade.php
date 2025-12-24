@@ -13,7 +13,7 @@
 
         x-model="form.{{ $model }}"
 
-        {{-- Sanitize if filter exists --}}
+        
         @if($filter)
             @input="sanitizeField('{{ $model }}', '{{ $filter }}'); validateField('{{ $model }}')"
         @else

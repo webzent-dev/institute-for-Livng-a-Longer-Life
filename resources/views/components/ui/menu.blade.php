@@ -11,14 +11,6 @@
         {{ $slot }}
     </div>
 </div>
-
-{{-- how to use --}}
-{{-- <x-ui.menu>
-    <x-slot name="trigger">Menu</x-slot>
-
-    <a class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-    <a class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-    <a class="block px-4 py-2 hover:bg-gray-100">Logout</a>
-</x-ui.menu> --}}
+ 
 
 

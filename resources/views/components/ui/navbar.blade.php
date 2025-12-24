@@ -17,10 +17,7 @@
 
     <div class="flex items-center space-x-4">
 
-        {{-- Theme Switch --}}
-        <x-ui.theme-switch />
-
-        {{-- Notifications Icon --}}
+        
         <button @click="notifications.toggle()" class="relative">
             <i data-lucide="bell"></i>
             <span 
@@ -51,6 +48,3 @@
     </div>
 
 </header>
-{{-- how to use --}}
-
-{{-- <x-ui.navbar /> --}}

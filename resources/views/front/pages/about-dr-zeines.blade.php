@@ -47,14 +47,14 @@
             <div class="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-8 px-4">
 
                 @foreach($credentials as $c)
-                    <x-card class="border-2 card-benefit  bg-white  transition-all duration-300 p-2 rounded-xl shadow hover:border-emerald-500 hover:border-[1px] equal-height">
+                    <x-card class=" equal-height">
                         <x-card-content class="space-y-4">
 
-                            <div class="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center mb-4 bg-emerald-500 ">
+                            <div class="iconbg w-14 h-14  ">
                                 <i data-lucide="{{ $c['icon'] }}" class="w-7 h-7 text-primary-foreground"></i>
                             </div>
 
-                            <h3 class="text-xl font-semibold text-foreground text-teal-950">
+                            <h3 class="heading-3 text-teal-950">
                                 {{ $c['title'] }}
                             </h3>
 
@@ -133,13 +133,13 @@
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
 
                     @foreach($principles as $p)
-                        <x-card class="border-2 shadow-md hover:shadow-medium hover:border-emerald-600 hover:border-[1px] transition ">
+                        <x-card class="equal-height ">
                             <x-card-content>
                                 <div class="text-5xl font-bold   bg-emerald-500 text-transparent bg-clip-text  mb-4">
                                     {{ $p[0] }}
                                 </div>
 
-                                <h3 class="text-xl font-semibold text-foreground mb-2 text-teal-950">
+                                <h3 class="heading-3 text-teal-950">
                                     {{ $p[1] }}
                                 </h3>
 
