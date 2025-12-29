@@ -12,8 +12,6 @@ use App\Http\Controllers\Front\ShopController;
 use App\Http\Controllers\Front\VitalBoostController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\UserRegister;
-
-use App\Models\User;
  
 
 Route::get('/', [IndexController::class, 'index'] );    
@@ -26,6 +24,8 @@ Route::get('/auth', [LoginController::class, 'showLoginForm'])->name('auth');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/contact', [ContactController::class, 'index'] )->name('contact');
+Route::post('contact/store', [ContactController::class, 'store'])->name('contact.store');
+Route::post('/newsletter/subscribe', [ContactController::class, 'subscribe'])->name('newsletter.subscribe');
 Route::get('/testimonials', [TestimonialsController::class, 'index'] )->name('testimonials');
 Route::get('/faq', [FAQController::class, 'index'] )->name('faq');
 Route::get('/help-center', [HelpCenterController::class, 'helpcenter'] )->name('help-center');
