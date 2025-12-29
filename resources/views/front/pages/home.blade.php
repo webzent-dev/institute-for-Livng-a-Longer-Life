@@ -671,43 +671,59 @@
                         <strong class="heading-4">Community Support:<br></strong> Be part of a community that uplifts and motivates each other towards a healthier, happier life.
                     </p>
                     </div>
-                    
+                    @if(session('success'))
+                    <div class="bg-green-100 text-green-700 px-4 py-3 rounded mb-4 text-center">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                    <form action="{{ route('newsletter.subscribe') }}" method="POST" class="space-y-4">
+                    @csrf
 
-                   
-                    <form action="" method="POST" class="space-y-4">
-                        @csrf
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            
-
-                             <x-form.input model="firstName" placeholder="First Name"  name="firstName"  />
-                             <x-form.input model="lastName" placeholder="Last Name"  name="lastName"  />
-
-                             
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <x-form.input name="firstName" placeholder="First Name" />
+                            @error('firstName')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
- 
-                          <x-form.input model="email" placeholder="Email..."  name="email"  />
-                         
-                          <x-form.select
-                               
-                              name="gender"
-                              :options="[
-                                  ['value'=>'not','label'=>'Not specified'],
-                                  ['value'=>'woman','label'=>'Woman'],
-                                  ['value'=>'man','label'=>'Man'],
-                              ]"
-                          />
 
+                        <div>
+                            <x-form.input name="lastName" placeholder="Last Name" />
+                            @error('lastName')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
 
+                    <div>
+                        <x-form.input name="email" placeholder="Email..." />
+                        @error('email')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                          <div class="flex justify-center mt-12 ">
-                              <x-button-use href="" type="submit" variant="outline" size="lg" icon="arrow-right" class="bg-accent hover:bg-gray-600 shadow-md text-white">
-                                 Subscribe
-                              </x-button-use>
-                          </div>
+                    <div>
+                        <x-form.select
+                            name="gender"
+                            :options="[
+                                ['value'=>'not','label'=>'Not specified'],
+                                ['value'=>'woman','label'=>'Woman'],
+                                ['value'=>'man','label'=>'Man'],
+                            ]"
+                        />
+                        @error('gender')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
+                    <div class="flex justify-center mt-12">
+                        <x-button-use type="submit" variant="outline" size="lg"
+                            class="bg-accent hover:bg-gray-600 shadow-md text-white">
+                            Subscribe
+                        </x-button-use>
+                    </div>
+                </form>
 
-                    </form>
 
                 </div>
             </div>

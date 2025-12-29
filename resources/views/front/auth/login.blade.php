@@ -14,7 +14,7 @@
                     Sign in to your account or create a new one
 </p>
  
-                <!-- Tabs -->
+                <!-- Tabs   fdjfdj  -->
 <div x-data="{ tab: 'signin' }">
 <div class="grid grid-cols-2 mb-4 bg-gray-100 rounded-lg">
 <button class="py-2 flex items-center justify-center"
