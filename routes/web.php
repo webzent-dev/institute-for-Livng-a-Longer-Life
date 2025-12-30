@@ -12,7 +12,25 @@ use App\Http\Controllers\Front\ShopController;
 use App\Http\Controllers\Front\VitalBoostController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\UserRegister;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Middleware\RoleMiddleware;
  
+// admin routes
+
+Route::get('/admin', [AdminController::class, 'index']);
+Route::post('/admin/login', [LoginController::class, 'adminLogin'])->name('admin.login');
+
+Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(function () {
+    Route::get('dashboard', [DashboardController::class, 'index'])
+        ->name('admin.dashboard');
+
+    // Yahan aur admin routes add kar sakte ho
+    // Route::get('users', [DashboardController::class, 'users'])->name('admin.users');
+    // Route::get('settings', [DashboardController::class, 'settings'])->name('admin.settings');
+});
+
+// Admin Routes closures
+
 
 Route::get('/', [IndexController::class, 'index'] );    
 Route::get('/about-dr-zeines',[AboutController::class, 'aboutZeines'] )->name('about-dr-zeines');
@@ -38,7 +56,8 @@ Route::resource('testimonial', TestimonialsController::class);
 Route::resource('faq', FAQController::class);
 
 
-    Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+
     Route::get('admin/dashboard/home', [DashboardController::class, 'home'])->name('admin/dashboard/home');
     Route::get('admin/member', [DashboardController::class, 'member'])->name('dashboard');
     Route::get('/das', fn () => view('components.dashboard.sidebar.das'))

@@ -678,19 +678,18 @@
                 @endif
                     <form action="{{ route('newsletter.subscribe') }}" method="POST" class="space-y-4">
                     @csrf
-
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <x-form.input name="firstName" placeholder="First Name" />
                             @error('firstName')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-800 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
                             <x-form.input name="lastName" placeholder="Last Name" />
                             @error('lastName')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-800 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
@@ -698,7 +697,7 @@
                     <div>
                         <x-form.input name="email" placeholder="Email..." />
                         @error('email')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-800 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -712,7 +711,7 @@
                             ]"
                         />
                         @error('gender')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-800 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -728,10 +727,6 @@
                 </div>
             </div>
         </section>
-
-
-
-
     <!-- CTA Section -->
     <section class="section-base py-10   text-center bg-white">
           <div class="container-base max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8 bg-gray-50 ">
@@ -746,13 +741,8 @@
               <i data-lucide="arrow-right" class="ml-2 w-5 h-5"></i>
             </a>
               </div>
-
-              
           </div>
       </section>
- 
- 
-
 </main>
 @endsection
 

@@ -16,7 +16,7 @@
                 
             </div>
             <span class="ml-2 font-semibold text-slate-800">
-                Welcome back <br><span class="text-primary">Dr. Zeines</span>
+            Welcome back <br><span class="text-primary">{{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}</span>
             </span>
         </div>
     </div>
@@ -50,8 +50,8 @@
                 {{ strtoupper(substr(auth()->user()->name,0,2)) }}
             </div>
             <div class="min-w-0">
-                <p class="font-medium truncate text-primary">Dr. Zeines</p>
-                <p class="text-sm text-slate-500 truncate">info@instituteforlivinglonger.com</p>
+                <p class="font-medium truncate text-primary">{{ auth()->user()->name }}</p>
+                <p class="text-sm text-slate-500 truncate">{{ auth()->user()->email }}</p>
                 <p class="font-medium truncate">{{ auth()->user()->name }}</p>
                 <p class="text-sm text-slate-500 truncate">{{ auth()->user()->email }}</p>
             </div> --}}
