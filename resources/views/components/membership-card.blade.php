@@ -33,7 +33,6 @@
                             <ul class="space-y-3">
                                 @foreach($plan['features'] as $feature)
                                 <li class="flex items-start">
-                                    
                                     <i data-lucide="check-circle" class="w-5 h-5 text-primary flex-shrink-0 mr-2 "></i>
                                     <span class="text-muted-foreground text-sm">{{ $feature }}</span>
                                 </li>
