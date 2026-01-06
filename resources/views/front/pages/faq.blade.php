@@ -19,7 +19,7 @@
                 </p>
             </div>
         </section>
-        {{-- FAQ SECTION --}}
+       
         <section class="py-20 bg-gray-50">
             <div class="max-w-4xl mx-auto px-6 space-y-10">
 
