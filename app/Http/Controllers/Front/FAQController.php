@@ -19,7 +19,7 @@ class FAQController extends Controller
 
             'questions' => $category->faqs->map(function ($faq) {
                 return [
-                    'q' => $faq->question, // 👈 IMPORTANT
+                    'q' => $faq->question, 
                     'a' => $faq->answer,   // 👈 IMPORTANT
                 ];
             })->toArray(),
