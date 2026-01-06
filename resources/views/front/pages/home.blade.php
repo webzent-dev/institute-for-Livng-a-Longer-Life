@@ -1,11 +1,7 @@
 
 @extends('front.layouts.app')
-
 @section('content')
-<main class="flex-1  font-jakarta">
-
-      
-           
+<main class="flex-1  font-jakarta">     
           <section class="section-base relative overflow-hidden mb-0">
               <div class="container-base ">
                   

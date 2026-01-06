@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Front\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 class LoginController extends Controller
 {
     public function showLoginForm()
@@ -18,7 +17,6 @@ class LoginController extends Controller
     'email' => 'required|email',
     'password' => 'required',
 ]);
-
 
 if (!Auth::attempt([
     'email' => $request->email,
@@ -53,7 +51,6 @@ return response()->json([
         $request->session()->regenerate();
         return redirect()->route('admin.dashboard')->with('success', 'Welcome Admin! Login successful.');
     }
-
     return back()->with('error', 'Invalid credentials or enter valid  credentials.')->withInput();
    }
 
