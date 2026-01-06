@@ -105,68 +105,121 @@
                             </x-card-header>
 
                             <x-card-content>
-                                     
-                               <div x-data="contactForm()" @submit.prevent="submitForm">     
-                                    <form class="space-y-6 " method="POST" action="">
-                                        @csrf
 
-                                        <div class="grid md:grid-cols-2 gap-6">
+   <form method="POST" action="{{ route('contact.store') }}" class="space-y-6">
+    @csrf
 
-                                             
-                                            <div class="space-y-2">
-                                                <label for="firstName" class="font-medium">First Name *</label>
-                                                
-                                                <x-form.input model="firstName" placeholder="John" />
-                                            </div>
+    {{-- GLOBAL SUCCESS MESSAGE --}}
+   @if (session('success'))
+    <p class="text-green-600 text-center text-xl font-semibold">
+        {{ session('success') }}
+    </p>
+@endif
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+            <label class="font-medium">First Name *</label>
+            <x-form.input
+                type="text"
+                name="first_name"
+                placeholder="John"
+                value="{{ old('first_name') }}"
+                required
+            />
+            @error('first_name')
+                <p class="text-red-500 text-sm">{{ $message }}</p>
+            @enderror
+        </div>
 
-                                           
-                                            <div class="space-y-2">
-                                                <label for="lastName" class="font-medium">Last Name *</label>
-                                                <x-form.input model="lastName" placeholder="Doe" />
-                                              
-                                            </div>
+        <div class="space-y-2">
+            <label class="font-medium">Last Name *</label>
+            <x-form.input
+                type="text"
+                name="last_name"
+                placeholder="Doe"
+                value="{{ old('last_name') }}"
+                required
+            />
+            @error('last_name')
+                <p class="text-red-500 text-sm">{{ $message }}</p>
+            @enderror
+        </div>
+    </div>
 
-                                        </div>
+    <div class="space-y-2">
+        <label class="font-medium">Email Address *</label>
+        <x-form.input
+            type="email"
+            name="email"
+            placeholder="john@example.com"
+            value="{{ old('email') }}"
+            required
+        />
+        @error('email')
+            <p class="text-red-500 text-sm">{{ $message }}</p>
+        @enderror
+    </div>
 
-                                       
-                                        <div class="space-y-2">
-                                            <label for="email" class="font-medium">Email Address *</label>
-                                             
-                                            <x-form.input model="email" placeholder="john@example.com" type="email" />
-                                        </div>
+    <div class="space-y-2">
+    <label class="font-medium" for="phone">Phone Number</label>
+    <input
+        type="tel"
+        id="phone"
+        name="phone"
+        value="{{ old('phone') }}"
+        class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:ring focus:ring-primary/30"
+        placeholder="(555) 123-4567"
+    />
+    @error('phone')
+        <p class="text-red-500 text-sm">{{ $message }}</p>
+    @enderror
+</div>
 
-                                
-                                        <div class="space-y-2">
-                                            <label for="phone" class="font-medium">Phone Number</label>
-                                            
-                                            <x-form.input model="phone" placeholder="(555) 123-4567" type="tel" />
-                                        </div>
+    <div class="space-y-2">
+        <label class="font-medium">Subject *</label>
+        <x-form.input
+            type="text"
+            name="subject"
+            value="{{ old('subject') }}"
+            required
+        />
+        @error('subject')
+            <p class="text-red-500 text-sm">{{ $message }}</p>
+        @enderror
+    </div>
 
-                                 
-                                        <div class="space-y-2">
-                                            <label for="subject" class="font-medium">Subject *</label>
-                                           
-                                            <x-form.input model="subject" placeholder="How can we help you?" />
-                                        </div>
- 
-                                        <div class="space-y-2">
-                                            <label for="subject" class="font-medium">Message *</label>
-                                            <x-form.textarea model="description" placeholder="Please provide details about your inquiry..." />
-                                        </div>
+  <div class="space-y-2">
+    <label class="font-medium" for="description">Message *</label>
+    
+    <textarea 
+        id="description" 
+        name="description" 
+        rows="4" 
+        class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:ring focus:ring-primary/30" 
+        
+    >{{ old('description') }}</textarea>
 
-                                        
+    @error('description')
+        <p class="text-red-500 text-sm">{{ $message }}</p>
+    @enderror
+</div>
 
-                                        <div class="grid grid-cols-1 gap-2 ">
-                                            <x-button-use type="submit" full="true" class="btn-hero lg py-3 flex items-center justify-center gap-2">
-                                            <i data-lucide="send" class="w-5 h-5"></i>
-                                            Send Message</x-button-use>
-                                            
-                                        </div>
-                                       
+    <div class="grid grid-cols-1 gap-2">
+        <x-button-use
+            type="submit"
+            full="true"
+            class="btn-hero lg py-3 flex items-center justify-center gap-2">
+            <i data-lucide="send" class="w-5 h-5"></i>
+            Send Message
+        </x-button-use>
+    </div>
+</form>
 
-                                    </form>
-                                </div>    
-                            </x-card-content>
+
+
+
+    </div>
+</x-card-content>
+
 
                         </x-card>
                     </div>
@@ -200,4 +253,10 @@
  
 
 </div>
+
+
+
 @endsection
+
+
+

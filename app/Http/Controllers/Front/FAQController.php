@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Front;
-
+use App\Models\FaqCategory;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -10,8 +10,24 @@ class FAQController extends Controller
      
     public function index()
     {
-      
-        return view('front.pages.faq');
+        $faqs = FaqCategory::with(['faqs' => function ($q) {
+        $q->where('status', true);
+    }])->get()->map(function ($category) {
+
+        return [
+            'category' => $category->name,
+
+            'questions' => $category->faqs->map(function ($faq) {
+                return [
+                    'q' => $faq->question, 
+                    'a' => $faq->answer,   // 👈 IMPORTANT
+                ];
+            })->toArray(),
+
+        ];
+
+    })->toArray();
+        return view('front.pages.faq', compact('faqs'));
     }
 
      

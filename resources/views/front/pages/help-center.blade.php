@@ -3,96 +3,6 @@
 @section('content')
 
 <div class="min-h-screen flex flex-col">
-   @php
-    $helpTopics = [
-      [
-        'icon' => 'Book',
-        'title' => "Getting Started",
-        'description' => "Learn how to set up your account and navigate the platform",
-        'articles' => [
-          "Creating Your Account",
-          "Navigating the Member Dashboard",
-          "Accessing Your First Course",
-          "Setting Up Your Profile"
-        ]
-      ],
-      [
-        'icon' => 'Video',
-        'title' => "Video Content",
-        'description' => "Everything about accessing and watching our educational content",
-        'articles' => [
-          "How to Access Pre-Recorded Lectures",
-          "Viewing Live Zoom Sessions",
-          "Downloading Content for Offline Viewing",
-          "Video Playback Troubleshooting"
-        ]
-      ],
-      [
-        'icon' => 'credit-card',
-        'title' => "Billing & Payments",
-        'description' => "Manage your subscription and payment information",
-        'articles' => [
-          "Understanding Membership Plans",
-          "Updating Payment Information",
-          "Upgrading or Downgrading Membership",
-          "Cancellation and Refund Policy"
-        ]
-      ],
-      [
-        'icon' => 'Users',
-        'title' => "Community & Live Sessions",
-        'description' => "Connect with other members and join live events",
-        'articles' => [
-          "Joining Live Zoom Sessions",
-          "Asking Questions During Q&A",
-          "Connecting with Other Members",
-          "Upcoming Events Calendar"
-        ]
-      ],
-      [
-        'icon' => 'Settings',
-        'title' => "Account Management",
-        'description' => "Control your account settings and preferences",
-        'articles' => [
-          "Updating Personal Information",
-          "Changing Password",
-          "Email Notification Settings",
-          "Privacy and Data Settings"
-        ]
-      ],
-      [
-        'icon' => 'life-buoy',
-        'title' => "Troubleshooting",
-        'description' => "Common issues and how to resolve them",
-        'articles' => [
-          "Login Problems",
-          "Video Won't Play",
-          "Payment Declined",
-          "Email Not Received"
-        ]
-      ]
-    ];
-
-   $contactOptions = [
-      [
-        'type' => 'mail',
-        'icon' => 'mail',
-        'title' => "Email Support",
-        'description' => "Get help via email",
-        'contact' => "support@livinglonger.com",
-        'note' => "Response within 24 hours"
-      ],
-      [
-        'type' => 'phone',
-        'icon' => 'phone',
-        'title' => "Phone Support",
-        'description' => "Speak with our team",
-        'contact' => "(555) 123-4567",
-        'note' => "Mon-Fri, 9am-5pm EST"
-      ]
-    ];
-
-   @endphp
 
     <main class="flex-1">
 
@@ -310,35 +220,37 @@
 
                 <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
 
-                        @foreach ($contactOptions as $option)
-                            <x-card class="shadow-medium">
-                                <x-card-content class="p-8 text-center">
+                       @foreach ($contactOptions as $option)
+                        <x-card class="shadow-medium">
+                            <x-card-content class="p-8 text-center">
 
-                                    <div class="w-16 h-16 rounded-full gradient-primary flex items-center justify-center mx-auto mb-4">
-                                        <i data-lucide="{{ $option['icon'] }}" class="h-8 w-8 text-primary-foreground" ></i>
-                                    </div>
+                                <div class="w-16 h-16 rounded-full gradient-primary flex items-center justify-center mx-auto mb-4">
+                                    <i data-lucide="{{ $option['icon'] }}"
+                                    class="h-8 w-8 text-primary-foreground"></i>
+                                </div>
 
-                                    <h3 class="text-xl font-semibold text-foreground mb-2">{{ $option['title'] }}</h3>
-                                    <p class="text-muted-foreground mb-4">{{ $option['description'] }}</p>  
+                                <h3 class="text-xl font-semibold text-foreground mb-2">
+                                    {{ $option->title }}
+                                </h3>
 
-                                    {{-- <p class="text-lg font-semibold text-primary mb-2">{{ $option['contact'] }}</p> --}}
-                                      <x-ui.contact-item 
-                                        type="{{ $option['type'] }}"
-                                        text="{{ $option['contact'] }}"
-                                        value="{{ $option['contact'] }}"
-                                     
-                                        class="w-full text-green-600 hover:text-white justify-center"
-                                    />  
+                                <p class="text-muted-foreground mb-4">
+                                    {{ $option['description'] }}
+                                </p>
 
-                                    <p class="text-sm text-muted-foreground">{{ $option['note'] }}</p>
+                                <x-ui.contact-item
+                                    :type="$option['type']"
+                                    :text="$option['contact']"
+                                    :value="$option['contact']"
+                                    class="w-full justify-center text-green-600 hover:text-white"
+                                />
 
-                                </x-card-content>
-                            </x-card>
-                        @endforeach
-                        
-                    
-                        
+                                <p class="text-sm text-muted-foreground mt-3">
+                                    {{ $option['note'] }}
+                                </p>
 
+                            </x-card-content>
+                        </x-card>
+                    @endforeach
                 </div>
                  
                 <div class="flex justify-center mt-12 gap-2">

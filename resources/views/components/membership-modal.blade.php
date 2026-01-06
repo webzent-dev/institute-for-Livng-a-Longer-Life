@@ -41,7 +41,7 @@
             <input type="password" class="w-full border p-2 rounded" placeholder="Confirm Password" x-model="form.confirmPassword">
 
             <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded">
-                Register Now
+                Register Now123
             </button>
 
             <button type="button" @click="close()" class="w-full border py-2 rounded">

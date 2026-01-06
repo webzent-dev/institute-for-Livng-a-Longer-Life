@@ -11,4 +11,8 @@ class AdminController extends Controller
     {
         return view('front.admin.login');
     }
+    public function index()
+    {
+        return view('admin.index');
+    }
 }
