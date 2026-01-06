@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class HelpCenterController extends Controller
 {
+    // Display Help Center Page
     public function helpcenter()
     {
         $helpTopics = HelpCategory::with(['articles' => function ($q) {
