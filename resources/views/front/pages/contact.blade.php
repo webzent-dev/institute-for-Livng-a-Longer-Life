@@ -229,7 +229,7 @@
         </section>
  
          
-                
+              {{-- Dynamic Locations Map Section   --}}
                 <x-maps-grid />
 
             {{-- FAQ Section k --}}
