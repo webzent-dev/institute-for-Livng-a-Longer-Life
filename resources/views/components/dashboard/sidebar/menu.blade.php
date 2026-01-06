@@ -4,9 +4,9 @@
 
 
 
-<nav class="flex-1 p-4 space-y-1">
+<nav class="flex-1 p-4 space-y-1  overflow-y-auto scrollbar-custom ">
 
-    <x-dashboard.sidebar.nav_link icon="layout-dashboard" label="Dashboard" route="dashboard" />
+    <x-dashboard.sidebar.nav_link icon="layout-dashboard" label="Dashboard" route="admin/dashboard/index" />
 
     {{-- @role('super_admin|admin') --}}
         <x-dashboard.sidebar.nav_link icon="users" label="Users" />

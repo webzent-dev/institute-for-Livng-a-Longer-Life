@@ -36,72 +36,52 @@
 
         @php
                 $plans = [
-                            [
-                                'name' => 'Essential Membership',
-                                'price' => '$29',
-                                'period' => '/Month',
-                                
-                                'description' => 'Perfect for those starting their wellness journey',
-                                'features' => [
-                                    'Access to all foundational video lessons',
-                                    'Monthly live Q&A sessions with Dr. Zeines',
-                                    'Community forum access',
-                                    '10% discount on all store products',
-                                    'Monthly wellness newsletter',
-                                    'Mobile app access'
-                                ],
-                                'benefits' => [
-                                    'Cancel anytime',
-                                    'Instant access upon signup',
-                                    'New content added monthly'
-                                ]
-                            ],
-                            [
-                                'name' => 'Premium Membership',
-                                'price' => '$79',
-                                'period' => '/Month',
-                                
-                                'description' => 'Our most popular plan for dedicated health enthusiasts',
-                                'popular' => true,
-                                'features' => [
-                                    'Everything in Essential',
-                                    'Access to exclusive collaborator content',
-                                    'All courses from partner doctors',
-                                    '20% discount on all store products',
-                                    'Priority customer support',
-                                    'Early access to new courses and products',
-                                    'Quarterly personalized health check-ins',
-                                    'Advanced nutrition guides'
-                                ],
-                                'benefits' => [
-                                    'Best value for money',
-                                    'Access to premium collaborator stores',
-                                    'VIP community status'
-                                ]
-                            ],
-                            [
-                                'name' => 'Elite Membership',
-                                'price' => '$149',
-                                'period' => '/Month',
-                                
-                                'description' => 'Complete wellness transformation with personalized care',
-                                'features' => [
-                                    'Everything in Premium',
-                                    'One-on-one monthly consultation with Dr. Zeines or collaborators',
-                                    '30% discount on all store products',
-                                    'VIP access to all live events and workshops',
-                                    'Personalized wellness and nutrition plan',
-                                    'Direct messaging with health experts',
-                                    'Custom supplement recommendations',
-                                    'Annual comprehensive health assessment'
-                                ],
-                                'benefits' => [
-                                    'Highest level of personalized care',
-                                    'Direct expert access',
-                                    'Priority event registration'
-                                ]
-                            ]
-                        ];
+            [
+              'name' => 'Standard Membership',
+              'price' => '$183',
+              'period' => '/Year',
+              'url' => '/membership',
+              'description' => 'Access to all video lessons',
+              'features' => [
+                'Access to 1 pre-recorded lecture a month',
+                '$10 Discount on Vital Boost',
+                'Monthly Live Zoom Session',
+                '3 free guides',
+              ],
+            ],
+            [
+              'name' => 'Premium Membership',
+              'price' => '$387',
+              'period' => '/Year',
+              'url' => '/membership',
+              'popular' => true,
+              'description' => 'Everything in Essential',
+              'features' => [
+                'Access to all pre-recorded lectures for a year',
+                '$15 Discount on Vital Boost',
+                'Monthly Live Zoom Session',
+                '3 free books',
+                '10 free guides',
+              ],
+            ],
+            [
+              'name' => 'Lifetime Membership',
+              'price' => '$799',
+              'period' => 'Lifetime',
+              'url' => '/membership',
+              'description' => 'Everything in Premium',
+              'features' => [
+                'Access to all pre-recorded lectures for lifetime',
+                '$20 Discount on Vital Boost',
+                'Monthly Live Zoom Session',
+                '3 free books, 10 free guides',
+                '50% off on consultations',
+              ],
+            ],
+          ];
+        
+        
+        
         @endphp
 
     <section class="py-20 bg-background">

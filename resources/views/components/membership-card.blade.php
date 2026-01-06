@@ -18,14 +18,14 @@
                         @endif
 
                         <div class="text-center pb-8 pt-12 px-6">
-                        <h3 class="text-3xl font-bold text-foreground mb-2">{{ $plan['name'] }}</h3>
-                        <p class="text-muted-foreground mb-6">{{ $plan['description'] }}</p>
-                        <div class="flex items-baseline justify-center">
-                            <span class="text-5xl font-bold text-foreground">{{ $plan['price'] }}</span>
-                            <span class="text-muted-foreground ml-2">{{ $plan['period'] }}</span>
-                        </div>
-                        </div>
-
+<h3 class="text-2xl font-bold text-foreground mb-2">{{ $plan['name'] }}</h3>
+<p class="text-muted-foreground mb-6">{{ $plan['description'] }}</p>
+<div class="flex items-baseline justify-center">
+<span class="text-3xl text-primary font-bold  ">{{ $plan['price'] }}</span>
+<span class="text-muted-foreground ml-2">{{ $plan['period'] }}</span>
+</div>
+</div>
+ 
                         <div class="flex-1 flex flex-col px-6 pb-6">
                         <div class="space-y-6 flex-1">
                             <div>

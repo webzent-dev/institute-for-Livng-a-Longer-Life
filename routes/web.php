@@ -11,6 +11,8 @@ use App\Http\Controllers\Front\HelpCenterController;
 use App\Http\Controllers\Front\ShopController;
 use App\Http\Controllers\Front\VitalBoostController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Collaborator\CollaboratorController;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\UserRegister;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Middleware\RoleMiddleware;
@@ -54,6 +56,13 @@ Route::resource('index', IndexController::class);
 Route::resource('about', AboutController::class);
 Route::resource('testimonial', TestimonialsController::class);
 Route::resource('faq', FAQController::class);
+
+//Collaborator Routes
+Route::get('/become-collaborator', [CollaboratorController::class, 'index'])->name('become-collaborator');
+Route::post('/become/collaborator', [CollaboratorController::class, 'store'])->name('become/collaborator.store');
+
+// Admin Login Route
+Route::get('/admin/login', [AdminController::class, 'login'])->name('admin.login');
 
 
     
