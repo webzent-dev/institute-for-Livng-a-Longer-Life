@@ -14,7 +14,6 @@ use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Collaborator\CollaboratorController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\UserRegister;
-use App\Http\Controllers\Admin\AdminController;
 use App\Http\Middleware\RoleMiddleware;
  
 // admin routes
