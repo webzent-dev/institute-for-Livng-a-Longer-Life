@@ -71,7 +71,7 @@
                         @endforeach
                     </div>
 
-                    <!-- Desktop Tabs -->
+                    <!-- Desktop Tabs for topics -->
                     <div class="hidden md:flex justify-center flex-wrap gap-3 mt-6">
                         <button
                             class="topic-tab active-tab"
