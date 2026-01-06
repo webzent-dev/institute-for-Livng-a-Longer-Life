@@ -1,15 +1,23 @@
-@props([ 'model' => '', 'name' => '', 'placeholder' => '', 'type' => 'text', 'filter' => null  {{-- ex: filter="name" --}} ])
-
+@props([
+    'model' => '',
+    'name' => '',
+    'placeholder' => '',
+    'type' => 'text',
+    'filter' => null
+])
 
 <div class="space-y-1">
     <input
         type="{{ $type }}"
-        name="{{ $name}}"
+        name="{{ $name }}"
         placeholder="{{ $placeholder }}"
-        class="input-base"
+        value="{{ old($name) }}"
+        class="input-base
+            @error($name) border-red-500 @enderror
+        "
         x-model="form.{{ $model }}"
         @input="
-            sanitizeField('{{ $model }}', '{{ $filter }}'); 
+            sanitizeField('{{ $model }}', '{{ $filter }}');
             validateField('{{ $model }}');
         "
         :class="{
@@ -18,31 +26,11 @@
         }"
     >
 
+    {{-- Alpine validation error --}}
     <p class="text-red-500 text-sm" x-text="errors.{{ $model }}"></p>
+
+    {{-- Laravel validation error --}}
+    @error($name)
+        <p class="text-red-500 text-sm">{{ $message }}</p>
+    @enderror
 </div>
-
-
-
-
-
-
-{{-- @props([
-    'model' => '',
-    'placeholder' => '',
-    'type' => 'text'
-])
-
-<div class="space-y-1">
-    <input 
-        type="{{ $type }}"
-        placeholder="{{ $placeholder }}"
-        class="input-base"
-        x-model="form.{{ $model }}"
-        @input="clearError('{{ $model }}')"
-        :class="{
-            'border-red-500': errors.{{ $model }},
-            'border-green-500': form.{{ $model }} && !errors.{{ $model }}
-        }"
-    >
-    <p class="text-red-500 text-sm" x-text="errors.{{ $model }}"></p>
-</div> --}}

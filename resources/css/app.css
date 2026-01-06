@@ -207,33 +207,33 @@
     @apply bg-destructive text-destructive-foreground hover:bg-destructive/90;
   }
 
-  /* Cards */
+  /* Cards   */
   .card {
-    @apply border-2 hover:border-primary transition-all shadow-soft hover:shadow-medium rounded-xl;
+    @apply  p-6 bg-white rounded-xl border border-gray-200  duration-300 ease-out hover:-translate-y-1  hover:shadow-xl transition-all ;
   }
  
 /* Shared button styles */
 .btn-base {
-    @apply h-11 rounded-md px-8 w-full mt-8 flex items-center justify-center;
+    @apply h-11 rounded-md px-8 w-full mt-8 flex items-center justify-center duration-300 ease-out hover:-translate-y-1 font-semibold;
 }
 
 /* Popular Plan Button (same gradient UI you already use) */
 .btn-popular {
-    @apply gradient-primary text-white font-semibold shadow-md hover:opacity-90;
+    @apply gradient-primary text-white font-semibold shadow-md hover:opacity-90 duration-300 ease-out hover:-translate-y-1;
 }
 
 /* Default Button */
 .btn-default {
-    @apply border border-gray-300 hover:bg-gray-100 text-gray-700;
+    @apply border border-gray-300 hover:bg-gray-100 text-gray-700 duration-300 ease-out hover:-translate-y-1;
 }
 
 
   .card-benefit {
-    @apply border-2 border-border hover:border-emerald-500 transition-all duration-300 p-6 rounded-lg shadow-soft hover:shadow-medium bg-white;
+    @apply border-2 border-border hover:border-emerald-500 transition-all duration-300 p-6 rounded-lg shadow-soft hover:shadow-medium bg-white  ease-out hover:-translate-y-1;
   }
 
   .card-video {
-    @apply border-2 hover:border-emerald-500 transition-all shadow-soft hover:shadow-medium bg-white rounded-lg;
+    @apply border-2 hover:border-emerald-500 transition-all shadow-soft hover:shadow-medium bg-white rounded-lg duration-300 ease-out hover:-translate-y-1;
   }
 
   .pricing-card {
@@ -241,7 +241,7 @@
   }
 
   .pricing-card-featured {
-    @apply border-4 border-emerald-500 shadow-medium scale-105 relative;
+    @apply border-4 border-emerald-500 shadow-medium scale-105 relative duration-300 ease-out hover:-translate-y-1;
   }
 
   .badge-featured {
@@ -250,7 +250,7 @@
 
   /* Forms */
   .input-base {
-    @apply w-full px-3 py-2 border border-input rounded-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors;
+    @apply w-full px-3 py-2 border border-input rounded-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-300 ease-out hover:-translate-y-1;
   }
 
   .label-base {
@@ -280,26 +280,26 @@
   }
 
   .heading-1 {
-    @apply text-4xl lg:text-6xl font-bold leading-tight;
+    @apply text-4xl lg:text-6xl font-bold leading-tight duration-300 ease-out hover:-translate-y-1;
   }
 
   .heading-2 {
-    @apply text-3xl lg:text-5xl font-bold;
+    @apply text-3xl lg:text-5xl font-bold duration-300 ease-out hover:-translate-y-1;
   }
 
   .heading-3 {
-    @apply text-xl lg:text-2xl font-semibold;
+    @apply text-xl lg:text-2xl font-semibold duration-300 ease-out hover:-translate-y-1;
   }
   .heading-4 {
-    @apply text-lg lg:text-xl font-semibold;
+    @apply text-lg lg:text-xl font-semibold duration-300 ease-out hover:-translate-y-1;
   }
 
   /* Premium Feature Badge */
   .premium-feature {
-    @apply gradient-accent text-accent-foreground hover:opacity-90 shadow-medium font-semibold inline-block bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full ml-2;
+    @apply gradient-accent text-accent-foreground hover:opacity-90 shadow-medium font-semibold inline-block bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full ml-2 duration-300 ease-out hover:-translate-y-1;
   }
   .iconbg {
-    @apply w-10 h-10 rounded-sm bg-primary hover:bg-accent flex items-center justify-center flex-shrink-0 text-white text-sm font-semibold;
+    @apply w-10 h-10 rounded-sm bg-primary hover:bg-accent flex items-center justify-center flex-shrink-0 text-white text-sm font-semibold duration-300 ease-out hover:-translate-y-1;
     display: inline-flex;
   }
 }
@@ -322,7 +322,7 @@
   /* Global Animation */
  
 .animate-on-view {
-    @apply opacity-0 motion-safe:animate-slide-up;
+    @apply opacity-0 motion-safe:animate-slide-up duration-300 ease-out hover:-translate-y-1;
   }
 
   
@@ -341,9 +341,18 @@
 
   /* Transitions */
   .transition-smooth {
-    @apply transition-all duration-300 ease-in-out;
+    @apply transition-all duration-300 ease-in-out hover:-translate-y-1;
   }
+  
+.topic-tab {
+        @apply flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300
+               text-sm font-medium whitespace-nowrap
+               hover:bg-primary hover:text-white transition;
+    }
 
+    .active-tab {
+        @apply bg-primary text-white border-primary;
+    }
   /* Visibility */
   .visually-hidden {
     position: absolute;

@@ -160,9 +160,9 @@
                                 <div class="grid sm:grid-cols-2 gap-4">
                                     <div class="sm:col-span-1">
                                         <a href="{{ url('/collaborator/'.$c['id']) }}" class=" btn btn-outline  w-full sm:w-auto flex items-center justify-center font-semibold px-2 py-3 rounded-md  ">
-                                            <button class=" w-full flex items-center">
-                                                <i data-lucide="award" class="h-5 w-5  hover:text-white  mr-2"></i>
-                                                <span class="ml-2">View Profile</span>
+                                           <button class="  w-full flex items-center justify-center">
+                                                <i data-lucide="award" class="h-5 w-5  hover:text-white mr-1"></i>
+                                                <span class="ml-1">View Profile</span>
                                             </button>
                                         </a>
                                     </div>
@@ -195,7 +195,7 @@
                         Manage your own store, create courses, and make a meaningful impact on people's lives."
                 
                 :buttons="[
-                    ['route' => 'contact',   'label' => 'Apply to Collaborate', 'variant' => 'outline', 'icon' => 'external-link'],
+                    ['route' => 'become-collaborator',   'label' => 'Apply to Collaborate', 'variant' => 'outline', 'icon' => 'external-link'],
                      
                 ]"
             /> 

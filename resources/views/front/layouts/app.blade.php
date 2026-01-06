@@ -20,7 +20,7 @@
     <script src="{{ asset('js/login.js') }}"></script>
 
 {{-- cdn --}}
-
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -28,7 +28,7 @@
  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
  <style>
-        /* Remove default Leaflet styles */
+        /* Remove default Leaflet styles for Location map */
         .leaflet-control-attribution,
         .leaflet-control-attribution a {
             display: none !important;

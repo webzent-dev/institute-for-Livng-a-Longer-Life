@@ -24,7 +24,7 @@ class DashboardController extends Controller
     }
     public function home()
     {
-        return view('components.dashboard.index');
+        return view('front.dashboard.index');
     }
   
 

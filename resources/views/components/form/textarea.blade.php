@@ -2,11 +2,14 @@
     'model' => '',
     'placeholder' => '',
     'rows' => 4,
-    'filter' => null
+    'filter' => null,
+    'name' => '',
+
 ])
 
 <div class="space-y-1">
     <textarea
+        name="{{ $name }}"
         rows="{{ $rows }}"
         placeholder="{{ $placeholder }}"
         class="input-base resize-none"

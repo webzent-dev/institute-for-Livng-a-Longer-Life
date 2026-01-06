@@ -111,26 +111,4 @@
   </div>
 </div>
 @endsection
-
-
-
-
-{{-- @extends('components.dashboard.member')
-
-@section('content')
-
-<h1 class="text-2xl font-semibold mb-6">My Orders</h1>
-
-<x-cards.info-card title="Order History">
-
-    <x-tables.orders-table :orders="$orders" />
-
-</x-cards.info-card>
-
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-    <x-cards.stat-card label="Total Orders" :value="$stats['total']" />
-    <x-cards.stat-card label="Delivered" :value="$stats['delivered']" />
-    <x-cards.stat-card label="In Progress" :value="$stats['processing']" />
-</div>
-
-@endsection --}}
+ 

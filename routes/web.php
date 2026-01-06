@@ -11,8 +11,9 @@ use App\Http\Controllers\Front\HelpCenterController;
 use App\Http\Controllers\Front\ShopController;
 use App\Http\Controllers\Front\VitalBoostController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Collaborator\CollaboratorController;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\UserRegister;
-
 use App\Models\User;
  
 
@@ -26,6 +27,7 @@ Route::get('/auth', [LoginController::class, 'showLoginForm'])->name('auth');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/contact', [ContactController::class, 'index'] )->name('contact');
+Route::post('/contact/form', [ContactController::class, 'store'] )->name('contact/form');
 Route::get('/testimonials', [TestimonialsController::class, 'index'] )->name('testimonials');
 Route::get('/faq', [FAQController::class, 'index'] )->name('faq');
 Route::get('/help-center', [HelpCenterController::class, 'helpcenter'] )->name('help-center');
@@ -37,9 +39,17 @@ Route::resource('about', AboutController::class);
 Route::resource('testimonial', TestimonialsController::class);
 Route::resource('faq', FAQController::class);
 
+//Collaborator Routes
+Route::get('/become-collaborator', [CollaboratorController::class, 'index'])->name('become-collaborator');
+Route::post('/become/collaborator', [CollaboratorController::class, 'store'])->name('become/collaborator.store');
 
+// Admin Login Route
+Route::get('/admin/login', [AdminController::class, 'login'])->name('admin.login');
+
+
+//Dashboard Routes  
     Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('admin/dashboard/home', [DashboardController::class, 'home'])->name('admin/dashboard/home');
+    Route::get('admin/dashboard/index', [DashboardController::class, 'home'])->name('admin/dashboard/index');
     Route::get('admin/member', [DashboardController::class, 'member'])->name('dashboard');
     Route::get('/das', fn () => view('components.dashboard.sidebar.das'))
         ->name('das');
