@@ -257,8 +257,9 @@
                     <x-button-use href="/faq" variant="outline" size="lg" icon="badge-question-mark">
                         View Frequently Asked Questions
                     </x-button-use>
+                    {{--Direct users to support ticket or contact. --}}
                     <x-button-use href="/contact" variant="outline" size="lg" icon="user-pen">
-                        Support Center
+                        Support Center      
                     </x-button-use>
                 </div>
 
