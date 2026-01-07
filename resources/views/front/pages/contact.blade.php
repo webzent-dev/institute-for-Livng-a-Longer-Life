@@ -21,7 +21,7 @@
    
 
 
-       
+       {{-- Contact Information --}}
         <section class=" py-20 bg-background">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid lg:grid-cols-3 gap-8">
