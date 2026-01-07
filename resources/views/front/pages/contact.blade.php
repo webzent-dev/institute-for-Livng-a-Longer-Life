@@ -42,7 +42,7 @@
                                     <div class="w-12 h-12 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
                                         <i data-lucide="mail" class="h-6 w-6 text-primary-foreground"></i>
                                     </div>
-
+                                    {{-- Email --}}
                                     <div>
                                         <h3 class="font-semibold text-foreground mb-1">Email</h3>
                                         <a href="mailto:info@instituteforlivinglonger.com" class="text-muted-foreground hover:text-primary transition-colors block">
