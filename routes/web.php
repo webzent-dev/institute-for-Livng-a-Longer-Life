@@ -49,6 +49,7 @@ Route::get('/testimonials', [TestimonialsController::class, 'index'] )->name('te
 Route::get('/faq', [FAQController::class, 'index'] )->name('faq');
 Route::get('/help-center', [HelpCenterController::class, 'helpcenter'] )->name('help-center');
 Route::get('/shop', [ShopController::class, 'index'] )->name('shop');
+Route::get('/product-details', [ShopController::class, 'productDetails'] )->name('product-details');
 Route::get('/products/filter', [ShopController::class, 'filter'])->name('products.filter');  
 Route::get('/vital-boost', [VitalBoostController::class, 'index'] )->name('vital-boost');
 Route::resource('index', IndexController::class);
@@ -65,8 +66,8 @@ Route::get('/admin/login', [AdminController::class, 'login'])->name('admin.login
 
 
     
-
-    Route::get('admin/dashboard/home', [DashboardController::class, 'home'])->name('admin/dashboard/home');
+Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('admin/dashboard/index', [DashboardController::class, 'home'])->name('admin/dashboard/index');
     Route::get('admin/member', [DashboardController::class, 'member'])->name('dashboard');
     Route::get('/das', fn () => view('components.dashboard.sidebar.das'))
         ->name('das');

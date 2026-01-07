@@ -2,7 +2,7 @@
 @section('content')
 <div class="min-h-screen flex flex-col">
     <section class="gradient-subtle pt-16">
-        <div class="max-w-7xl mx-auto py-10 px-4">
+        <div class="max-w-7xl mx-auto pt-10 px-4 place-self-center">
                 <div class="text-center mb-16 ">
                     <h1 class="text-4xl lg:text-6xl font-bold text-foreground mb-4">
                         Wellness Store
@@ -13,69 +13,51 @@
                     </p>
                 </div>
                 <!-- Search + Category -->
-                <div class="mb-8 flex flex-col md:flex-row gap-4">
-                        <div class="relative flex-1">
-                        <input
-                            type="text"
-                            id="searchInput"
-                            placeholder="Search products..."
-                            class="w-full pl-12 pr-12 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-lg"
-                        />
-                        <i class="fas fa-search absolute left-4 top-3 text-gray-500 text-xl"></i>
+                <div class="">
+                    <div class="mb-8 flex flex-col md:flex-row gap-4">
+                        <div class="relative ">
+                            <input
+                                type="text"
+                                id="searchInput"
+                                placeholder="Search products..."
+                                class="w-full pl-12 pr-12 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-lg"
+                            />
+                            <i class="fas fa-search absolute left-4 top-3 text-gray-500 text-xl"></i>
 
-                        <button id="clearSearch" class="absolute right-3 top-4 text-gray-500 hover:text-gray-700 text-2xl hidden">
-                            <i class="fas fa-times-circle"></i>
-                        </button>
+                            <button id="clearSearch" class="absolute right-3 top-4 text-gray-500 hover:text-gray-700 text-2xl hidden">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
                         </div>
 
                         <select id="categoryFilter" class="px-6 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-lg" >
                         <option value="all">All Categories</option>
 
                         {{-- Generate categories automatically (optional) --}}
-                        @foreach($products->pluck('category')->unique() as $cat)
+                        {{-- @foreach($products->pluck('category')->unique() as $cat)
+                            <option value="{{ $cat }}">{{ $cat }}</option>
+                        @endforeach --}}
+
+                         @foreach($categories as $cat)
                             <option value="{{ $cat }}">{{ $cat }}</option>
                         @endforeach
                         </select>
-                </div>
-
-                <!-- Price, Rating, Clear -->
-                <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Price -->
-                    <div>
-                    <label class="block text-sm font-medium text-primary mb-2">Price Range</label>
-                    <div class="flex items-center gap-3">
-                        <input type="number" id="minPrice" placeholder="Min" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"/>
-                        <span class="text-gray-500">—</span>
-                        <input type="number" id="maxPrice" placeholder="Max" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"/>
-                    </div>
-                    </div>
-
-                    <!-- Rating -->
-                    <div>
-                    <label class="block text-sm font-medium text-primary mb-2">Minimum Rating</label>
-                    <select id="ratingFilter" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary">
-                        <option value="0">Any Rating</option>
-                        <option value="4">4★ & above</option>
-                        <option value="3">3★ & above</option>
-                        <option value="2">2★ & above</option>
-                        <option value="1">1★ & above</option>
-                    </select>
-                    </div>
-
-                    <!-- Clear All -->
-                    <div class="flex items-end">
-                    <button
-                        id="clearFilters"
-                        class="w-full bg-primary text-white px-8 py-3 rounded-lg hover:bg-amber-500 transition"
-                    >
-                        Clear Filters
-                    </button>
+                        <div class="flex items-end">
+                            <button
+                                id="clearFilters"
+                                class="w-full bg-primary text-white px-8 py-3 rounded-lg hover:bg-amber-500 transition"
+                            >
+                                Clear Filters
+                            </button>
+                        </div>
                     </div>
                 </div>
+                
+
+                 
         </div>
     </section>            
 
-<section class="gradient-subtle py-5">
+<section class="gradient-subtle pb-5">
     <div class="max-w-7xl mx-auto py-10 px-4">
   <!-- Active Filter Chips -->
   <div id="activeFilters" class="mb-6 flex flex-wrap gap-2"></div>
@@ -146,9 +128,9 @@
     const searchInput = document.getElementById('searchInput');
     const clearSearchBtn = document.getElementById('clearSearch');
     const categoryFilter = document.getElementById('categoryFilter');
-    const minPrice = document.getElementById('minPrice');
-    const maxPrice = document.getElementById('maxPrice');
-    const ratingFilter = document.getElementById('ratingFilter');
+    // const minPrice = document.getElementById('minPrice');
+    // const maxPrice = document.getElementById('maxPrice');
+    // const ratingFilter = document.getElementById('ratingFilter');
     const clearFiltersBtn = document.getElementById('clearFilters');
     const productsGrid = document.getElementById('productsGrid');
     const resultsCount = document.getElementById('resultsCount');
@@ -168,9 +150,9 @@
     clearFiltersBtn.addEventListener('click', () => {
         searchInput.value = '';
         categoryFilter.value = 'all';
-        minPrice.value = '';
-        maxPrice.value = '';
-        ratingFilter.value = '0';
+        // minPrice.value = '';
+        // maxPrice.value = '';
+        // ratingFilter.value = '0';
         activeFilters.innerHTML = '';
         clearSearchBtn.classList.add('hidden');
 
@@ -182,17 +164,17 @@
 
         const query = searchInput.value.toLowerCase().trim();
         const category = categoryFilter.value;
-        const min = minPrice.value ? Number(minPrice.value) : 0;
-        const max = maxPrice.value ? Number(maxPrice.value) : Infinity;
-        const minRating = Number(ratingFilter.value);
+        // const min = minPrice.value ? Number(minPrice.value) : 0;
+        // const max = maxPrice.value ? Number(maxPrice.value) : Infinity;
+        // const minRating = Number(ratingFilter.value);
 
         if (query) filtered = filtered.filter(p => p.name.toLowerCase().includes(query));
         if (category !== 'all') filtered = filtered.filter(p => p.category === category);
-        filtered = filtered.filter(p => p.price >= min && p.price <= max);
-        filtered = filtered.filter(p => p.rating >= minRating);
+        // filtered = filtered.filter(p => p.price >= min && p.price <= max);
+        // filtered = filtered.filter(p => p.rating >= minRating);
 
         renderProducts(filtered);
-        updateActiveFilters({ query, category, min, max, minRating });
+        updateActiveFilters({ query, category});
     }
 
     function renderProducts(list) {
@@ -273,7 +255,7 @@
         `).join('');
     }
 
-    function updateActiveFilters({ query, category, min, max, minRating }) {
+    function updateActiveFilters({ query, category }) {
         activeFilters.innerHTML = '';
 
         if (query)
@@ -282,11 +264,11 @@
         if (category !== 'all')
             activeFilters.innerHTML += chip(category, "clearCategory");
 
-        if (min > 0 || max < Infinity)
-            activeFilters.innerHTML += chip(`$${min || 0} - ${max === Infinity ? 'Any' : '$' + max}`, "clearPrice");
+        // if (min > 0 || max < Infinity)
+        //     activeFilters.innerHTML += chip(`$${min || 0} - ${max === Infinity ? 'Any' : '$' + max}`, "clearPrice");
 
-        if (minRating > 0)
-            activeFilters.innerHTML += chip(`${minRating}★ & up`, "clearRating");
+        // if (minRating > 0)
+        //     activeFilters.innerHTML += chip(`${minRating}★ & up`, "clearRating");
     }
 
     const chip = (text, fn) =>
@@ -298,11 +280,11 @@
     // individual clear functions
     function clearSearchInput() { searchInput.value = ''; clearSearchBtn.classList.add('hidden'); filterProducts(); }
     function clearCategory() { categoryFilter.value = 'all'; filterProducts(); }
-    function clearPrice() { minPrice.value = ''; maxPrice.value = ''; filterProducts(); }
-    function clearRating() { ratingFilter.value = '0'; filterProducts(); }
+    // function clearPrice() { minPrice.value = ''; maxPrice.value = ''; filterProducts(); }
+    // function clearRating() { ratingFilter.value = '0'; filterProducts(); }
 
     // Events
-    [searchInput, categoryFilter, minPrice, maxPrice, ratingFilter].forEach(e => {
+    [searchInput, categoryFilter].forEach(e => {
         e.addEventListener('input', filterProducts);
         e.addEventListener('change', filterProducts);
     });
