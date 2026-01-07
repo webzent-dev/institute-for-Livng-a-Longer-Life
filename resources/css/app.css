@@ -212,20 +212,20 @@
     @apply  p-6 bg-white rounded-xl border border-gray-200  duration-300 ease-out hover:-translate-y-1  hover:shadow-xl transition-all ;
   }
  
-/* Shared button styles */
-.btn-base {
-    @apply h-11 rounded-md px-8 w-full mt-8 flex items-center justify-center duration-300 ease-out hover:-translate-y-1 font-semibold;
-}
+  /* Shared button styles */
+  .btn-base {
+      @apply h-11 rounded-md px-8 w-full mt-8 flex items-center justify-center duration-300 ease-out hover:-translate-y-1 font-semibold;
+  }
 
-/* Popular Plan Button (same gradient UI you already use) */
-.btn-popular {
-    @apply gradient-primary text-white font-semibold shadow-md hover:opacity-90 duration-300 ease-out hover:-translate-y-1;
-}
+  /* Popular Plan Button (same gradient UI you already use) */
+  .btn-popular {
+      @apply gradient-primary text-white font-semibold shadow-md hover:opacity-90 duration-300 ease-out hover:-translate-y-1;
+  }
 
-/* Default Button */
-.btn-default {
-    @apply border border-gray-300 hover:bg-gray-100 text-gray-700 duration-300 ease-out hover:-translate-y-1;
-}
+  /* Default Button */
+  .btn-default {
+      @apply border border-gray-300 hover:bg-gray-100 text-gray-700 duration-300 ease-out hover:-translate-y-1;
+  }
 
 
   .card-benefit {
@@ -302,6 +302,62 @@
     @apply w-10 h-10 rounded-sm bg-primary hover:bg-accent flex items-center justify-center flex-shrink-0 text-white text-sm font-semibold duration-300 ease-out hover:-translate-y-1;
     display: inline-flex;
   }
+
+  /* Product Image Hover & Zoom */
+  .product-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+  }
+
+  .product-image-container img {
+    transition: transform 0.3s ease;
+  }
+
+  .product-image-container:hover img {
+    transform: scale(1.03);
+  }
+
+  .thumbnail.active {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  }
+
+  .zoom-image {
+    cursor: zoom-in;
+  }
+
+  /* Related Products */
+  .related-product-card {
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .related-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .related-product-image {
+    transition: transform 0.5s ease;
+  }
+
+  .related-product-card:hover .related-product-image {
+    transform: scale(1.05);
+  }
+
+  .quick-add-btn {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+  }
+
+  .related-product-card:hover .quick-add-btn {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
 }
 
 /* Utilities Layer */
