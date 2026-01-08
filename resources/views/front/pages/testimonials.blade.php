@@ -63,7 +63,7 @@
                 <x-card class="testimonial-card flex flex-col border-2 hover:border-primary transition-all shadow-soft hover:shadow-medium">
                     <x-card-content class="flex-1 p-6 space-y-4">
 
-                        {{-- Rating --}}
+                        {{-- Rating Star--}}
                         <div class="flex items-center space-x-1">
                             @for ($i = 0; $i < $testimonial->rating; $i++)
                                 <i data-lucide="star" class="lucide-star h-5 w-5 text-accent fill-accent"></i>
