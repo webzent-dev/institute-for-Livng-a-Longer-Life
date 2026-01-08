@@ -41,7 +41,7 @@
                         </div>
                         <div class=" w-full md:w-80 ">
                                 <select  id="topicSelect" class="pl-12 pr-12 py-3 max-w-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-lg search-select" >
-                        <option value="all" >All Titles</option>
+                                <option value="all" >All Titles</option>
 
                         <!-- Options will be populated by JavaScript -->
                         </select>
@@ -86,6 +86,7 @@
                                 <i data-lucide="{{ strtolower($topic['icon']) }}" class="w-4 h-4 mr-2"></i>
                                 {{ $topic['title'] }}
                             </button>
+                            
                         @endforeach
                     </div>
 
@@ -276,7 +277,7 @@
        
 
         const helpTopics = @json($helpTopics);
-         
+         console.log(helpTopics);
 
         // DOM Elements
         const searchInput = document.getElementById('searchInput');
@@ -305,8 +306,8 @@
             // Add topic options
             helpTopics.forEach(topic => {
                 const topicOption = document.createElement('option');
-                topicOption.value = `topic:${topic.title}`;
-                topicOption.textContent = `Topic: ${topic.title}`;
+                topicOption.value = `${topic.title}`;
+                topicOption.textContent = `${topic.title}`; 
                 topicSelect.appendChild(topicOption);
             });
 
@@ -314,8 +315,9 @@
             helpTopics.forEach(topic => {
                 topic.articles.forEach(article => {
                     const articleOption = document.createElement('option');
-                    articleOption.value = `article:${article}`;
-                    articleOption.textContent = `Article: ${article} (${topic.title})`;
+                    articleOption.value = `${article.title}`;
+                    articleOption.textContent = `${article.title} `;
+                    // articleOption.textContent = `Article: ${article} (${topic.title})`;
                     topicSelect.appendChild(articleOption);
                 });
             });
@@ -348,7 +350,7 @@
                 // Generate HTML for articles list with highlighting
                 let articlesHTML = '';
                 topic.articles.forEach(article => {
-                    const highlightedArticle = highlightText(article, searchTerm);
+                    const highlightedArticle = highlightText(article.title, searchTerm);
                     articlesHTML += `<li class="flex items-start py-2"><a href="#" class="text-primary hover:underline flex items-center">
                         <i class="fas fa-file-alt  mt-1 mr-3 text-sm"></i>
                         <span>${highlightedArticle}</span>

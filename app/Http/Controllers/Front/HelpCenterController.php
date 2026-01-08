@@ -9,12 +9,30 @@ use Illuminate\Http\Request;
 class HelpCenterController extends Controller
 {
     // Display Help Center Page
+    // public function helpcenter()
+    // {
+    //     $helpTopics = HelpCategory::with(['articles' => function ($q) {
+    //         $q->limit(5);
+    //     }])->get();
+    //      $contactOptions = ContactOption::all();
+    //     return view('front.pages.help-center', compact('helpTopics', 'contactOptions'));
+    // }
     public function helpcenter()
-    {
-        $helpTopics = HelpCategory::with(['articles' => function ($q) {
-            $q->limit(5);
-        }])->get();
-         $contactOptions = ContactOption::all();
-        return view('front.pages.help-center', compact('helpTopics', 'contactOptions'));
-    }
+        {
+            
+            $helpTopics = HelpCategory::with([
+                'articles' => function($q){
+                                                $q->limit(5);
+                                            }
+                                        ])->get();
+
+            $contactOptions = ContactOption::all();
+
+            return view(
+                'front.pages.help-center',
+                compact('helpTopics', 'contactOptions')
+            );
+        }
+        
+
 }
