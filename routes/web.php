@@ -66,8 +66,8 @@ Route::get('/admin/login', [AdminController::class, 'login'])->name('admin.login
 
 
     
-
-    Route::get('admin/dashboard/home', [DashboardController::class, 'home'])->name('admin/dashboard/home');
+Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('admin/dashboard/index', [DashboardController::class, 'home'])->name('admin/dashboard/index');
     Route::get('admin/member', [DashboardController::class, 'member'])->name('dashboard');
     Route::get('/das', fn () => view('components.dashboard.sidebar.das'))
         ->name('das');

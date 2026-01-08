@@ -24,7 +24,7 @@
 
             </div>
 
-              <!-- Search + Category -->
+              <!-- Search + Category functionality-->
                 <div class="my-8 flex flex-col md:flex-row gap-4  justify-center ">
                         <div class="relative ">
                         <input
@@ -71,7 +71,7 @@
                         @endforeach
                     </div>
 
-                    <!-- Desktop Tabs -->
+                    <!-- Desktop Tabs for topics -->
                     <div class="hidden md:flex justify-center flex-wrap gap-3 mt-6">
                         <button
                             class="topic-tab active-tab"
@@ -92,49 +92,7 @@
 
                 </div>
 
-        </section>
-        <section class=" py-0">
-            <div class=" py-0 ">
-                        <!-- Search and Filter Section -->
-                    {{-- <div class="mb-2">
-                        <div class="my-8 flex flex-col md:flex-row gap-4 justify-center">
-                             
-                            <div class="">
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                                        <i class="fas fa-search text-gray-500 text-xl"></i>
-                                    </div>
-                                    <input 
-                                        type="text" 
-                                        id="searchInput" 
-                                        placeholder="Search topics or articles..." 
-                                        class="w-full pl-12 pr-12 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-lg"
-                                    >
-                                </div>
-                            </div>
-                            
-                             
-                            <div class="relative w-full md:w-80">
-                                <select 
-                                    id="topicSelect" 
-                                    class="px-6 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-lgappearance-none text-lg search-select"
-                                >
-                                    <option value="">All Topics</option>
-                                    
-                                </select>
-                                
-                            </div>
-                        </div>
-                        
-                        <!-- Search Stats -->
-                        <div id="searchStats" class="mt-3 text-sm text-gray-500 hidden">
-                            Showing <span id="resultCount" class="font-semibold"></span> of <span id="totalCount" class="font-semibold"></span> topics
-                        </div>
-                    </div> --}}
-                    
-                   
-                </div>
-        </section>
+        </section> 
             
         {{-- HELP TOPICS GRID --}}
         <section class="py-4 bg-background">
@@ -258,8 +216,9 @@
                     <x-button-use href="/faq" variant="outline" size="lg" icon="badge-question-mark">
                         View Frequently Asked Questions
                     </x-button-use>
+                    {{--Direct users to support ticket or contact. --}}
                     <x-button-use href="/contact" variant="outline" size="lg" icon="user-pen">
-                        Support Center
+                        Support Center      
                     </x-button-use>
                 </div>
 

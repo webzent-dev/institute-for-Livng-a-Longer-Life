@@ -16,7 +16,7 @@
 
                     <div class="space-y-6">
                         <div class="inline-flex items-center space-x-2 bg-primary/10 px-4 py-2 rounded-full">
-                            {{-- Replace icon with SVG --}}
+                            
                            <i data-lucide="zap" class="w-5 h-5 text-primary"></i>
                             <span class="text-sm font-semibold text-primary">Premium Wellness Formula</span>
                         </div>

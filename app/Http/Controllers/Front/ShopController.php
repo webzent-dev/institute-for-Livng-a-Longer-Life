@@ -8,7 +8,7 @@ use App\Models\Product;
 
 class ShopController extends Controller
 {
-    public function index()
+   public function index()
     {
         $products = 
                     [
@@ -85,6 +85,7 @@ class ShopController extends Controller
 
         return view('front.pages.shop', compact('products', 'categories'));
     }
+
     public function filter(Request $request)
     {
          
@@ -98,7 +99,7 @@ class ShopController extends Controller
                         $q->where('category', $category);
                     })
                     ->get();
- 
+
  
         return view('front.pages.shop', compact('products'));
     }
