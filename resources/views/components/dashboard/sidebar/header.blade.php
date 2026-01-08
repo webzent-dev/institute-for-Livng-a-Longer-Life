@@ -13,7 +13,7 @@
             </button> --}}
 
             <div class="ml-6 ">
-                <h1 class=" text-left text-xl font-semibold self-center ">Admin Portal</h1>
+                <h1 class=" text-left text-xl font-semibold self-center ">{{ ucfirst(auth()->user()->role) }} Dashboard</h1>
                 {{-- <p class="text-sm text-slate-500 hidden md:block"> --}}
                     {{-- Welcome back, {{ $user->name }}. Here's what's happening today. --}}
                     {{-- Welcome back, Dr. Zeines Here's what's happening today. --}}
@@ -35,12 +35,6 @@
         </div>
     </div>
 </header>
-
-
-
-
-
-
 {{-- <div class="flex items-center justify-between">
     <div class="flex items-center space-x-4">
         <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-lg hover:bg-slate-100">
@@ -48,7 +42,7 @@
         </button>
         <div>
             <h1 class="text-xl font-semibold text-slate-800">{{ ucfirst(request()->route()->getName()) ?: 'Dashboard' }}</h1>
-            <p class="text-sm text-slate-500 hidden md:block">Welcome back, {{ $user->name }}. Here's what's happening today.</p>
+            <p class="text-sm text-slate-500 hidden md:block">Welcome back, {{ auth()->user()->first_name . ' ' . auth()->user()->last_name }}. Here's what's happening today.</p>
         </div>
     </div>
 
