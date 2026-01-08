@@ -4,8 +4,6 @@ use App\Models\HelpCategory;
 use App\Models\ContactOption;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-
 class HelpCenterController extends Controller
 {
     // Display Help Center Page

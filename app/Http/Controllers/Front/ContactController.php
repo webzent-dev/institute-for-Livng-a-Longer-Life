@@ -36,7 +36,7 @@ class ContactController extends Controller
 
     public function subscribe(Request $request)
     {
-        // Validation here
+        // Validation here 
         $validated = $request->validate([
             'firstName' => 'required|string|max:255',
             'lastName'  => 'required|string|max:255',

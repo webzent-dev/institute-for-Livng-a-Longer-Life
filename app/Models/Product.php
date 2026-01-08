@@ -6,8 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-   public function collabrator()
-   {
-        return $this->belongsTo(User::class, 'user_id', 'id')->where('role', 'collabrator');
-   }
+     protected $fillable = [
+        'user_id',        
+        'name',
+        'description',
+        'price',
+        'discount',
+        'originalPrice',
+        'category',
+        'rating',
+        'reviews',
+        'stock_quantity',
+        'image',
+        'status',
+    ];
+
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

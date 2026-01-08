@@ -15,13 +15,16 @@ use App\Http\Controllers\Collaborator\CollaboratorController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\UserRegister; 
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Controllers\Product\ProductController;
+
  
 // admin routes
 
 Route::get('/admin', [AdminController::class, 'index']);
 Route::post('/admin/login', [LoginController::class, 'adminLogin'])->name('admin.login');
 
-Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(function () {
+Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(function () 
+{
     Route::get('dashboard', [DashboardController::class, 'index'])
         ->name('admin.dashboard');
 
@@ -31,6 +34,30 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
 });
 
 // Admin Routes closures
+
+//Collaborator  Routes
+
+Route::get('/collaborator', [CollaboratorController::class, 'index']);
+Route::post('/collaborator/login', [LoginController::class, 'collaboratorLogin'])->name('collaborator.login');
+
+Route::prefix('collaborator')->middleware([RoleMiddleware::class.':collaborator'])->group(function () 
+{
+    Route::get('dashboard', [DashboardController::class, 'collaboratorDashboard'])->name('collaborator.dashboard');
+
+    //product routes for collaborator
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+    Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
+    Route::post('/products/{id}/update', [ProductController::class, 'update'])->name('products.update');
+
+
+    // Yahan aur collaborator routes add kar sakte ho
+    // Route::get('projects', [DashboardController::class, 'projects'])->name('collaborator.projects');
+    // Route::get('profile', [DashboardController::class, 'profile'])->name('collaborator.profile');
+});
+
+//Collaborator  Routes closures
 
 
 Route::get('/', [IndexController::class, 'index'] );    
@@ -57,17 +84,10 @@ Route::resource('about', AboutController::class);
 Route::resource('testimonial', TestimonialsController::class);
 Route::resource('faq', FAQController::class);
 
-//Collaborator Routes
-Route::get('/become-collaborator', [CollaboratorController::class, 'index'])->name('become-collaborator');
-Route::post('/become/collaborator', [CollaboratorController::class, 'store'])->name('become/collaborator.store');
-
-// Admin Login Route
-Route::get('/admin/login', [AdminController::class, 'login'])->name('admin.login');
-
 
     
-Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('admin/dashboard/index', [DashboardController::class, 'home'])->name('admin/dashboard/index');
+
+    
     Route::get('admin/member', [DashboardController::class, 'member'])->name('dashboard');
     Route::get('/das', fn () => view('components.dashboard.sidebar.das'))
         ->name('das');
