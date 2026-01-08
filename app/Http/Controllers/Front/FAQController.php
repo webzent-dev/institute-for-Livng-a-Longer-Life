@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Front;
 use App\Models\FaqCategory;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
 class FAQController extends Controller
 {
      
@@ -16,11 +15,10 @@ class FAQController extends Controller
 
         return [
             'category' => $category->name,
-
             'questions' => $category->faqs->map(function ($faq) {
                 return [
                     'q' => $faq->question, 
-                    'a' => $faq->answer,   // 👈 IMPORTANT
+                    'a' => $faq->answer, 
                 ];
             })->toArray(),
 
@@ -29,8 +27,6 @@ class FAQController extends Controller
     })->toArray();
         return view('front.pages.faq', compact('faqs'));
     }
-
-     
     public function create()
     {
          

@@ -12,21 +12,20 @@ class DashboardController extends Controller
      
     public function index()
     {
-        $users = DB::table('users')->where('id', 1)->first();
-         
-
-        return view('front.dashboard.dashboard', compact('users'));
+        // $users = DB::table('users')->where('id', 1)->first();
+        return view('admin.dashboard.index');
         
     } 
     public function member()
     {
         return view('components.dashboard.member');
     }
-    public function home()
+
+    public function collaboratorDashboard()
     {
-        return view('front.dashboard.index');
+        return view('collaborator.dashboard.index');
     }
-  
+    
 
     private function getRoleStats($role)
     {

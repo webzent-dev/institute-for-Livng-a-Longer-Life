@@ -17,25 +17,23 @@ class LoginController extends Controller
     'email' => 'required|email',
     'password' => 'required',
 ]);
-
-if (!Auth::attempt([
-    'email' => $request->email,
-    'password' => $request->password,
-    'role' => 'user',   // 👈 IMPORTANT
-])) 
-{
-    return response()->json([
-        'message' => 'Invalid credentials or admin access not allowed'
-    ], 401);
-}
+    if (!Auth::attempt([
+        'email' => $request->email,
+        'password' => $request->password,
+        'role' => 'user',   // 👈 IMPORTANT
+    ])) 
+    {
+        return response()->json([
+            'message' => 'Invalid credentials or admin access not allowed'
+        ], 401);
+    }
 
 
 return response()->json([
     'message' => 'Login successful'
 ]);
+
    }
-
-
    public function adminLogin(Request $request)
   {
       $request->validate([
@@ -54,6 +52,24 @@ return response()->json([
     return back()->with('error', 'Invalid credentials or enter valid  credentials.')->withInput();
    }
 
+
+   public function collaboratorLogin(Request $request)
+  {
+      $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required',
+    ]); 
+
+    $credentials = $request->only('email', 'password');
+    $collaboratorLogin = Auth::attempt(array_merge($credentials, [
+        'role' => 'collaborator'
+    ]));
+    if ($collaboratorLogin) {
+        $request->session()->regenerate();
+        return redirect()->route('collaborator.dashboard')->with('success', 'Welcome Collaborator! Login successful.');
+    }
+    return back()->with('error', 'Invalid credentials or enter valid  credentials.')->withInput();
+   }
 
    public function logout(Request $request)
 		{
