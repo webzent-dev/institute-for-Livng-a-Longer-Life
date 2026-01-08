@@ -9,8 +9,13 @@ class HelpArticle extends Model
     protected $fillable = [
         'help_category_id','title','slug','content'
     ];
+    // public function category()
+    // {
+    //     return $this->belongsTo(HelpCategory::class);
+    // }
     public function category()
     {
-        return $this->belongsTo(HelpCategory::class);
+        return $this->belongsTo(HelpCategory::class, 'help_category_id');
+        
     }
 }

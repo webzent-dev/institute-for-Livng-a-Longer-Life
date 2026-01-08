@@ -93,14 +93,10 @@
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 
                     @foreach ($collaborators as $c)
-                        <div class="flex flex-col card border-2 bg-emerald-50 rounded-2xl {{ $c['featured'] ? 'border-primary shadow-medium' : 'shadow-soft' }} hover:border-primary py-4 ">
+                        <div class="flex flex-col card border-2  rounded-2xl {{ $c['featured'] ? 'border-primary shadow-medium' : 'shadow-soft' }} hover:border-primary py-4 ">
                             <div class="card-header px-6 py-4">
                                 <div class="flex justify-between items-start mb-4">
-                                    {{-- <div class="w-8 h-8 p-8 rounded-full gradient-primary bg-emerald-500 flex items-center justify-center">
-                                        <span class="text-2xl font-bold text-primary-foreground">
-                                            {{ collect(explode(' ', $c['name']))->map(fn($w) => $w[0])->join('') }}
-                                        </span>
-                                    </div> --}}
+                                     
                                     <x-ui.avatar name="{{ $c['name'] }}"  size="4" />
  
 
@@ -141,7 +137,7 @@
                                                 </x-badge>
                                             </div>
 
-                                            <div class=" sm:col-span-1 flex items-center justify-between p-3 bg-secondary rounded-lg bg-teal-50">
+                                            <div class=" sm:col-span-1 flex items-center justify-between p-3 bg-secondary rounded-lg bg-teal-50 gap-2">
                                                 <div class="flex items-center">
                                                     <i data-lucide="store" class="h-5 w-5 text-primary mr-2"></i>
                                                     
