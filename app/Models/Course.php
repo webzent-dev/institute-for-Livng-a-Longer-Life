@@ -6,12 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class Course extends Model
 {
-      protected $fillable = [
-        'first_name',
-        'last_name',
-        'email',
-        'phone',
-        'subject',
-        'description',
+     protected $fillable = [
+    'user_id',
+    'title',
+    'duration',
+    'instructor',
+    'category',
+    'description',
+    'video_file',
+    'video_url',
+    'featured',
+    'published',
+    'status',
+    'approval_status',
     ];
+
+   
+
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

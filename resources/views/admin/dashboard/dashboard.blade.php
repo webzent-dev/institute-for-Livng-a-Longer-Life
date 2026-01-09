@@ -36,19 +36,14 @@
        
         <x-dashboard.sidebar.header />
 
-        <main class="flex-1 p-4 md:p-6 overflow-y-auto">
-
-               @if (request()->is('admin/dashboard')) 
-   
-            
-                            <!-- Main Content -->
-                        <main class="flex-1 p-4 md:p-6 overflow-y-auto scrollbar-custom ">
+        @if(auth()->user()->isAdmin())
+              <main class="flex-1 p-4 md:p-6 overflow-y-auto scrollbar-custom ">
                             <!-- Welcome Card -->
                            
                             <div class="bg-white/100 rounded-2xl p-6   mb-6 shadow-md text-slate-800">
                                 <div class="flex flex-col md:flex-row md:items-center justify-between">
                                     <div>
-                                        <h2 class="text-2xl font-semibold mb-2 text-left">Welcome back, Dr. Zeines!</h2>
+                                        <h2 class="text-2xl font-semibold mb-2 text-left">Welcome back, {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}!</h2>
                                         <p class=" mb-4 max-w-2xl">Your team's performance is up by 24% this month. Keep up the great work!</p>
                                         <button class="bg-white text-green-600 font-medium px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all shadow-md">
                                             View Reports
@@ -64,10 +59,10 @@
                             <div class="my-10">
                                  <!-- Cards Section -->
                             <x-ui.stats :items="[
-     ['label' => 'Total Users', 'value' => 127, 'icon' => 'users','icon_color' => 'bg-green-50 text-green-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-green-600'],
-    ['label' => 'collaborators', 'value' => '8', 'icon' => 'credit-card','iconbg' => 'bg-amber-50', 'icon_color' => 'bg-amber-50 text-amber-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-amber-50 text-amber-600'],
+     ['label' => 'Total Users', 'value' => $totalUsers, 'icon' => 'users','icon_color' => 'bg-green-50 text-green-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-green-600'],
+    ['label' => 'collaborators', 'value' => $collaborators, 'icon' => 'credit-card','iconbg' => 'bg-amber-50', 'icon_color' => 'bg-amber-50 text-amber-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-amber-50 text-amber-600'],
     ['label' => 'Orders', 'value' => 340, 'icon' => 'bar-chart-3', 'iconbg' => 'bg-blue-50', 'icon_color' => 'bg-blue-50 text-blue-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-blue-600'],
-    ['label' => 'Visits', 'value' => '45k', 'icon' => 'eye',  'iconbg' => 	'bg-yellow-50', 	'icon_color' => 	'text-yellow-600', 	'percent_change' => '+8.5%', 	'percent_change_bg' => 	'text-yellow-600'],
+    ['label' => 'Visits', 'value' => 20, 'icon' => 'eye',  'iconbg' => 	'bg-yellow-50', 	'icon_color' => 	'text-yellow-600', 	'percent_change' => '+8.5%', 	'percent_change_bg' => 	'text-yellow-600'],
 ]" />
                             </div>
                          
@@ -378,10 +373,95 @@
                                 </div>
                             </div>
                         </main>
+                 @endif
+
+            @if(auth()->user()->isCollaborator())
+                 <div class="bg-white/100 rounded-2xl p-6   mb-6 shadow-md text-slate-800">
+                                <div class="flex flex-col md:flex-row md:items-center justify-between">
+                                    <div>
+                                        <h2 class="text-2xl font-semibold mb-2 text-left">Welcome back, {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}!</h2>
+                                        <p class=" mb-4 max-w-2xl">Your team's performance is up by 24% this month. Keep up the great work!</p>
+                                        <button class="bg-white text-green-600 font-medium px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all shadow-md">
+                                            View Reports
+                                        </button>
+                                    </div>
+                                    <div class="mt-6 md:mt-0">
+                                        <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-green-100 hover:bg-green-200 flex items-center justify-center mx-auto">
+                                            <i data-lucide="trending-up" class="w-10 h-10 text-green-500"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="my-10">
+                                 <!-- Cards Section -->
+                            <x-ui.stats :items="[
+     ['label' => 'Total Users', 'value' => $totalUsers, 'icon' => 'users','icon_color' => 'bg-green-50 text-green-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-green-600'],
+    ['label' => 'collaborators', 'value' => $collaborators, 'icon' => 'credit-card','iconbg' => 'bg-amber-50', 'icon_color' => 'bg-amber-50 text-amber-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-amber-50 text-amber-600'],
+    ['label' => 'Orders', 'value' => 340, 'icon' => 'bar-chart-3', 'iconbg' => 'bg-blue-50', 'icon_color' => 'bg-blue-50 text-blue-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-blue-600'],
+    ['label' => 'Visits', 'value' => 20, 'icon' => 'eye',  'iconbg' => 	'bg-yellow-50', 	'icon_color' => 	'text-yellow-600', 	'percent_change' => '+8.5%', 	'percent_change_bg' => 	'text-yellow-600'],
+]" />
+                            </div>
+                         
+
+                            
+                           
+                            <!-- Stats Cards -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                                <!-- Stat Card 1 -->
+                                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="p-3 rounded-xl bg-blue-50 text-green-600">
+                                            <i data-lucide="users" class="w-6 h-6"></i>
+                                        </div>
+                                        <span class="text-sm text-green-600 font-medium bg-green-50 px-2.5 py-1 rounded-full">+12.5%</span>
+                                    </div>
+                                    <h3 class="text-2xl font-semibold text-slate-800 mb-1">4,823</h3>
+                                    <p class="text-slate-500 text-sm">Total Users</p>
+                                </div>
+                                
+                                <!-- Stat Card 2 -->
+                                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="p-3 rounded-xl bg-emerald-50 text-emerald-600">
+                                            <i data-lucide="credit-card" class="w-6 h-6"></i>
+                                        </div>
+                                        <span class="text-sm text-green-600 font-medium bg-green-50 px-2.5 py-1 rounded-full">+8.2%</span>
+                                    </div>
+                                    <h3 class="text-2xl font-semibold text-slate-800 mb-1">$42,580</h3>
+                                    <p class="text-slate-500 text-sm">Monthly Revenue</p>
+                                </div>
+                                
+                                <!-- Stat Card 3 -->
+                                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="p-3 rounded-xl bg-amber-50 text-amber-600">
+                                            <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+                                        </div>
+                                        <span class="text-sm text-red-600 font-medium bg-red-50 px-2.5 py-1 rounded-full">-3.1%</span>
+                                    </div>
+                                    <h3 class="text-2xl font-semibold text-slate-800 mb-1">1,247</h3>
+                                    <p class="text-slate-500 text-sm">Sessions</p>
+                                </div>
+                                
+                                <!-- Stat Card 4 -->
+                                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="p-3 rounded-xl bg-violet-50 text-violet-600">
+                                            <i data-lucide="target" class="w-6 h-6"></i>
+                                        </div>
+                                        <span class="text-sm text-green-600 font-medium bg-green-50 px-2.5 py-1 rounded-full">+24.7%</span>
+                                    </div>
+                                    <h3 class="text-2xl font-semibold text-slate-800 mb-1">86%</h3>
+                                    <p class="text-slate-500 text-sm">Conversion Rate</p>
+                                </div>
+                            </div>
+@endif
+
+
+       
 
                
-             @endif   
-
+             
             @yield('content')
             
         </main>

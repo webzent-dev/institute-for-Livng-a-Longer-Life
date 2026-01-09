@@ -13,6 +13,12 @@ class DashboardController extends Controller
     public function index()
     {
         // $users = DB::table('users')->where('id', 1)->first();
+        return view('collaborator.dashboard.index', [
+        'totalUsers'      => User::count(),
+        'admins'          => User::where('role', 'admin')->count(),
+        'collaborators'   => User::where('role', 'collaborator')->count(),
+        'customers'       => User::where('role', 'user')->count(),
+    ]);
         return view('admin.dashboard.index');
         
     } 
@@ -23,6 +29,12 @@ class DashboardController extends Controller
 
     public function collaboratorDashboard()
     {
+         return view('collaborator.dashboard.index', [
+        'totalUsers'      => User::count(),
+        'admins'          => User::where('role', 'admin')->count(),
+        'collaborators'   => User::where('role', 'collaborator')->count(),
+        'customers'       => User::where('role', 'user')->count(),
+    ]);
         return view('collaborator.dashboard.index');
     }
     
