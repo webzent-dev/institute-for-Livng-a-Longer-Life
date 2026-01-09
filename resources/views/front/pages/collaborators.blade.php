@@ -172,7 +172,7 @@ $collaborators = [
             </div>
         </div>
         
-        {{--Clear Filter Results Count --}}
+        {{--Clear Filter  --}}
         <div id="resultsCount" class="mb-6 text-muted-foreground">
             {{-- Showing {{ count($collaborators) }} of {{ count($collaborators) }} collaborators --}}
         </div>
