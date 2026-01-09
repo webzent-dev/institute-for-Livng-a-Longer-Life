@@ -16,6 +16,11 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\UserRegister; 
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Courses\CoursesController;
+
+
+
+
 
  
 // admin routes
@@ -25,8 +30,13 @@ Route::post('/admin/login', [LoginController::class, 'adminLogin'])->name('admin
 
 Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(function () 
 {
-    Route::get('dashboard', [DashboardController::class, 'index'])
-        ->name('admin.dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('Approved', [AdminController::class, 'Approved'])->name('admin.approved.products');
+    Route::post('/admin/products/{id}/status', [AdminController::class, 'updateStatus'])->name('admin.products.status');
+    Route::get('users', [AdminController::class, 'users'])->name('users.index');
+    Route::get('/collaborators', [AdminController::class, 'collaborators'])->name('collaborators.index');
+    Route::get('/courses', [AdminController::class, 'courses'])->name('admin.courses');
+    
 
     Route::get('users',[AdminController::class, 'users'])->name('admin.users');
     
@@ -52,12 +62,26 @@ Route::prefix('collaborator')->middleware([RoleMiddleware::class.':collaborator'
 {
     Route::get('dashboard', [DashboardController::class, 'collaboratorDashboard'])->name('collaborator.dashboard');
 
+    Route::get('/profile', [CollaboratorController::class, 'profile'])->name('profile.show');  
+    Route::put('/profile/update', [CollaboratorController::class, 'updateProfile'])->name('profile.update');
+
     //product routes for collaborator
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
     Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
     Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
-    Route::post('/products/{id}/update', [ProductController::class, 'update'])->name('products.update');
+    Route::put('/products/{id}/update', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{id}/delete', [ProductController::class, 'destroy'])->name('products.delete');
+
+    Route::get('/courses', [CoursesController::class, 'index'])->name('courses.index');
+    Route::get('/courses/create', [CoursesController::class, 'create'])->name('courses.create');
+    Route::post('/courses/store', [CoursesController::class, 'store'])->name('courses.store');
+    Route::get('/courses/{id}/edit', [CoursesController::class, 'edit'])->name('courses.edit');
+    Route::put('/courses/{course}', [CoursesController::class, 'update'])->name('courses.update');
+    Route::delete('/courses/{course}', [CoursesController::class, 'destroy'])->name('courses.destroy');
+   
+
+    
 
 
     // Yahan aur collaborator routes add kar sakte ho
