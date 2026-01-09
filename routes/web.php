@@ -38,6 +38,11 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
     Route::get('/courses', [AdminController::class, 'courses'])->name('admin.courses');
     
 
+    Route::get('users',[AdminController::class, 'users'])->name('admin.users');
+    
+       
+    Route::view('collaborators', 'admin.dashboard.collaborators-list')->name('admin.collaborators');   
+
     // Yahan aur admin routes add kar sakte ho
     // Route::get('users', [DashboardController::class, 'users'])->name('admin.users');
     // Route::get('settings', [DashboardController::class, 'settings'])->name('admin.settings');
@@ -46,6 +51,9 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
 // Admin Routes closures
 
 //Collaborator  Routes
+
+Route::get('/become-collaborator', [CollaboratorController::class, 'become_collaborator'])->name('become-collaborator');
+Route::post('/become/collaborator', [CollaboratorController::class, 'store'])->name('become/collaborator.store');
 
 Route::get('/collaborator', [CollaboratorController::class, 'index']);
 Route::post('/collaborator/login', [LoginController::class, 'collaboratorLogin'])->name('collaborator.login');
