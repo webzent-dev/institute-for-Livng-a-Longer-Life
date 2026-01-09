@@ -43,7 +43,7 @@
                     </p>
                 </div> 
             </div>
-        </section>
+    </section>
    <section class="section-base gradient-subtle py-20">
             <div class="container-base max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                  <div class="text-center mb-12">
@@ -54,7 +54,8 @@
                 </div> 
                 <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                     @foreach($benefits as $b)
-                    <div class="border-2 hover:border-primary transition-all shadow-soft hover:shadow-medium rounded-xl">
+                    {{-- <div class="border-2 hover:border-primary transition-all shadow-soft hover:shadow-medium rounded-xl"> --}}
+                    <div class="card hover:border-primary">
                         <div class="p-6 space-y-4">
                             <div class="iconbg w-14 h-14">
                                  
@@ -77,7 +78,7 @@
     <section class="section-base gradient-subtle py-20">
             <div class="container-base max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">   
                 <div class="lg:col-span-2">
-                        <x-card class="shadow-medium">
+                        <x-card class=" shadow-medium">
                             
                             <x-card-header>
                                 <x-card-title class="text-3xl">Collaborator Application</x-card-title>
