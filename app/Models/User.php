@@ -52,4 +52,14 @@ class User extends Authenticatable
     {
         return $this->role === 'collaborator';
     }
+
+    public function courses()
+    {
+        return $this->hasMany(Course::class);
+    }
+
+     public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

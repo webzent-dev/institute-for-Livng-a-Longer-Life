@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Front;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class AboutController extends Controller
 {
@@ -18,7 +18,15 @@ class AboutController extends Controller
     }
     public function collaborators()
     {
-        return view('front.pages.collaborators');
+    $collaborators = User::where('role', 'collaborator') ->withCount('courses', 'products') ->get();
+    $specialties = $collaborators->pluck('Specialty')
+    ->filter()
+    ->unique()
+    ->sort()
+    ->values();
+
+return view('front.pages.collaborators', compact('collaborators', 'specialties'));
+       
     }
 
      
