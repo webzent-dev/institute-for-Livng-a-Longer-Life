@@ -51,6 +51,44 @@
         </a> -->
     </div>
 
+    <!-- Edit User Modal -->
+<div id="editUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+        <h2 class="text-xl font-semibold mb-4">Change Role User</h2>
+
+        <form id="editUserForm" method="POST" action="{{ route('admin.user.update') }}">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="user_id" id="editUserId">
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1" for="editFirstName">First Name</label>
+                <input type="text" id="editFirstName" name="first_name" class="w-full border rounded px-3 py-2">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1" for="editLastName">Last Name</label>
+                <input type="text" id="editLastName" name="last_name" class="w-full border rounded px-3 py-2">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1" for="editRole">Role</label>
+                <select id="editRole" name="role" class="w-full border rounded px-3 py-2">
+                    <option value="admin">Admin</option>
+                    <option value="collaborator">Collaborator</option>
+                    <option value="user">User</option>
+                </select>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
     <!-- Product Table -->
     <div class="bg-white rounded-xl shadow-sm overflow-x-auto">
        <table class="min-w-full text-sm divide-y divide-gray-200">
@@ -100,6 +138,20 @@
                 </td>
                <td class="px-4 py-3 text-right">
     <div class="flex justify-end gap-3">
+
+<button
+    type="button"
+    class="text-blue-600 hover:text-blue-800"
+    title="Change Role"
+    onclick="openEditModal({{ $user->id }}, '{{ $user->first_name }}', '{{ $user->last_name }}', '{{ $user->role }}')"
+>
+    <svg xmlns="http://www.w3.org/2000/svg"
+         class="h-5 w-5"
+         viewBox="0 0 20 20"
+         fill="currentColor">
+        <path d="M10 2a5 5 0 100 10 5 5 0 000-10zM2 18a8 8 0 0116 0H2z" />
+    </svg>
+</button>
 
         <!-- Edit Icon (no route yet) -->
         <button
@@ -188,6 +240,21 @@
     }, 2000);
 }
 
+</script>
+
+<script>
+function openEditModal(id, firstName, lastName, role) {
+    document.getElementById('editUserId').value = id;
+    document.getElementById('editFirstName').value = firstName;
+    document.getElementById('editLastName').value = lastName;
+    document.getElementById('editRole').value = role;
+
+    document.getElementById('editUserModal').classList.remove('hidden');
+}
+
+function closeEditModal() {
+    document.getElementById('editUserModal').classList.add('hidden');
+}
 </script>
 
 </html>

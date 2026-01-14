@@ -20,25 +20,25 @@ function login() {
 
         generalError: "",
  
-        validateField(field) {
+        // validateField(field) {
 
-            const rule = validators.rules[field];
+        //     const rule = validators.rules[field];
 
-            if (!rule) return;
+        //     if (!rule) return;
  
-            const result = rule(this.form[field], this.form);
+        //     const result = rule(this.form[field], this.form);
 
-            this.errors[field] = result === true ? "" : result;
+        //     this.errors[field] = result === true ? "" : result;
 
-        },
+        // },
  
-        validateAllFields() {
+        // validateAllFields() {
 
-            Object.keys(this.form).forEach(field => this.validateField(field));
+        //     Object.keys(this.form).forEach(field => this.validateField(field));
 
-            return Object.values(this.errors).every(v => !v);
+        //     return Object.values(this.errors).every(v => !v);
 
-        },
+        // },
  
         async submitForm() {
 
@@ -50,7 +50,7 @@ function login() {
  
             // 🔍 Client validation
 
-            if (!this.validateAllFields()) return;
+            // if (!this.validateAllFields()) return;
  
             try {
 

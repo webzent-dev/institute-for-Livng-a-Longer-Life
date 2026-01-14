@@ -18,7 +18,14 @@ class User extends Authenticatable
         'email',
         'phone',
         'password',
-        'type',
+        'role',
+        'Specialty',
+        'professional_credentials',
+        'experience',
+        'organization',
+        'website',
+        'collaborator_massge',
+        
     ];
 
      
