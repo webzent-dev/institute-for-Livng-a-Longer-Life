@@ -13,29 +13,29 @@
 
       <!-- Desktop Navigation -->
       
-      <div class="hidden lg:flex items-center gap-2">
-        <a href="{{ url('/') }}" class="px-4 py-2 text-md font-medium rounded-md hover:bg-amber-500 active:bg-green-600 ">Home</a>
+      <div class=" lg:flex items-center gap-2">
+        <a href="{{ url('/') }}" class="px-4 py-2 text-md font-medium rounded-md {{ request()->is('/') ? 'text-primary' : 'hover:bg-amber-500' }}">Home</a>
 
         <div class="relative group">
-          <button class="flex items-center px-4 py-2 text-sm font-medium rounded-md  hover:bg-amber-500 active:bg-lime-600">
+          <button class="flex items-center px-4 py-2 text-sm font-medium rounded-md {{ request()->is('about*') ? 'text-primary' : 'hover:bg-amber-500' }}">
             About
             <i data-lucide="chevron-down" class="ml-1 h-4 w-4"></i>
           </button>
           <div class="absolute hidden group-hover:block bg-white border border-gray-200 rounded-md shadow-lg w-56 ">
             
-              <a href="{{ url('/about-dr-zeines') }}" class="block px-4 py-2 text-sm hover:bg-gray-100">About Dr. Zeines</a>
-              <a href="/collaborators" class="block px-4 py-2 text-sm hover:bg-gray-100">Our Collaborators</a>
+              <a href="{{ url('/about-dr-zeines') }}" class="block px-4 py-2 text-sm  {{ request()->is('about-dr-zeines') ? 'text-primary' : 'hover:bg-gray-100' }}">About Dr. Zeines</a>
+              <a href="/collaborators" class="block px-4 py-2 text-sm {{ request()->is('collaborators') ? 'text-primary' : 'hover:bg-gray-100' }}">Our Collaborators</a>
           </div>
         </div>
         
 
-        <a href="{{ url('/intro-videos') }}" class="px-4 py-2 text-sm font-medium rounded-md hover:bg-amber-500 active:bg-lime-600">Intro Videos</a> 
-        <a href="{{ url('/vital-boost') }}" class="px-4 py-2 text-sm font-medium rounded-md  hover:bg-amber-500 active:bg-lime-600">Vital Boost</a>
-        <a href="{{ url('/shop') }}" class="px-4 py-2 text-sm font-medium rounded-md  hover:bg-amber-500 active:bg-lime-600">Store</a>
-        <a href="{{ url('/contact') }}" class="px-4 py-2 text-sm font-medium rounded-md  hover:bg-amber-500 active:bg-lime-600">Contact Us</a>
-        <a href="{{ url('/testimonials') }}" class="px-4 py-2 text-sm font-medium rounded-md  hover:bg-amber-500 active:bg-lime-600">Testimonials</a>
+        <a href="{{ url('/vital-boost') }}" class="px-4 py-2 text-sm font-medium rounded-md {{ request()->is('vital-boost') ? 'text-primary' : 'hover:bg-amber-500' }}">Vital Boost</a>
+        <a href="{{ url('/shop') }}" class="px-4 py-2 text-sm font-medium rounded-md {{ request()->is('shop') ? 'text-primary' : 'hover:bg-amber-500' }}">Store</a>
+        {{-- <a href="{{ url('/shop') }}" class="px-4 py-2 text-sm font-medium rounded-md  hover:bg-amber-500 active:bg-lime-600">Store</a> --}}
+        <a href="{{ url('/contact') }}" class="px-4 py-2 text-sm font-medium rounded-md {{ request()->is('contact') ? 'text-primary' : 'hover:bg-amber-500' }}">Contact Us</a>
+        <a href="{{ url('/testimonials') }}" class="px-4 py-2 text-sm font-medium rounded-md  {{ request()->is('testimonials') ? 'text-primary' : 'hover:bg-amber-500' }}">Testimonials</a>
 
-        <a href="{{ url('/cart') }}" class="relative px-3 py-2 bgs-green  hover:bg-amber-500 active:bg-lime-600 rounded-md" style="background-color:#14b989; hover:#f7f317; ">
+        <a href="{{ url('/cart') }}" class="relative px-3 py-2 bgs-green {{ request()->is('cart') ? 'text-primary' : 'hover:bg-amber-500' }} rounded-md" style="background-color:#14b989; hover:#f7f317; ">
           <i data-lucide="shopping-cart" class="h-5 w-5"></i>
           <span class="absolute -top-1 -right-1 bg-gradient-to-r from-green-500 to-orange-400 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
         </a>

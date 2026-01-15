@@ -27,21 +27,16 @@ use App\Http\Controllers\Courses\CoursesController;
 
 Route::get('/admin', [AdminController::class, 'index']);
 Route::post('/admin/login', [LoginController::class, 'adminLogin'])->name('admin.login');
-
 Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(function () 
 {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('Approved', [AdminController::class, 'Approved'])->name('admin.approved.products');
     Route::post('/admin/products/{id}/status', [AdminController::class, 'updateStatus'])->name('admin.products.status');
     Route::get('users', [AdminController::class, 'users'])->name('users.index');
+    Route::put('user/update', [AdminController::class, 'update'])->name('admin.user.update');
     Route::get('/collaborators', [AdminController::class, 'collaborators'])->name('collaborators.index');
-    Route::get('/courses', [AdminController::class, 'courses'])->name('admin.courses');
+    Route::get('admin/courses', [AdminController::class, 'courses'])->name('admin.courses');
     
-
-    Route::get('users',[AdminController::class, 'users'])->name('admin.users');
-    
-       
-    Route::view('collaborators', 'admin.dashboard.collaborators-list')->name('admin.collaborators');   
 
     // Yahan aur admin routes add kar sakte ho
     // Route::get('users', [DashboardController::class, 'users'])->name('admin.users');
@@ -52,17 +47,17 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
 
 //Collaborator  Routes
 
-Route::get('/become-collaborator', [CollaboratorController::class, 'become_collaborator'])->name('become-collaborator');
-Route::post('/become/collaborator', [CollaboratorController::class, 'store'])->name('become/collaborator.store');
+
 
 Route::get('/collaborator', [CollaboratorController::class, 'index']);
+Route::post('collaborator/apply', [CollaboratorController::class, 'apply'])->name('become.collaborator.store');
 Route::post('/collaborator/login', [LoginController::class, 'collaboratorLogin'])->name('collaborator.login');
 
 Route::prefix('collaborator')->middleware([RoleMiddleware::class.':collaborator'])->group(function () 
 {
     Route::get('dashboard', [DashboardController::class, 'collaboratorDashboard'])->name('collaborator.dashboard');
 
-    Route::get('/profile', [CollaboratorController::class, 'profile'])->name('profile.show');  
+    Route::get('/profile', [CollaboratorController::class, 'createProfile'])->name('profile.show');  
     Route::put('/profile/update', [CollaboratorController::class, 'updateProfile'])->name('profile.update');
 
     //product routes for collaborator
@@ -111,6 +106,13 @@ Route::get('/shop', [ShopController::class, 'index'] )->name('shop');
 Route::get('/product-details', [ShopController::class, 'productDetails'] )->name('product-details');
 Route::get('/products/filter', [ShopController::class, 'filter'])->name('products.filter');  
 Route::get('/vital-boost', [VitalBoostController::class, 'index'] )->name('vital-boost');
+Route::get('/become-collaborator', [CollaboratorController::class, 'becomeCollaborator'])->name('become-collaborator');
+Route::get('/collaborator/profile-details', [CollaboratorController::class, 'profile'])->name('collaborator.profile-details');
+Route::post('/become/collaborator', [CollaboratorController::class, 'store'])
+    ->name('become.collaborator.store');
+
+ 
+
 Route::resource('index', IndexController::class);
 Route::resource('about', AboutController::class);
 Route::resource('testimonial', TestimonialsController::class);

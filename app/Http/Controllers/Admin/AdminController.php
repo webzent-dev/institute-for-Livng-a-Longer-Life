@@ -53,5 +53,26 @@ class AdminController extends Controller
             return view('admin.courses', compact('courses'));
         }
 
+
+        // role update function
+        public function update(Request $request)
+{
+    $request->validate([
+        'user_id' => 'required|exists:users,id',
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'role' => 'required|in:admin,collaborator,user',
+    ]);
+
+    $user = User::find($request->user_id);
+    $user->update([
+        'first_name' => $request->first_name,
+        'last_name' => $request->last_name,
+        'role' => $request->role,
+    ]);
+
+    return redirect()->back()->with('success', 'Role updated successfully!');
+}
+
     
 }   

@@ -20,12 +20,15 @@ class Collaborator extends Model
         'practice_organization',
         'website_url',
         'description',
+        'status',
+        'role',
     ];
 
-    // Optional: Accessors/Mutators for phone formatting (e.g., normalize to E.164)
+  
     protected $casts = [
         'experience' => 'integer',
     ];
+    
     
 }
 

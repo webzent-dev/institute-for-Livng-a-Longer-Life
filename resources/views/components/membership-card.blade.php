@@ -57,7 +57,7 @@
                         </div>
                         
                            {{-- If URL exists → use data-url | else → open modal --}}
-                                @if (!empty($plan['url']))
+                                {{-- @if (!empty($plan['url']))
                                 
                                       <a href="{{ $plan['url'] }}"
                                         type="button" 
@@ -69,7 +69,7 @@
                                         </a>
                                 
                                    
-                                @else
+                                @else --}}
                                 
                                     <button
                                         type="button" 
@@ -88,7 +88,7 @@
                                             Get Started 
                                     </button>
                                 
-                                @endif
+                                {{-- @endif --}}
                       
                          
                           
