@@ -87,11 +87,6 @@ class CollaboratorController extends Controller
         Mail::to($user->email)->send(
         new CollaboratorLoginMail($user, $plainPassword)
     );
-       return redirect()->route('become-collaborator')->with('success', 'Submitted successfully.');
-     
-                
-            }
-
-    
-
-            }
+      return redirect()->back()->with('success', 'Submitted successfully.');
+     }
+}
