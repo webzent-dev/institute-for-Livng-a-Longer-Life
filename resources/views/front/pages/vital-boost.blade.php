@@ -2,13 +2,7 @@
 
 @section('content')
 <div class=" min-h-screen flex flex-col">
-
-   
-
     <main class="  ">
-
-
-
         {{-- Hero Section --}}
         <section class="section-base gradient-subtle py-20">
             <div class="container-base max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,17 +15,14 @@
                             <span class="text-sm font-semibold text-primary">Premium Wellness Formula</span>
                         </div>
 
-                        <h1 class="heading-1">Vital Boost</h1>
+                        <h1 class="heading-1">{{ $product->name }}</h1>
 
                         <p class="text-2xl text-muted-foreground">
-                            Your Daily Foundation for Longevity and Vitality
+                            {{ $product->category }}
                         </p>
 
                         <p class="text-lg text-muted-foreground">
-                            Inspired by years of lecturing and thirty years of research treating thousands 
-                            of patients, Dr. Zeines developed this excellent and complete vitamin, mineral, 
-                            and nutrient-rich supplement. When used daily, it gives you renewed Energy, 
-                            Vitality, and Health to help you live a better, more satisfying life!
+                            {{ $product->description }}
                         </p>
 
                         <div class="p-6 bg-secondary rounded-lg border-l-8 border-primary  ">
@@ -55,7 +46,7 @@
                             <div class="p-8">
                                 <div class="aspect-square rounded-2xl overflow-hidden">
                                     <img 
-                                        src="{{ asset('assets/vitalboost.webp') }}"
+                                        src="{{ asset('product_images/'.$product->image) }}"
                                         alt="Vital Boost - Premium Longevity Formula"
                                         class="w-full h-full object-cover"
                                     />

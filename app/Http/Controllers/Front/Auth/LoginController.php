@@ -55,29 +55,32 @@ return response()->json([
 
    public function collaboratorLogin(Request $request)
   {
-      $request->validate([
-        'email'    => 'required|email',
-        'password' => 'required',
-    ]); 
+     $request->validate([
+    'email'    => 'required|email',
+    'password' => 'required',
+]);
 
-    $credentials = $request->only('email', 'password');
-    $collaboratorLogin = Auth::attempt(array_merge($credentials, [
-        'role' => 'collaborator'
-    ]));
-    if ($collaboratorLogin) {
-        $request->session()->regenerate();
-        return redirect()->route('collaborator.dashboard')->with('success', 'Welcome Collaborator! Login successful.');
-    }
-    return back()->with('error', 'Invalid credentials or enter valid  credentials.')->withInput();
-   }
+$credentials = $request->only('email', 'password');
+$collaboratorLogin = Auth::attempt(array_merge($credentials, [
+    'role' => 'collaborator',
+    'status' => 'active', // <-- only active collaborators
+]));
 
-   public function logout(Request $request)
-		{
-		    Auth::logout();
-		    $request->session()->invalidate();
-		    $request->session()->regenerateToken();
+if ($collaboratorLogin) {
+    $request->session()->regenerate();
+    return redirect()->route('collaborator.dashboard')
+                     ->with('success', 'Welcome Collaborator! Login successful.');
+}
+$user = \App\Models\User::where('email', $request->email)
+                         ->where('role', 'collaborator')
+                         ->first();
 
-		    return redirect('/');
-		}
+if ($user && $user->status !== 'active') {
+    return back()->with('error', 'Your account is inactive. Please wait for admin to activate it.')->withInput();
+}
+
+// If credentials are completely wrong
+return back()->with('error', 'Invalid credentials.')->withInput();
+  }
 
 }

@@ -25,6 +25,7 @@ class User extends Authenticatable
         'organization',
         'website',
         'collaborator_massge',
+         'status',
         
     ];
 

@@ -171,7 +171,7 @@
                                 </a>
                             </div>
                             <div class="sm:col-span-1">
-                                <a href="{{ url('/shop?vendor='.$c['id']) }}" class="btn btn-outline w-full sm:w-auto flex items-center justify-center font-semibold px-2 py-3 rounded-md">
+                                <a href="{{ route('collaborator.store', encrypt($c['id'])) }}" class="btn btn-outline w-full sm:w-auto flex items-center justify-center font-semibold px-2 py-3 rounded-md">
                                     <button class="w-full flex items-center justify-center">
                                         <i data-lucide="store" class="h-5 w-5 hover:text-white mr-2"></i>
                                         <span class="ml-2">Visit Store</span>

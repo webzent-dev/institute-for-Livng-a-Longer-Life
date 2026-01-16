@@ -532,7 +532,7 @@
                       {{-- Image --}}
                       <div class="relative" >
                           <img
-                              src="{{ asset('assets/vitalboost.webp') }}"
+                              src="{{ asset('product_images/'.$product->image) }}"
                               alt="Vital Boost superfood supplement"
                               class="w-full max-w-md mx-auto"
                           />
@@ -543,14 +543,11 @@
                           
 
                           <h2 class="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mt-2 mb-6">
-                              Vital Boost
+                              {{ $product->name}}
                           </h2>
 
                           <p class="text-muted-foreground mb-8 leading-relaxed">
-                              Dr. Zeines created Vital Boost, a Superfood, specifically but not exclusively for his patients.
-                              Vital Boost is not just a supplement; it's a revolution in your daily wellness routine. Crafted
-                              for the modern lifestyle, it's a powerhouse of phyto-nutrients and nutraceutical ingredients,
-                              all packed into one vegan-friendly formula.
+                                {{ $product->description }}
                           </p>
 
                           {{-- Benefits list --}}

@@ -73,16 +73,31 @@
                 <td class="px-4 py-3">{{ $collaborator->email }}</td>
                 <td class="px-4 py-3">{{ $collaborator->phone }}</td>
                 <td class="px-4 py-3">
-                   <span
-    class="px-2 py-1 text-xs rounded status-badge
-    {{ $collaborator->status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}"
-    data-product-id="{{ $collaborator->id }}"
-    data-status="{{ $collaborator->status }}"
-    data-url="{{ route('admin.products.status', $collaborator->id) }}"
-    style="cursor:pointer;"
->
-    {{ ucfirst($collaborator->status) }}
-</span>
+                                    <span
+                        class="px-2 py-1 text-xs rounded status-badge inline-flex items-center gap-1
+                        {{ $collaborator->status === 'active'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-red-100 text-red-700' }}"
+                        data-id="{{ $collaborator->id }}"
+                        data-status="{{ $collaborator->status }}"
+                        data-url="{{ route('admin.collaborators.status', $collaborator->id) }}"
+                        style="cursor:pointer;"
+                    >
+                        <span class="status-text">
+                            {{ ucfirst($collaborator->status ?? 'inactive') }}
+                        </span>
+
+                        <!-- Loader -->
+                        <svg class="loader hidden w-3 h-3 animate-spin"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10"
+                                    stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                        </svg>
+                    </span>
+
                 </td>
                <td class="px-4 py-3 text-right">
     <div class="flex justify-end gap-3">
@@ -175,5 +190,63 @@
 }
 
 </script>
+
+<script>
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.status-badge')) {
+
+        let badge = e.target.closest('.status-badge');
+        let url = badge.dataset.url;
+
+        let text = badge.querySelector('.status-text');
+        let loader = badge.querySelector('.loader');
+
+        // ⛔ prevent double click
+        if (badge.classList.contains('loading')) return;
+        badge.classList.add('loading');
+
+        // ✅ show loader
+        text.classList.add('hidden');
+        loader.classList.remove('hidden');
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            // update text
+            text.textContent =
+                data.status.charAt(0).toUpperCase() + data.status.slice(1);
+
+            badge.dataset.status = data.status;
+
+            // update color
+            badge.classList.remove(
+                'bg-green-100','text-green-700',
+                'bg-red-100','text-red-700'
+            );
+
+            if (data.status === 'active') {
+                badge.classList.add('bg-green-100','text-green-700');
+            } else {
+                badge.classList.add('bg-red-100','text-red-700');
+            }
+        })
+        .catch(err => console.error(err))
+        .finally(() => {
+            // ✅ hide loader
+            loader.classList.add('hidden');
+            text.classList.remove('hidden');
+            badge.classList.remove('loading');
+        });
+    }
+});
+</script>
+
 
 </html>
