@@ -16,7 +16,9 @@
     <p><strong>Email:</strong> {{ $user->email }}</p>
     <p><strong>Password:</strong> {{ $password }}</p>
 
-    <p>Please login and change your password after first login.</p>
+   <p><strong>Note:</strong> Your account is currently inactive. Please wait for the administrator to activate it. Once you log in for the first time, we recommend changing your password.</p>
+
+
 
     <br>
     <p>Thanks,<br>{{ config('app.name') }}</p>
