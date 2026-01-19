@@ -36,7 +36,7 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
     Route::put('user/update', [AdminController::class, 'update'])->name('admin.user.update');
     Route::get('/collaborators', [AdminController::class, 'collaborators'])->name('collaborators.index');
 
- 
+
 
     Route::get('/web/settings', [WebSettingsController::class, 'websettings'])->name('admin.web.settings');
     // Route::get('/web/settings', [WebSettingsController::class, 'editSettings'])->name('admin.web.settings.edit');
@@ -108,6 +108,11 @@ Route::get('/become-collaborator', [CollaboratorController::class, 'becomeCollab
 Route::get('/collaborator/profile-details', [CollaboratorController::class, 'profile'])->name('collaborator.profile-details');
 Route::post('/become/collaborator', [CollaboratorController::class, 'store'])->name('become.collaborator.store');
 
+
+Route::get('/collaborator/profile-details', [CollaboratorController::class, 'profile'])->name('collaborator.profile-details');
+
+Route::post('/become/collaborator', [CollaboratorController::class, 'store'])
+    ->name('become.collaborator.store');
    
 
     Route::prefix('member')->name('member.')->group(function () {
