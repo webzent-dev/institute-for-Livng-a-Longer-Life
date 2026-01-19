@@ -1,6 +1,6 @@
 
 @extends('front.layouts.app')
-@section('content')
+@section('content') 
 
 
 <div class="max-w-7xl mx-auto">

@@ -4,13 +4,15 @@ namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Product;
 
 class IndexController extends Controller
 {
      
     public function index()
     {
-        return view('front.pages.home');
+         $product = Product::where('status', 1)->latest()->first();
+         return view('front.pages.home', compact('product'));
     }
      public function introVideos()
     {

@@ -5,7 +5,7 @@
         <div class="max-w-7xl mx-auto py-10 px-4 place-self-center">
             <div class="text-center mb-16">
                 <h1 class="text-4xl lg:text-6xl font-bold text-foreground mb-4">
-                    Wellness Store
+                      {{ $collaborator->first_name }} {{ $collaborator->last_name }} Store
                 </h1>
                 <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
                     Premium products curated by our expert collaborators.

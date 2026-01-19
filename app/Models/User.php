@@ -18,7 +18,15 @@ class User extends Authenticatable
         'email',
         'phone',
         'password',
-        'type',
+        'role',
+        'Specialty',
+        'professional_credentials',
+        'experience',
+        'organization',
+        'website',
+        'collaborator_massge',
+         'status',
+        
     ];
 
      
@@ -44,5 +52,15 @@ class User extends Authenticatable
     public function isCollaborator()
     {
         return $this->role === 'collaborator';
+    }
+
+    public function courses()
+    {
+        return $this->hasMany(Course::class);
+    }
+
+     public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 }

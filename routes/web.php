@@ -27,19 +27,23 @@ use App\Http\Controllers\Admin\WebSettingsController;
 
 Route::get('/admin', [AdminController::class, 'index']);
 Route::post('/admin/login', [LoginController::class, 'adminLogin'])->name('admin.login');
-
 Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(function () 
 {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('Approved', [AdminController::class, 'Approved'])->name('admin.approved.products');
     Route::post('/admin/products/{id}/status', [AdminController::class, 'updateStatus'])->name('admin.products.status');
     Route::get('users', [AdminController::class, 'users'])->name('users.index');
+    Route::put('user/update', [AdminController::class, 'update'])->name('admin.user.update');
     Route::get('/collaborators', [AdminController::class, 'collaborators'])->name('collaborators.index');
-    Route::get('/courses', [AdminController::class, 'courses'])->name('admin.courses');
+
+
 
     Route::get('/web/settings', [WebSettingsController::class, 'websettings'])->name('admin.web.settings');
     // Route::get('/web/settings', [WebSettingsController::class, 'editSettings'])->name('admin.web.settings.edit');
     Route::post('web/settings/update', [WebSettingsController::class, 'updateSettings'])->name('admin.web.settings.update');
+
+    Route::post('/admin/collaborators/status/{id}', [AdminController::class, 'CollabStatus'])->name('admin.collaborators.status');
+    Route::get('admin/courses', [AdminController::class, 'courses'])->name('admin.courses');
 
     
 
@@ -83,13 +87,12 @@ Route::prefix('collaborator')->middleware([RoleMiddleware::class.':collaborator'
 //Public Routes
 Route::get('/', [IndexController::class, 'index'] );    
 Route::get('/about-dr-zeines',[AboutController::class, 'aboutZeines'] )->name('about-dr-zeines');
-Route::get('/collaborators',[AboutController::class, 'collaborators'] )->name('collaborators'); 
+Route::get('/collaborators',[AboutController::class, 'collaborators'] )->name('collaborators');
+Route::get('collaborator/store/{id}', [AboutController::class, 'store'])->name('collaborator.store');
 Route::get('/intro-videos',[IndexController::class, 'introVideos'] )->name('intro-videos');  
 Route::get('/membership',[IndexController::class, 'membership'] )->name('membership'); 
 Route::post('/membership/store', [UserRegister::class, 'store']);
 Route::get('/auth', [LoginController::class, 'showLoginForm'])->name('auth');
-Route::post('/login', [LoginController::class, 'login'])->name('login');
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/contact', [ContactController::class, 'index'] )->name('contact');
 Route::post('contact/store', [ContactController::class, 'store'])->name('contact.store');
 Route::post('/newsletter/subscribe', [ContactController::class, 'subscribe'])->name('newsletter.subscribe');
@@ -101,6 +104,10 @@ Route::get('/product-details', [ShopController::class, 'productDetails'] )->name
 Route::get('/products/filter', [ShopController::class, 'filter'])->name('products.filter');  
 Route::get('/vital-boost', [VitalBoostController::class, 'index'] )->name('vital-boost');
 Route::get('/become-collaborator', [CollaboratorController::class, 'becomeCollaborator'])->name('become-collaborator');
+
+Route::get('/collaborator/profile-details', [CollaboratorController::class, 'profile'])->name('collaborator.profile-details');
+Route::post('/become/collaborator', [CollaboratorController::class, 'store'])->name('become.collaborator.store');
+
 
 Route::get('/collaborator/profile-details', [CollaboratorController::class, 'profile'])->name('collaborator.profile-details');
 

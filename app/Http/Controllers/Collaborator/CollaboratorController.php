@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Collaborator;
 use App\Http\Controllers\Controller;
 use App\Models\Collaborator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CollaboratorLoginMail;
+use App\Models\User;
 class CollaboratorController extends Controller
 {
     public function index()
@@ -44,35 +48,45 @@ class CollaboratorController extends Controller
 
     public function becomeCollaborator()
     {
-        $collaborator_data = Collaborator::all();
-       
-        return view('front.collaborator.become-collaborator', compact('collaborator_data'));
+        
+        return view('front.collaborator.become-collaborator');
     }
     
-    public function store(Request $request)
+          public function store(Request $request)
             {
-
-                // dd($request->all());
-    $validated = $request->validate([
-                    'first_name' => 'required|string|max:100',
-                    'last_name' => 'required|string|max:100',
-                    'email' => 'required|email|unique:users,email',
-                    'phone'      => 'required|unique:users,phone',
-                    'specialty_area_of_expertise' => 'nullable|string|max:255',
-                    'professional_credentials' => 'nullable|string|max:255',
-                    'experience' => 'nullable|int',
-                    'practice_organization'=> 'nullable|string|max:255',
-                    'website_url' => 'nullable|string|max:255',
-                    'description' => "nullable|string|max:255",
+              $request->validate([
+                'first_name' => 'required',
+                'last_name'  => 'required',
+                'email'      => 'required|email|unique:users,email',
+                'phone'      => 'required',
+                'password'   => 'required|min:8|confirmed',
+                'Specialty'  => 'required',
+                'professional_credentials' => 'required',
+                'experience' => 'required',
+                'organization' => 'required',
+                'website'    => 'nullable|url',
+                'collaborator_massge' => 'required',
                 
-                ]);
-                  
-                 Collaborator::create($validated); 
+         ]);
 
-                return back()->with('success', 'Application submitted successfully!');
-                
-            }
-
-    
-
-            }
+         $plainPassword = $request->password;
+          $user = User::create([
+        'first_name' => $request->first_name,
+        'last_name'  => $request->last_name,
+        'email'      => $request->email,
+        'phone'      => $request->phone,
+        'password'   => Hash::make($request->password),
+        'Specialty'  => $request->Specialty,
+        'professional_credentials' => $request->professional_credentials,
+        'experience' => $request->experience,
+        'organization' => $request->organization,
+        'website'    => $request->website,
+        'collaborator_massge' => $request->collaborator_massge,
+        'role'       => 'collaborator',
+       ]);
+        Mail::to($user->email)->send(
+        new CollaboratorLoginMail($user, $plainPassword)
+    );
+      return redirect()->back()->with('success', 'Collaborator added successfully. Please wait for admin approval.');
+     }
+}
