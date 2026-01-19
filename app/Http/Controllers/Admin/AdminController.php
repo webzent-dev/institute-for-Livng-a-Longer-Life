@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Course;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CollaboratorActiveMail;
 
 
 class AdminController extends Controller
@@ -54,5 +56,50 @@ class AdminController extends Controller
     }
     
 
-    
-}   
+
+        // role update function
+        public function update(Request $request)
+            {
+                $request->validate([
+                    'user_id' => 'required|exists:users,id',
+                    'first_name' => 'required|string|max:255',
+                    'last_name' => 'required|string|max:255',
+                    'role' => 'required|in:admin,collaborator,user',
+                ]);
+
+                $user = User::find($request->user_id);
+                $user->update([
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'role' => $request->role,
+                ]);
+
+                return redirect()->back()->with('success', 'Role updated successfully!');
+            }
+
+            public function CollabStatus($id)
+            {
+                $collaborator = User::findOrFail($id);
+
+                if ($collaborator->status !== 'active') {
+                    $newStatus = 'active';
+                } else {
+                    $newStatus = 'inactive';
+                }
+
+                $collaborator->update([
+                    'status' => $newStatus
+                ]);
+
+                if ($newStatus === 'active') {
+                    Mail::to($collaborator->email)
+                        ->send(new CollaboratorActiveMail($collaborator));
+                }
+
+                return response()->json([
+                    'status' => $newStatus
+                ]);
+            }
+
+
+}

@@ -74,119 +74,188 @@
                  
     </section>
  
+<section class="section-base gradient-subtle py-20">
+    <div class="container-base max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="lg:col-span-2">
+            <x-card class="shadow-medium">
 
-    <section class="section-base gradient-subtle py-20">
-            <div class="container-base max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">   
-                <div class="lg:col-span-2">
-                        <x-card class=" shadow-medium">
-                            
-                            <x-card-header>
-                                <x-card-title class="text-3xl">Collaborator Application</x-card-title>
-                                <p class="text-muted-foreground">
-                                    Fill out the form below and we'll review your application within 3-5 business days
-                                </p>
-                            </x-card-header>
+                <x-card-header>
+                    <x-card-title class="text-3xl">Collaborator Application</x-card-title>
+                    <p class="text-muted-foreground">
+                        Fill out the form below and we'll review your application within 3-5 business days
+                    </p>
+                </x-card-header>
 
-                            <x-card-content>
-                                     
-                               {{-- <div x-data="contactForm()" @submit.prevent="submitForm"> --}}
-                               <div>
-                                    {{-- <form class="space-y-6" method="POST" action="{{ url('/become/collaborator') }}"> --}}
-                                    @if (session('success'))
-                                        <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
-                                            {{ session('success') }}
-                                        </div>
-                                    @endif
+  
+   @php
+    $user = auth()->user();
+@endphp
+@if(session('success'))
+    <div 
+        id="toast-success"
+        class="fixed top-5 right-5 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50"
+    >
+        {{ session('success') }}
+    </div>
 
-                                    @if ($errors->any())
-                                        <div class="mb-4 p-3 bg-red-100 text-red-700 rounded">
-                                            <ul class="list-disc pl-6 text-sm">
-                                                @foreach ($errors->all() as $error)
-                                                    <li>- {{ $error }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                    @endif        
+    <script>
+        setTimeout(() => {
+            document.getElementById('toast-success').remove();
+        }, 3000);
+    </script>
+@endif
 
-                                    <form method="POST" id="collabForm" action="{{ route('become.collaborator.store') }}" class="space-y-6">
-                                        @csrf
+@if(session('error'))
+    <div class="fixed top-5 right-5 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        {{ session('error') }}
+    </div>
+@endif
+<form id="collabForm" method="POST" action="{{ route('become.collaborator.store') }}" class="space-y-6">
+    @csrf
 
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                            <div class="space-y-2">
-                                                <label for="firstName" class="font-medium">First Name *</label>
-                                                <x-form.input model="firstName" name="first_name" placeholder="John" filter="name" value="{{ old('first_name') }}" />
-                                                
-                                            </div>
+    <!-- First & Last Name -->
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+            <label class="font-medium">First Name *</label>
+            <x-form.input
+                name="first_name"
+                placeholder="John"
+                :value="old('first_name', $user?->first_name)"
+            />
+        </div>
 
-                                            <div class="space-y-2">
-                                                <label for="lastName" class="font-medium">Last Name *</label>
-                                                <x-form.input model="lastName" name="last_name" placeholder="Doe" filter="name" value="{{ old('last_name') }}" />
-                                            </div>
-                                        </div>
+        <div class="space-y-2">
+            <label class="font-medium">Last Name *</label>
+            <x-form.input
+                name="last_name"
+                placeholder="Doe"
+                :value="old('last_name', $user?->last_name)"
+            />
+        </div>
+    </div>
 
-                                        <div class="grid md:grid-cols-2 gap-6"> 
-                                            <div class="space-y-2">
-                                                <label for="email" class="font-medium">Email Address *</label>
-                                                <x-form.input model="email" name="email" placeholder="john@example.com" type="email" filter="email" value="{{ old('email') }}" />
-                                            </div>
+    <!-- Email & Phone -->
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+            <label class="font-medium">Email Address *</label>
+            <x-form.input
+                type="email"
+                name="email"
+                placeholder="john@example.com"
+                :value="old('email', $user?->email)"
+                
+            />
+        </div>
 
-                                            <div class="space-y-2">
-                                                <label for="phone" class="font-medium">Phone Number</label>
-                                                <x-form.input model="phone" name="phone" placeholder="+1-555-123-4567" type="tel" filter="phone" value="{{ old('phone') }}" />  
-                                            </div>
-                                        </div>       
+        <div class="space-y-2">
+            <label class="font-medium">Phone Number</label>
+            <x-form.input
+                type="tel"
+                name="phone"
+                placeholder="+1-555-123-4567"
+                :value="old('phone', $user?->phone)"
+            />
+        </div>
+    </div>
 
-                                        <div class="space-y-2">
-                                            <label for="specialty_area_of_expertise" class="font-medium">Specialty/Area of Expertise *</label>
-                                            <x-form.input model="specialty_area_of_expertise" name="specialty_area_of_expertise" placeholder="e.g., Functional Medicine, Nutrition, Integrative Health" filter="text" value="{{ old('specialty_area_of_expertise') }}" />
-                                        </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+            <label class="font-medium">Password *</label>
+            <x-form.input
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+            />
+        </div>
 
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                            <div class="space-y-2">
-                                                <label for="professional_credentials" class="font-medium">Professional Credentials *</label>
-                                                <x-form.input model="professional_credentials" name="professional_credentials" placeholder="e.g., MD, DO, ND, RD, PhD" filter="name" value="{{ old('professional_credentials') }}" />
-                                            </div>
-                                            <div class="space-y-2">
-                                                <label for="experience" class="font-medium">Years of Experience *</label>
-                                                <x-form.input type="number" model="experience" name="experience" placeholder="10" filter="number" value="{{ old('experience') }}" /> <!-- Removed 'e.g., 10+ years' for number input -->
-                                            </div>
-                                        </div>
+        <div class="space-y-2">
+            <label class="font-medium">Confirm Password *</label>
+            <x-form.input
+                type="password"
+                name="password_confirmation"
+                placeholder="Confirm your password"
+            />
+        </div>
+    </div>
 
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                            <div class="space-y-2">
-                                                <label for="practice_organization" class="font-medium">Practice/Organization *</label>
-                                                <x-form.input model="practice_organization" name="practice_organization" placeholder="Your clinic, practice, or organization name" filter="name" value="{{ old('practice_organization') }}" />
-                                            </div>
-                                            <div class="space-y-2">
-                                                <label for="website_url" class="font-medium">Website (Optional)</label>
-                                                <x-form.input model="website_url" name="website_url" placeholder="https://your-website.com" type="url" filter="url" value="{{ old('website_url') }}" />
-                                            </div>
-                                        </div>
+    <!-- Specialty -->
+    <div class="space-y-2">
+        <label class="font-medium">Specialty / Area of Expertise *</label>
+        <x-form.input
+            name="Specialty"
+            :value="old('Specialty')"
+        />
+    </div>
 
-                                        <div class="space-y-2">
-                                            <label for="subject" class="font-medium">Why do you want to become a collaborator? *</label>
-                                            <x-form.textarea model="description" name="description" placeholder="Tell us about your interest in joining our network, what you hope to contribute, and what makes you a good fit..." filter="text" value="{{ old('description') }}" />
-                                            <p class="text-sm text-muted-foreground" x-text="charCount.description + '/2000 characters'"></p>
-                                        </div>
+    <!-- Credentials & Experience -->
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+            <label class="font-medium">Professional Credentials *</label>
+            <x-form.input
+                name="professional_credentials"
+                :value="old('professional_credentials')"
+            />
+        </div>
 
-                                        <div class="grid grid-cols-1 gap-2">
-                                            <x-button-use type="submit" id="submitBtn" full="true" class="btn-hero lg py-3 flex items-center justify-center gap-2">
-                                                <i data-lucide="send" class="w-5 h-5"></i>
-                                                Submit Application
-                                            </x-button-use>
-                                            <p x-show="success" class="text-green-500 text-sm" x-text="success"></p>
-                                            <p x-show="error" class="text-red-500 text-sm" x-text="error"></p>
-                                        </div>
-                                    </form>
-                                </div>
+        <div class="space-y-2">
+            <label class="font-medium">Years of Experience *</label>
+            <x-form.input
+                type="number"
+                name="experience"
+                :value="old('experience')"
+            />
+        </div>
+    </div>
 
-                            </x-card-content>
+    <!-- Organization & Website -->
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+            <label class="font-medium">Practice / Organization *</label>
+            <x-form.input
+                name="organization"
+                :value="old('organization')"
+            />
+        </div>
 
-                        </x-card>
-                </div>
-            </div>
-                 
-    </section>
+        <div class="space-y-2">
+            <label class="font-medium">Website (Optional)</label>
+            <x-form.input
+                type="url"
+                name="website"
+                :value="old('website')"
+            />
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="space-y-2">
+        <label class="font-medium">Why do you want to become a collaborator? *</label>
+        <x-form.textarea
+            name="collaborator_massge"
+            rows="4"
+            placeholder="Describe your motivation and goals..."
+            :value="old('collaborator_massge')"
+        />
+    </div>
+
+    <!-- Submit -->
+    <x-button-use type="submit" full="true" class="btn-hero py-3">
+        Submit Application
+    </x-button-use>
+</form>
+
+
+{{-- Success & Error --}}
+<div id="successMsg" class="hidden mb-4 p-3 bg-green-100 text-green-700 rounded"></div>
+<div id="errorList" class="mb-4 text-red-700 text-sm"></div>
+
+
+
+
+            </x-card>
+        </div>
+    </div>
+</section>
 
     <script>
 $('#collabForm').on('submit', function(e) {
@@ -231,6 +300,49 @@ document.getElementById('collabForm').addEventListener('submit', async function 
             });
         }
     }
+});
+</script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+$(function () {
+    $('#collabForm').on('submit', function (e) {
+
+        let password = $('input[name="password"]').val();
+        let confirmPassword = $('input[name="password_confirmation"]').val();
+        let valid = true;
+
+        $('.password-error').remove();
+
+        if (!password) {
+            valid = false;
+            $('input[name="password"]').after(
+                '<span class="password-error text-red-500 text-sm">Password is required</span>'
+            );
+        } else if (password.length < 8) {
+            valid = false;
+            $('input[name="password"]').after(
+                '<span class="password-error text-red-500 text-sm">Minimum 8 characters required</span>'
+            );
+        }
+
+        if (!confirmPassword) {
+            valid = false;
+            $('input[name="password_confirmation"]').after(
+                '<span class="password-error text-red-500 text-sm">Confirm password is required</span>'
+            );
+        } else if (password !== confirmPassword) {
+            valid = false;
+            $('input[name="password_confirmation"]').after(
+                '<span class="password-error text-red-500 text-sm">Passwords do not match</span>'
+            );
+        }
+
+        if (!valid) {
+            e.preventDefault();
+        }
+    });
 });
 </script>
 

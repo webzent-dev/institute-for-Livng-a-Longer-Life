@@ -88,14 +88,13 @@ class ProductController extends Controller
 
     if ($request->hasFile('image')) {
 
-        if ($product->image_url && file_exists(public_path('product_images/'.$product->image_url))) {
-            unlink(public_path('product_images/'.$product->image_url));
+        if ($product->image && file_exists(public_path('product_images/'.$product->image))) {
+            unlink(public_path('product_images/'.$product->image));
         }
-
         $imageName = time() . '.' . $request->image->extension();
         $request->image->move(public_path('product_images'), $imageName);
 
-        $product->image_url = $imageName;
+        $product->image = $imageName;
     }
 
     $product->update([

@@ -9,6 +9,12 @@
    {{ $route && request()->routeIs($route) ? 'bg-gray-200 font-semibold' : '' }}"> --}}
 
    <a href="{{ $route && Route::has($route) ? route($route) : '#' }}"
+   class="flex items-center px-4 py-2 rounded-lg hover:bg-gray-100
+   {{ $route && Route::has($route) && request()->routeIs($route)
+        ? 'bg-gray-200 font-semibold'
+        : '' }}">
+
+   <a href="{{ $route && Route::has($route) ? route($route) : '#' }}"
    class="flex items-center px-4 py-2 rounded-lg 
    {{ $route && Route::has($route) && request()->routeIs($route)
         ? 'bg-primary text-white font-semibold'
