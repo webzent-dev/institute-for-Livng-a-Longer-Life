@@ -4,32 +4,48 @@
 
                 @php
                   $isPopular = isset($plan['popular']) && $plan['popular'] === true;
+                  $isCurrentPlan = isset($plan['current']) && $plan['current'] === true;
+                  
                 @endphp
               <div class="relative"   x-data="{ selectedPlan: { name: '', price: '', period: '' } }">
                     <div class="flex flex-col {{ $isPopular ? 'border-primary border-4 shadow-strong md:scale-105 bg-card' : 'border-2 shadow-medium bg-card' }} rounded-2xl  ">
                       @if($isPopular)
-                        <div class="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                            <span class="gradient-accent px-6 py-2 rounded-full text-sm font-semibold text-accent-foreground shadow-medium inline-flex items-center">
-                            
-                            <i data-lucide="star" class="w-4 h-4  flex-shrink-0 mr-2 "></i>
-                            Most Popular
-                            </span>
-                        </div>
+                            <div class="relative">
+                                <div class="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                                    <span class="gradient-accent px-6 py-2 rounded-full text-sm font-semibold text-accent-foreground shadow-medium inline-flex items-center">
+                                    
+                                    <i data-lucide="star" class="w-4 h-4  flex-shrink-0 mr-2 "></i>
+                                    Most Popular
+                                    </span>
+                                </div>
+
+                                @if($isCurrentPlan)
+                                <div class=" w-10 h-10 absolute -top-5 -right-6  -translate-x-1/2 z-10">
+                                    <span class="w-10 h-10  gradient-accent px-6 py-2 rounded-full text-sm font-semibold text-accent-foreground shadow-medium inline-flex justify-center text-white items-center">
+                                    
+                                    <i data-lucide="check-check" class="w-4 h-4 font-extrabold flex-shrink-0  "></i>
+                                    {{-- Current Plan --}}
+                                    </span>
+                                </div>
+                                @endif
+                            </div>
+
                         @endif
+                        
 
                         <div class="text-center pb-8 pt-12 px-6">
-<h3 class="text-2xl font-bold text-foreground mb-2">{{ $plan['name'] }}</h3>
-<p class="text-muted-foreground mb-6">{{ $plan['description'] }}</p>
-<div class="flex items-baseline justify-center">
-<span class="text-3xl text-primary font-bold  ">{{ $plan['price'] }}</span>
-<span class="text-muted-foreground ml-2">{{ $plan['period'] }}</span>
-</div>
-</div>
- 
-                        <div class="flex-1 flex flex-col px-6 pb-6">
+                            <h3 class="text-2xl font-bold text-foreground mb-2">{{ $plan['name'] }}</h3>
+                            <p class="text-muted-foreground mb-6">{{ $plan['description'] }}</p>
+                            <div class="flex items-baseline justify-center">
+                            <span class="text-3xl text-primary font-bold  ">{{ $plan['price'] }}</span>
+                            <span class="text-muted-foreground ml-2">{{ $plan['period'] }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-gray-200 flex-1 flex flex-col px-6 pb-6">
                         <div class="space-y-6 flex-1">
                             <div>
-                            <h4 class="font-semibold text-foreground mb-3">Features</h4>
+                            <h4 class="font-semibold text-foreground mb-3 mt-1">Features</h4>
                             <ul class="space-y-3">
                                 @foreach($plan['features'] as $feature)
                                 <li class="flex items-start">

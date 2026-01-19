@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('become_collaborators', function (Blueprint $table) {
+        Schema::create('collaborators', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
+             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->unique();
             $table->string('phone')->nullable(); // Worldwide phone
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('website_url')->nullable();
             $table->text('description'); // Up to 2000 chars
             $table->boolean('status')->default(false);
-            $table->string('role')->default('collaborator'); // Default role
+            $table->string('role')->default('collaborator');
             $table->timestamps();
         });
     }
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('become_collaborators');
+        Schema::dropIfExists('collaborators');
     }
 };

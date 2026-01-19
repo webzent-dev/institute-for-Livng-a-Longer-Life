@@ -406,8 +406,26 @@
     opacity: 1;
     transform: translateY(0);
   }
-
-
+  
+  .fill-primary {
+    fill: hsl(var(--primary));
+  }
+  .tab-active {
+            border-bottom: 3px solid #10b77f !important;
+            color: #10b77f !important;
+            font-weight: 600;
+        }
+        .tab-inactive {
+            color: #6b7280 !important;
+            border-bottom: 3px solid transparent;
+        }
+        .session-card {
+            transition: all 0.3s ease;
+        }
+        .session-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
 
 /* Utilities Layer */
 @layer utilities {

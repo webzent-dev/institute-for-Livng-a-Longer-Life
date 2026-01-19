@@ -11,7 +11,7 @@
                     Our Expert <span class="text-amber-500    ">Collaborators</span>
                 </h1>
                 <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
-                    Learn from a network of world-class physicians and health practitioners, each bringing 
+                    Learn from a network of world-class physicians and health practitioners, each bringing
                     specialized expertise to your wellness journey. Access their exclusive courses and recommended products.
                 </p>
             </div>
@@ -28,14 +28,14 @@
                     <p class="text-muted-foreground mt-1">Find experts by name, specialty, or status</p>
                 </div>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {{-- Search Input --}}
+                {{-- Search Input filter --}}
                 <div class="  place-self-center">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Search by Name</label>
                     <div class="relative">
-                        <input type="text" 
-                               id="nameSearch" 
+                        <input type="text"
+                               id="nameSearch"
                                placeholder="Search collaborators..."
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
                         <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -43,12 +43,12 @@
                         </div>
                     </div>
                 </div>
-                
+
                 {{-- Specialty Filter  here --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Specialty</label>
                     <div class="relative">
-                        <select id="specialtyFilter" 
+                        <select id="specialtyFilter"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none appearance-none bg-white">
                             <option value="">All Specialties</option>
                            @php
@@ -69,12 +69,12 @@
                         </div>
                     </div>
                 </div>
-                
+
                 {{-- Featured Filter --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Featured Status</label>
                     <div class="relative">
-                        <select id="featuredFilter" 
+                        <select id="featuredFilter"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none appearance-none bg-white">
                             <option value="">All Status</option>
                             <option value="featured">Featured Only</option>
@@ -85,10 +85,10 @@
                         </div>
                     </div>
                 </div>
-                
+
                 {{-- Clear Button --}}
                 <div class="flex items-end">
-                    <button id="clearFilters" 
+                    <button id="clearFilters"
                             class="w-full px-4 py-2 border border-gray-300 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
                             disabled>
                         <i data-lucide="x" class="h-4 w-4"></i>
@@ -96,7 +96,7 @@
                     </button>
                 </div>
             </div>
-            
+
             {{-- Active Filters Display --}}
             <div id="activeFilters" class="mt-4 hidden">
                 <div class="flex items-center gap-2">
@@ -105,12 +105,12 @@
                 </div>
             </div>
         </div>
-        
+
         {{--Clear Filter  --}}
         <div id="resultsCount" class="mb-6 text-muted-foreground">
             {{-- Showing {{ count($collaborators) }} of {{ count($collaborators) }} collaborators --}}
         </div>
-        
+
         {{-- Grid Products View --}}
         <div id="collaboratorsGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach ($collaborators as $c)
@@ -163,11 +163,12 @@
                         </div>
                         <div class="grid sm:grid-cols-2 gap-4 py-4">
                             <div class="sm:col-span-1">
-                                <a href="{{ url('/collaborator/'.$c['id']) }}" class="btn btn-outline w-full sm:w-auto flex items-center justify-center font-semibold px-2 py-3 rounded-md">
+                                <a href="{{ url('/collaborator/profile-details') }}" class="btn btn-outline w-full sm:w-auto flex items-center justify-center font-semibold px-2 py-3 rounded-md">
                                     <button class="w-full flex items-center justify-center">
                                         <i data-lucide="award" class="h-5 w-5 hover:text-white mr-1"></i>
                                         <span class="ml-1">View Profile</span>
                                     </button>
+
                                 </a>
                             </div>
                             <div class="sm:col-span-1">
@@ -183,7 +184,7 @@
                 </div>
             @endforeach
         </div>
-        
+
         {{-- No Results Message --}}
         <div id="noResults" class="hidden text-center py-12">
             <div class="mb-4">
@@ -214,49 +215,49 @@ document.addEventListener('DOMContentLoaded', function() {
     const noResults = document.getElementById('noResults');
     const collaboratorsGrid = document.getElementById('collaboratorsGrid');
     const collaboratorCards = document.querySelectorAll('.collaborator-card');
-    
+
     // Store the original state
     const originalCards = Array.from(collaboratorCards);
-    
+
     // Filter state
     let filters = {
         name: '',
         specialty: '',
         featured: ''
     };
-    
+
     // Update select values based on filter state
     function updateSelectValues() {
         specialtyFilter.value = filters.specialty || '';
         featuredFilter.value = filters.featured || '';
         nameSearch.value = filters.name || '';
     }
-    
+
     // Event listeners for filters
     nameSearch.addEventListener('input', function() {
         filters.name = this.value.toLowerCase().trim();
         applyFilters();
         updateClearButton();
     });
-    
+
     specialtyFilter.addEventListener('change', function() {
         filters.specialty = this.value;
         applyFilters();
         updateClearButton();
     });
-    
+
     featuredFilter.addEventListener('change', function() {
         filters.featured = this.value;
         applyFilters();
         updateClearButton();
     });
-    
+
     // Clear filters button
     clearFiltersBtn.addEventListener('click', function() {
         resetFilters();
         applyFilters();
     });
-    
+
     // Reset all filters button (in no results message)
     resetAllFiltersBtn.addEventListener('click', function() {
         resetFilters();
@@ -265,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
         noResults.classList.add('hidden');
         collaboratorsGrid.classList.remove('hidden');
     });
-    
+
     // Reset all filters
     function resetFilters() {
         filters = {
@@ -273,16 +274,16 @@ document.addEventListener('DOMContentLoaded', function() {
             specialty: '',
             featured: ''
         };
-        
+
         updateSelectValues();
         updateClearButton();
         updateActiveFiltersDisplay();
     }
-    
+
     // Update clear button state
     function updateClearButton() {
         const hasFilters = filters.name || filters.specialty || filters.featured;
-        
+
         if (hasFilters) {
             clearFiltersBtn.disabled = false;
             clearFiltersBtn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -293,11 +294,11 @@ document.addEventListener('DOMContentLoaded', function() {
             clearFiltersBtn.classList.remove('bg-red-50', 'text-red-700', 'border-red-300', 'hover:bg-red-100');
         }
     }
-    
+
     // Update active filters display
     function updateActiveFiltersDisplay() {
         const activeFilters = [];
-        
+
         if (filters.name) {
             activeFilters.push({
                 type: 'name',
@@ -305,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 value: filters.name
             });
         }
-        
+
         if (filters.specialty) {
             activeFilters.push({
                 type: 'specialty',
@@ -313,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 value: filters.specialty
             });
         }
-        
+
         if (filters.featured) {
             const label = filters.featured === 'featured' ? 'Featured Only' : 'Not Featured';
             activeFilters.push({
@@ -322,12 +323,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 value: filters.featured
             });
         }
-        
+
         // Update active filters display
         if (activeFilters.length > 0) {
             activeFiltersDiv.classList.remove('hidden');
             filterChipsDiv.innerHTML = '';
-            
+
             activeFilters.forEach(filter => {
                 const chip = document.createElement('div');
                 chip.className = 'inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm';
@@ -339,12 +340,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 filterChipsDiv.appendChild(chip);
             });
-            
+
             // Initialize Lucide icons
             if (window.lucide) {
                 lucide.createIcons();
             }
-            
+
             // Add event listeners to remove buttons
             document.querySelectorAll('.remove-filter').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -357,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
             activeFiltersDiv.classList.add('hidden');
         }
     }
-    
+
     // Remove specific filter
     function removeFilter(type, value) {
         switch(type) {
@@ -374,38 +375,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 featuredFilter.value = '';
                 break;
         }
-        
+
         applyFilters();
         updateClearButton();
     }
-    
+
     // Apply filters to cards
     function applyFilters() {
         let visibleCount = 0;
         const totalCount = originalCards.length;
-        
+
         originalCards.forEach(card => {
             const name = card.getAttribute('data-name');
             const specialty = card.getAttribute('data-specialty');
             const featured = card.getAttribute('data-featured');
-            
+
             let matches = true;
-            
+
             // Name filter
             if (filters.name && !name.includes(filters.name.toLowerCase())) {
                 matches = false;
             }
-            
+
             // Specialty filter
             if (filters.specialty && filters.specialty !== specialty) {
                 matches = false;
             }
-            
+
             // Featured filter
             if (filters.featured && featured !== filters.featured) {
                 matches = false;
             }
-            
+
             if (matches) {
                 card.style.display = 'flex';
                 visibleCount++;
@@ -413,10 +414,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 card.style.display = 'none';
             }
         });
-        
+
         // Update results count
         // resultsCount.textContent = `Showing ${visibleCount} of ${totalCount} collaborators`;
-        
+
         // // Show/hide no results message
         // if (visibleCount === 0) {
         //     noResults.classList.remove('hidden');
@@ -425,15 +426,15 @@ document.addEventListener('DOMContentLoaded', function() {
         //     noResults.classList.add('hidden');
         //     collaboratorsGrid.classList.remove('hidden');
         // }
-        
+
         // Update active filters display
         updateActiveFiltersDisplay();
     }
-    
+
     // Initialize
     updateClearButton();
     applyFilters();
-    
+
     // Initialize Lucide icons if available
     if (window.lucide) {
         lucide.createIcons();
@@ -474,26 +475,26 @@ select {
 
 
         {{-- CTA --}}
-            <x-ui.cta-section 
+            <x-ui.cta-section
                 icon="user-star"
                 align="center"
                 title=" Interested in Becoming a Collaborator?"
-                subtitle="Join our network of expert practitioners and share your knowledge with our growing community. 
+                subtitle="Join our network of expert practitioners and share your knowledge with our growing community.
                         Manage your own store, create courses, and make a meaningful impact on people's lives."
-                
+
                 :buttons="[
                     ['route' => 'become-collaborator',   'label' => 'Apply to Collaborate', 'variant' => 'outline', 'icon' => 'external-link'],
-                     
-                ]"
-            /> 
 
- 
+                ]"
+            />
+
+
 
     </main>
 
- 
+
 
 </div>
- 
+
 
 @endsection

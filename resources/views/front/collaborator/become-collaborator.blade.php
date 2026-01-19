@@ -42,7 +42,7 @@
                         Join our network of distinguished health professionals and help us empower individuals on their journey to <br>optimal health and longevity.
                     </p>
                 </div> 
-            </div>
+            </div> 
     </section>
    <section class="section-base gradient-subtle py-20">
             <div class="container-base max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

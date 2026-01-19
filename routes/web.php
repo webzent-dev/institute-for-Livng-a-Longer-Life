@@ -16,8 +16,8 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\UserRegister; 
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\Product\ProductController;
-use App\Http\Controllers\Courses\CoursesController;
-
+use App\Http\Controllers\Courses\CoursesController; 
+use App\Http\Controllers\Admin\WebSettingsController;
 
 
 
@@ -35,8 +35,16 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
     Route::get('users', [AdminController::class, 'users'])->name('users.index');
     Route::put('user/update', [AdminController::class, 'update'])->name('admin.user.update');
     Route::get('/collaborators', [AdminController::class, 'collaborators'])->name('collaborators.index');
+
+ 
+
+    Route::get('/web/settings', [WebSettingsController::class, 'websettings'])->name('admin.web.settings');
+    // Route::get('/web/settings', [WebSettingsController::class, 'editSettings'])->name('admin.web.settings.edit');
+    Route::post('web/settings/update', [WebSettingsController::class, 'updateSettings'])->name('admin.web.settings.update');
+
     Route::post('/admin/collaborators/status/{id}', [AdminController::class, 'CollabStatus'])->name('admin.collaborators.status');
     Route::get('admin/courses', [AdminController::class, 'courses'])->name('admin.courses');
+
     
 
     // Yahan aur admin routes add kar sakte ho
@@ -44,9 +52,7 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
     // Route::get('settings', [DashboardController::class, 'settings'])->name('admin.settings');
 });
 
-// Admin Routes closures
 
-//Collaborator  Routes
 
 
 
@@ -75,18 +81,10 @@ Route::prefix('collaborator')->middleware([RoleMiddleware::class.':collaborator'
     Route::put('/courses/{course}', [CoursesController::class, 'update'])->name('courses.update');
     Route::delete('/courses/{course}', [CoursesController::class, 'destroy'])->name('courses.destroy');
    
-
-    
-
-
-    // Yahan aur collaborator routes add kar sakte ho
-    // Route::get('projects', [DashboardController::class, 'projects'])->name('collaborator.projects');
-    // Route::get('profile', [DashboardController::class, 'profile'])->name('collaborator.profile');
+ 
 });
 
-//Collaborator  Routes closures
-
-
+//Public Routes
 Route::get('/', [IndexController::class, 'index'] );    
 Route::get('/about-dr-zeines',[AboutController::class, 'aboutZeines'] )->name('about-dr-zeines');
 Route::get('/collaborators',[AboutController::class, 'collaborators'] )->name('collaborators');
@@ -99,44 +97,54 @@ Route::get('/contact', [ContactController::class, 'index'] )->name('contact');
 Route::post('contact/store', [ContactController::class, 'store'])->name('contact.store');
 Route::post('/newsletter/subscribe', [ContactController::class, 'subscribe'])->name('newsletter.subscribe');
 Route::get('/testimonials', [TestimonialsController::class, 'index'] )->name('testimonials');
-Route::get('/faq', [FAQController::class, 'index'] )->name('faq');
+Route::get('/faq', [FAQController::class, 'index'] )->name('faq.index');
 Route::get('/help-center', [HelpCenterController::class, 'helpcenter'] )->name('help-center');
 Route::get('/shop', [ShopController::class, 'index'] )->name('shop');
 Route::get('/product-details', [ShopController::class, 'productDetails'] )->name('product-details');
 Route::get('/products/filter', [ShopController::class, 'filter'])->name('products.filter');  
 Route::get('/vital-boost', [VitalBoostController::class, 'index'] )->name('vital-boost');
 Route::get('/become-collaborator', [CollaboratorController::class, 'becomeCollaborator'])->name('become-collaborator');
+
 Route::get('/collaborator/profile-details', [CollaboratorController::class, 'profile'])->name('collaborator.profile-details');
 Route::post('/become/collaborator', [CollaboratorController::class, 'store'])->name('become.collaborator.store');
 
- 
+   
 
-Route::resource('index', IndexController::class);
-Route::resource('about', AboutController::class);
-Route::resource('testimonial', TestimonialsController::class);
-Route::resource('faq', FAQController::class);
+    Route::prefix('member')->name('member.')->group(function () {
 
+  
+    Route::get('/', [DashboardController::class, 'member_dashboard'])
+        ->name('dashboard');
 
-    
+    Route::get('/profile', [DashboardController::class, 'member_profile'])
+        ->name('profile');
 
-    
-    Route::get('admin/member', [DashboardController::class, 'member'])->name('dashboard');
-    Route::get('/das', fn () => view('components.dashboard.sidebar.das'))
-        ->name('das');
-
-    Route::get('/orders', fn () => view('components.dashboard.sidebar.orders'))
-        ->name('orders');
-
-    Route::get('/security', fn () => view('components.dashboard.sidebar.security'))
+    Route::get('/security', [DashboardController::class, 'member_security'])
         ->name('security');
 
-    Route::get('/subscription', fn () => view('components.dashboard.sidebar.subscription'))
+    Route::get('/subscription', [DashboardController::class, 'member_subscription'])
         ->name('subscription');
 
-    Route::get('/member', fn () => view('components.dashboard.sidebar.member'))
-        ->name('member');
+    Route::get('/orders', [DashboardController::class, 'member_orders'])
+        ->name('orders');
 
-    Route::get('/payments', fn () => view('components.dashboard.sidebar.payments'))
+    Route::get('/plans', [DashboardController::class, 'member_plans'])
+        ->name('plans');
+
+    Route::get('/payments', [DashboardController::class, 'member_payments'])
         ->name('payments');
 
+    Route::get('/video-library', [DashboardController::class, 'member_videoLibrary'])
+        ->name('video-library');
+
+    Route::get('/store', [DashboardController::class, 'member_store'])
+        ->name('store');
+
+});
+
  
+
+
+   Route::fallback(function () {
+    abort(404);
+});     

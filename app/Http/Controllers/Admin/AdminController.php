@@ -23,8 +23,8 @@ class AdminController extends Controller
         return view('admin.approved_products', compact('products'));
     }
 
-    public function updateStatus(Request $request, $id)
-        {
+     public function updateStatus(Request $request, $id)
+    {
             $request->validate([
                 'status' => 'required|in:active,inactive'
             ]);
@@ -34,26 +34,27 @@ class AdminController extends Controller
             $product->save();
 
             return response()->json(['success' => true]);
-        }
+    }
 
-        public function collaborators()
-        {
+    public function collaborators()
+    {
             $collaborators = User::where('role', 'collaborator')->get();
             return view('admin.collaborators', compact('collaborators'));
-        }
+    }
 
-        public function users()
-        {
+    public function users()
+    {
            $users = User::all();
             return view('admin.users', compact('users'));
-        }
+    }
 
-        public function courses()
-        {
+    public function courses()
+    {
             // Logic to get courses can be added here
             $courses = Course::all();
             return view('admin.courses', compact('courses'));
-        }
+    }
+    
 
 
         // role update function

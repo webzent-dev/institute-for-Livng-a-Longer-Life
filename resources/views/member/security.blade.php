@@ -1,6 +1,7 @@
 
-@extends('components.dashboard.member')
-@section('content')
+@extends('member.member')
+
+@section('member-content')
 
 
 <!-- Security Settings Page -->
