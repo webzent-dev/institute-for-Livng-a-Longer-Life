@@ -14,8 +14,9 @@
     <x-dashboard.sidebar.nav_link icon="shopping-cart" label="Orders" />
     <x-dashboard.sidebar.nav_link icon="graduation-cap" label="My Courses"  route="admin.courses" />
     <x-dashboard.sidebar.nav_link icon="settings" label="Settings"  />
-    {{-- <x-dashboard.sidebar.nav_link icon="dollar-sign" label="Payments"  />
-    <x-dashboard.sidebar.nav_link icon="users" label="Members" /> --}}
+   <x-dashboard.sidebar.nav_link icon="notebook-pen" label="Website Settings" route="admin.web.settings"  />
+   {{-- <x-dashboard.sidebar.nav_link icon="dollar-sign" label="Payments"  /> --}}
+     {{-- <x-dashboard.sidebar.nav_link icon="users" label="Members" /> --}}
     <x-dashboard.sidebar.nav_link icon="file-text" label="Audit Logs"  />
 @endif
 

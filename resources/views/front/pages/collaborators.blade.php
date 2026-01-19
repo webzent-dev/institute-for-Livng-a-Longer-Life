@@ -225,11 +225,12 @@ $collaborators = [
                         </div>
                         <div class="grid sm:grid-cols-2 gap-4 py-4">
                             <div class="sm:col-span-1">
-                                <a href="{{ url('/collaborator/'.$c['id']) }}" class="btn btn-outline w-full sm:w-auto flex items-center justify-center font-semibold px-2 py-3 rounded-md">
+                                <a href="{{ url('/collaborator/profile-details') }}" class="btn btn-outline w-full sm:w-auto flex items-center justify-center font-semibold px-2 py-3 rounded-md">
                                     <button class="w-full flex items-center justify-center">
                                         <i data-lucide="award" class="h-5 w-5 hover:text-white mr-1"></i>
                                         <span class="ml-1">View Profile</span>
                                     </button>
+                                    
                                 </a>
                             </div>
                             <div class="sm:col-span-1">

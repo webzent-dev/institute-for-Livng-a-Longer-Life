@@ -42,7 +42,7 @@
                         Join our network of distinguished health professionals and help us empower individuals on their journey to <br>optimal health and longevity.
                     </p>
                 </div> 
-            </div>
+            </div> 
     </section>
    <section class="section-base gradient-subtle py-20">
             <div class="container-base max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -91,13 +91,31 @@
                                      
                                {{-- <div x-data="contactForm()" @submit.prevent="submitForm"> --}}
                                <div>
-                                    <form class="space-y-6" method="POST" action="{{ url('become/collaborator') }}">
+                                    {{-- <form class="space-y-6" method="POST" action="{{ url('/become/collaborator') }}"> --}}
+                                    @if (session('success'))
+                                        <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
+                                            {{ session('success') }}
+                                        </div>
+                                    @endif
+
+                                    @if ($errors->any())
+                                        <div class="mb-4 p-3 bg-red-100 text-red-700 rounded">
+                                            <ul class="list-disc pl-6 text-sm">
+                                                @foreach ($errors->all() as $error)
+                                                    <li>- {{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif        
+
+                                    <form method="POST" id="collabForm" action="{{ route('become.collaborator.store') }}" class="space-y-6">
                                         @csrf
 
                                         <div class="grid md:grid-cols-2 gap-6">
                                             <div class="space-y-2">
                                                 <label for="firstName" class="font-medium">First Name *</label>
                                                 <x-form.input model="firstName" name="first_name" placeholder="John" filter="name" value="{{ old('first_name') }}" />
+                                                
                                             </div>
 
                                             <div class="space-y-2">
@@ -152,7 +170,7 @@
                                         </div>
 
                                         <div class="grid grid-cols-1 gap-2">
-                                            <x-button-use type="submit" full="true" class="btn-hero lg py-3 flex items-center justify-center gap-2">
+                                            <x-button-use type="submit" id="submitBtn" full="true" class="btn-hero lg py-3 flex items-center justify-center gap-2">
                                                 <i data-lucide="send" class="w-5 h-5"></i>
                                                 Submit Application
                                             </x-button-use>
@@ -170,8 +188,54 @@
                  
     </section>
 
+    <script>
+$('#collabForm').on('submit', function(e) {
+    e.preventDefault();
+    console.log('Form submission prevented (jQuery).');
+});
+<script>
+document.getElementById('collabForm').addEventListener('submit', async function (event) {
+    event.preventDefault(); // Stop normal submit
+
+    let form = event.target;
+    let formData = new FormData(form);
+
+    // UI Reset
+    document.getElementById('successMsg').classList.add('hidden');
+    document.getElementById('errorList').innerHTML = '';
+
+    // Send AJAX
+    const response = await fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        body: formData
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+        // success
+        document.getElementById('successMsg').textContent = result.message;
+        document.getElementById('successMsg').classList.remove('hidden');
+        form.reset();
+    } else {
+        // validation errors
+        if (result.errors) {
+            Object.values(result.errors).forEach(error => {
+                let p = document.createElement('p');
+                p.textContent = error;
+                document.getElementById('errorList').appendChild(p);
+            });
+        }
+    }
+});
+</script>
 
       
-@endsection    
+@endsection  
+
 
  

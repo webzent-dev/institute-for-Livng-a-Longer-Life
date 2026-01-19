@@ -36,35 +36,35 @@
        
         <x-dashboard.sidebar.header />
 
-        @if(auth()->user()->isAdmin())
-              <main class="flex-1 p-4 md:p-6 overflow-y-auto scrollbar-custom ">
-                            <!-- Welcome Card -->
-                           
-                            <div class="bg-white/100 rounded-2xl p-6   mb-6 shadow-md text-slate-800">
-                                <div class="flex flex-col md:flex-row md:items-center justify-between">
-                                    <div>
-                                        <h2 class="text-2xl font-semibold mb-2 text-left">Welcome back, {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}!</h2>
-                                        <p class=" mb-4 max-w-2xl">Your team's performance is up by 24% this month. Keep up the great work!</p>
-                                        <button class="bg-white text-green-600 font-medium px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all shadow-md">
-                                            View Reports
-                                        </button>
-                                    </div>
-                                    <div class="mt-6 md:mt-0">
-                                        <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-green-100 hover:bg-green-200 flex items-center justify-center mx-auto">
-                                            <i data-lucide="trending-up" class="w-10 h-10 text-green-500"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="my-10">
-                                 <!-- Cards Section -->
-                            <x-ui.stats :items="[
-     ['label' => 'Total Users', 'value' => $totalUsers, 'icon' => 'users','icon_color' => 'bg-green-50 text-green-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-green-600'],
-    ['label' => 'collaborators', 'value' => $collaborators, 'icon' => 'credit-card','iconbg' => 'bg-amber-50', 'icon_color' => 'bg-amber-50 text-amber-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-amber-50 text-amber-600'],
-    ['label' => 'Orders', 'value' => 340, 'icon' => 'bar-chart-3', 'iconbg' => 'bg-blue-50', 'icon_color' => 'bg-blue-50 text-blue-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-blue-600'],
-    ['label' => 'Visits', 'value' => 20, 'icon' => 'eye',  'iconbg' => 	'bg-yellow-50', 	'icon_color' => 	'text-yellow-600', 	'percent_change' => '+8.5%', 	'percent_change_bg' => 	'text-yellow-600'],
-]" />
-                            </div>
+                @if(auth()->user()->isAdmin())
+                        <main class="flex-1 p-4 md:p-6 overflow-y-auto scrollbar-custom ">
+                                                            <!-- Welcome Card -->
+                                                        
+                                                            <div class="bg-white/100 rounded-2xl p-6   mb-6 shadow-md text-slate-800">
+                                                                <div class="flex flex-col md:flex-row md:items-center justify-between">
+                                                                    <div>
+                                                                        <h2 class="text-2xl font-semibold mb-2 text-left">Welcome back, {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}!</h2>
+                                                                        <p class=" mb-4 max-w-2xl">Your team's performance is up by 24% this month. Keep up the great work!</p>
+                                                                        <button class="bg-white text-green-600 font-medium px-5 py-2.5 rounded-xl hover:bg-gray-100 transition-all shadow-md">
+                                                                            View Reports
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="mt-6 md:mt-0">
+                                                                        <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-green-100 hover:bg-green-200 flex items-center justify-center mx-auto">
+                                                                            <i data-lucide="trending-up" class="w-10 h-10 text-green-500"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="my-10">
+                                                                <!-- Cards Section -->
+                                                            <x-ui.stats :items="[
+                                    ['label' => 'Total Users', 'value' => $totalUsers, 'icon' => 'users','icon_color' => 'bg-green-50 text-green-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-green-600'],
+                                    ['label' => 'collaborators', 'value' => $collaborators, 'icon' => 'credit-card','iconbg' => 'bg-amber-50', 'icon_color' => 'bg-amber-50 text-amber-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-amber-50 text-amber-600'],
+                                    ['label' => 'Orders', 'value' => 340, 'icon' => 'bar-chart-3', 'iconbg' => 'bg-blue-50', 'icon_color' => 'bg-blue-50 text-blue-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-blue-600'],
+                                    ['label' => 'Visits', 'value' => 20, 'icon' => 'eye',  'iconbg' => 	'bg-yellow-50', 	'icon_color' => 	'text-yellow-600', 	'percent_change' => '+8.5%', 	'percent_change_bg' => 	'text-yellow-600'],
+                                ]" />
+                             </div>
                          
 
                             
@@ -395,11 +395,11 @@
                             <div class="my-10">
                                  <!-- Cards Section -->
                             <x-ui.stats :items="[
-     ['label' => 'Total Users', 'value' => $totalUsers, 'icon' => 'users','icon_color' => 'bg-green-50 text-green-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-green-600'],
-    ['label' => 'collaborators', 'value' => $collaborators, 'icon' => 'credit-card','iconbg' => 'bg-amber-50', 'icon_color' => 'bg-amber-50 text-amber-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-amber-50 text-amber-600'],
-    ['label' => 'Orders', 'value' => 340, 'icon' => 'bar-chart-3', 'iconbg' => 'bg-blue-50', 'icon_color' => 'bg-blue-50 text-blue-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-blue-600'],
-    ['label' => 'Visits', 'value' => 20, 'icon' => 'eye',  'iconbg' => 	'bg-yellow-50', 	'icon_color' => 	'text-yellow-600', 	'percent_change' => '+8.5%', 	'percent_change_bg' => 	'text-yellow-600'],
-]" />
+                                 ['label' => 'Total Users', 'value' => $totalUsers, 'icon' => 'users','icon_color' => 'bg-green-50 text-green-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-green-600'],
+                                        ['label' => 'collaborators', 'value' => $collaborators, 'icon' => 'credit-card','iconbg' => 'bg-amber-50', 'icon_color' => 'bg-amber-50 text-amber-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-amber-50 text-amber-600'],
+                                    ['label' => 'Orders', 'value' => 340, 'icon' => 'bar-chart-3', 'iconbg' => 'bg-blue-50', 'icon_color' => 'bg-blue-50 text-blue-600', 'percent_change' => '+8.5%', 'percent_change_bg' => 'bg-green-50 text-blue-600'],
+                                    ['label' => 'Visits', 'value' => 20, 'icon' => 'eye',  'iconbg' => 	'bg-yellow-50', 	'icon_color' => 	'text-yellow-600', 	'percent_change' => '+8.5%', 	'percent_change_bg' => 	'text-yellow-600'],
+                                ]" />
                             </div>
                          
 
@@ -455,12 +455,8 @@
                                     <p class="text-slate-500 text-sm">Conversion Rate</p>
                                 </div>
                             </div>
-@endif
-
-
-       
-
-               
+            @endif
+ 
              
             @yield('content')
             

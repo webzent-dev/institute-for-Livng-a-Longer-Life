@@ -72,7 +72,7 @@ class CoursesController extends Controller
         'duration' => 'nullable|string|max:50',
         'instructor' => 'nullable|string|max:255',
         'category' => 'nullable|string|max:255',
-        'description' => 'nullable|string',
+        'description' => 'nullable|string', 
         'video_file' => 'nullable|mimes:mp4,webm|max:51200',
         'video_url'  => 'nullable|url',
         'featured' => 'nullable|boolean',

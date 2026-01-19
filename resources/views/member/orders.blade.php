@@ -1,6 +1,7 @@
 
-@extends('components.dashboard.member')
-@section('content')
+@extends('member.member')
+
+@section('member-content')
 
 <!-- Orders Page -->
 <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">

@@ -1,12 +1,14 @@
-
+@php
+    $logo = DB::table('web_settings')->where('id', 1)->first();
+@endphp  
 <footer class="bg-white border-t border-gray-200 font-jakarta">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8">
+    <div class="grid sm:grid-cols-1 md:grid-cols-4 gap-8 pb-8">
       <!-- Brand -->
       <div class="col-span-1 md:col-span-2 text-center md:text-left">
           <div class="mb-4 flex justify-center md:justify-start">
               <img 
-                  src="{{ asset('assets/logo.png') }}" 
+                  src="{{ asset('storage/'.$logo->logo) }}" 
                   alt="Institute for Living Longer" 
                   class="h-16 w-auto" 
               />
