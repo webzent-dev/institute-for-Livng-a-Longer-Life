@@ -1,6 +1,6 @@
 
 @extends('front.layouts.app')
-@section('content') 
+@section('content')
 
 
 <div class="max-w-7xl mx-auto">
@@ -10,7 +10,7 @@
 
     <main class="bg-gray-100">
 
-            <!-- PROFILE HEADER -->
+            <!--Collaborator PROFILE HEADER -->
             <div class="bg-white shadow  max-w-7xl max-auto justify-items-center">
                 <div class=" px-6 py-8 flex flex-col lg:flex-row  lg:items-start gap-6 justify-center">
 
@@ -25,7 +25,7 @@
                                 <span class="px-3 py-1 bg-green-100 text-green-600 rounded-full text-xs">Integrative Cardiology</span>
                                 <span class="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-xs">Strength Training & Cardio Specialist</span>
                         </div>
-                        <p class="mt-3 text-muted-foreground">Expert in age-defying fitness protocols and movement optimization for enhanced vitality and strength.</p>    
+                        <p class="mt-3 text-muted-foreground">Expert in age-defying fitness protocols and movement optimization for enhanced vitality and strength.</p>
                     <div class="flex items-center mt-3 text-yellow-500">
                         <span class="text-lg">★★★★☆</span>
                         <span class="text-gray-600 ml-2 text-sm">(4.5 - 182 Reviews)</span>
@@ -89,13 +89,13 @@
                                     <span class="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-xs">Workshops</span>
                                 </div>
                                 </div>
-                        </section>    
+                        </section>
 
                         <!-- ABOUT SECTION -->
                         <section class="card-hover card">
                             <h2 class="text-xl font-semibold mb-3">About</h2>
                             <p class="text-sm text-gray-700 leading-relaxed">
-                                Dr. Michael Rodriguez is a leading specialist in exercise physiology and integrative cardiology, combining advanced medical science with performance-driven training strategies to help individuals build strength, resilience, and long-term cardiovascular health. As a Strength Training & Cardio Specialist, he designs precision-based programs that optimize heart function, muscular performance, and metabolic efficiency across all stages of life. 
+                                Dr. Michael Rodriguez is a leading specialist in exercise physiology and integrative cardiology, combining advanced medical science with performance-driven training strategies to help individuals build strength, resilience, and long-term cardiovascular health. As a Strength Training & Cardio Specialist, he designs precision-based programs that optimize heart function, muscular performance, and metabolic efficiency across all stages of life.
                             </p>
                         </section>
 
@@ -154,7 +154,7 @@
                                 <p class="text-xs text-gray-600 mt-1">Good trainer with detailed guidance.</p>
                                 </div>
                             </div>
-                        
+
                         </section>
                         <!-- WORKSHOPS SECTION -->
                         <section class=" card-hover card">
@@ -185,7 +185,7 @@
     </main>
 
     {{-- Wellness Marketplace Data --}}
- 
+
 
     <main class="bg-gradient-to-br from-gray-50 to-blue-50">
         <div class="container mx-auto px-4 py-6 max-w-screen-xxl">
@@ -198,11 +198,11 @@
                         </h1>
                         <p class="text-gray-600 mt-1">Your journey to better health starts here</p>
                     </div>
-                    
+
                     <div class="relative w-full md:w-1/3">
-                        <input 
-                            type="text" 
-                            id="searchInput" 
+                        <input
+                            type="text"
+                            id="searchInput"
                             placeholder="Search videos, products, books, testimonials..."
                             class="w-full p-4 pl-12 pr-10 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent shadow-sm"
                         >
@@ -214,7 +214,7 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="flex items-center justify-between">
                     <p class="text-gray-600 hidden md:block">Discover videos, supplements, books, and inspiring stories for your wellness journey</p>
                     <div class="flex items-center space-x-4">
@@ -248,7 +248,7 @@
                                 <i class="fas fa-times text-xl"></i>
                             </button>
                         </div>
-                        
+
                         <!-- Content Type filter -->
                         <div class="mb-8">
                             <h3 class="font-bold text-lg text-gray-800 mb-4">Content Type</h3>
@@ -283,7 +283,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <!-- Category filter -->
                         <div class="mb-8">
                             <h3 class="font-bold text-lg text-gray-800 mb-4">Category</h3>
@@ -353,7 +353,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <!-- Price filter -->
                         <div class="mb-8">
                             <h3 class="font-bold text-lg text-gray-800 mb-4">Price Range</h3>
@@ -384,7 +384,7 @@
                                 </label>
                             </div>
                         </div>
-                        
+
                         <!-- Rating filter -->
                         {{-- <div class="mb-8">
                             <h3 class="font-bold text-lg text-gray-800 mb-4">Rating</h3>
@@ -403,13 +403,13 @@
                                 </button>
                             </div>
                         </div> --}}
-                        
+
                         <!-- Clear filters button -->
                         <button id="clearFilters" class="w-full py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
                             <i class="fas fa-times-circle mr-2"></i> Clear All Filters
                         </button>
                     </div>
-                    
+
                     <!-- Active filters display -->
                     <div id="activeFilters" class="bg-white rounded-xl p-4 shadow-sm mb-6 hidden">
                         <h3 class="font-bold text-gray-800 mb-3">Active Filters</h3>
@@ -426,13 +426,13 @@
                             <h2 class="text-2xl font-bold text-accent">Wellness <span class="text-primary">Resources</span></h2>
                             {{-- <p id="resultsCount" class="text-gray-600">Showing 1-12 of 24 results</p> --}}
                         </div>
-                        
+
                         <div class="flex flex-col md:flex-row items-start md:items-center space-y-3 md:space-y-0 md:space-x-4">
                             <!-- Second Clear All Filters Button -->
                             <button id="clearFiltersTop" class="hidden px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors md:order-first">
                                 <i class="fas fa-times-circle mr-2"></i> Clear All Filters
                             </button>
-                            
+
                             <div class="flex items-center space-x-4">
                                 <div class="hidden md:flex items-center space-x-4">
                                     <span class="text-gray-600">Sort by:</span>
@@ -454,25 +454,25 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Content grid/list -->
                     <div id="contentView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-6">
                         <!-- Content cards will be dynamically loaded here -->
                     </div>
-                    
+
                     <!-- Pagination -->
                     <div class="mt-10 flex flex-col sm:flex-row justify-between items-center">
                         {{-- <div id="paginationInfo" class="text-gray-600 mb-4 sm:mb-0">
                             Showing <span id="pageStart">1</span> to <span id="pageEnd">12</span> of <span id="totalItems">24</span> results
                         </div> --}}
-                        
+
                         <div class="flex items-center space-x-2" id="paginationControls">
                             <!-- Pagination buttons will be dynamically generated here -->
                         </div>
                     </div>
                 </main>
             </div>
-             
+
         </div>
     </main>
     <script>
@@ -492,7 +492,7 @@
 
             { id: 11, type: "video", title: "Stress and Your Health - Mind-Body", duration: "14:40", category: "mental-health", views: 16000, rating: 4.8, thumbnail: "https://d3imrogdy81qei.cloudfront.net/video_images/7179/How_stress_affects_the_body-01.jpg", presenter: "Dr. Jennifer Park", description: "Techniques to manage stress and its impact on aging.", price: 0 },
             { id: 12, type: "video", title: "Sleep Optimization Basics", duration: "11:45", category: "sleep", views: 13000, rating: 4.7, thumbnail: "https://disk.subscribr.ai/cdn-cgi/image/width=1280,height=720,fit=contain,quality=90,format=auto/https://subscribr-disk.nyc3.digitaloceanspaces.com/pages/thumb_sleep-tips-youtube-video-ideas_a85b510946945844.jpg", presenter: "Dr. Emily Thompson", description: "Strategies for better sleep to enhance recovery and longevity.", price: 0 },
-            
+
             // Products
             { id: 7, type: "product", name: "Vital Boost Superfood Formula", category: "supplement", price: 79.99, rating: 4.9, stock: 500, image: "https://m.media-amazon.com/images/I/61oUe3SdUGL.jpg", ingredients: ["Vitamins C, B Complex", "Folic Acid", "Zinc", "Magnesium"], description: "Daily powdered nutritional supplement for immune support and vitality." },
             { id: 8, type: "product", name: "Heart Health Optimizer", category: "supplement", price: 49.99, rating: 4.7, stock: 300, image: "https://m.media-amazon.com/images/I/71vq1jILmXL.jpg", ingredients: ["CoQ10", "Omega-3", "Garlic Extract"], description: "Supports cardiovascular function and blood pressure." },
@@ -500,7 +500,7 @@
             { id: 10, type: "product", name: "Sleep Aid Formula", category: "supplement", price: 39.99, rating: 4.6, stock: 250, image: "https://m.media-amazon.com/images/I/612yj213I7L._AC_UF1000,1000_QL80_.jpg", ingredients: ["Melatonin", "Valerian Root", "Chamomile"], description: "Natural aid for better sleep and recovery." },
             { id: 11, type: "product", name: "Hormone Balance Support", category: "supplement", price: 54.99, rating: 4.7, stock: 350, image: "https://m.media-amazon.com/images/I/71wXNLPd63L.jpg", ingredients: ["Ashwagandha", "Maca Root", "Vitamin D"], description: "Optimizes hormonal health for energy and vitality." },
             { id: 12, type: "product", name: "Immune Strength Booster", category: "supplement", price: 44.99, rating: 4.8, stock: 450, image: "https://m.media-amazon.com/images/I/81GP7ZmwngL._AC_UF1000,1000_QL80_.jpg", ingredients: ["Elderberry", "Echinacea", "Vitamin C"], description: "Enhances natural defenses against illnesses." },
-            
+
             // Books
             { id: 13, type: "book", title: "Healthy Body, Healthy Mouth", author: "Dr. Victor Zeines", category: "holistic-health", price: 24.99, rating: 4.8, pages: 256, image: "https://assets.prod.dp.digitellcdn.com/api/services/imgopt/mw_400,mh_400/akamai-opus-nc-public.digitellcdn.com/americandentalassociation/product-icons/0bcf0d9fa31cefcf82b063a65688a72ebbbd43e2f9cc634184ca017d15de5b74.png.webp", description: "Explores the connection between oral health and overall wellness." },
             { id: 14, type: "book", title: "The Science of Living Longer", author: "Dr. Victor Zeines", category: "longevity", price: 29.99, rating: 4.9, pages: 320, image: "https://i.kickstarter.com/assets/046/153/762/54033058c21a63bf0bfdb9555e29a4cc_original.jpg?anim=false&fit=cover&gravity=auto&height=576&origin=ugc&q=92&v=1724193482&width=1024&sig=4ZDaPH4PUNdqJZWIQjvYObB%2BixrrVhTWQ84ke5EAssQ%3D", description: "Evidence-based strategies for extending lifespan and healthspan." },
@@ -508,7 +508,7 @@
             { id: 16, type: "book", title: "Age-Defying Fitness Protocols", author: "Dr. Michael Rodriguez", category: "exercise", price: 22.99, rating: 4.6, pages: 192, image: "https://m.media-amazon.com/images/I/81asgCMfgHL.jpg", description: "Exercises to maintain strength and vitality throughout life." },
             { id: 17, type: "book", title: "Mind-Body Stress Reduction", author: "Dr. Jennifer Park", category: "mental-health", price: 21.99, rating: 4.8, pages: 240, image: "https://m.media-amazon.com/images/I/71eIy2Wl6rL.jpg", description: "Techniques for reducing stress and improving mental-physical balance." },
             { id: 18, type: "book", title: "Optimizing Sleep for Longevity", author: "Dr. Emily Thompson", category: "sleep", price: 18.99, rating: 4.7, pages: 208, image: "https://m.media-amazon.com/images/I/71uHS9QXb4L.jpg", description: "Practical guide to achieving restorative sleep." },
-            
+
             // Testimonials
             { id: 19, type: "testimonial", name: "Michael R.", age: 55, location: "Denver, CO", rating: 5, image: "https://www.denverheadshotco.com/wp-content/uploads/2023/12/Denver-Headshot-Co-Small1103.jpg", quote: "The videos really helped a lot.", description: "Improved overall health through the program.", category: "Testimonials" },
             { id: 20, type: "testimonial", name: "Jennifer P.", age: 48, location: "Seattle, WA", rating: 5, image: "https://images.seattletimes.com/wp-content/uploads/2018/04/Karla_Miller02-crop-web-tzr.jpg?d=780x502", quote: "IT CHANGED MY LIFE.", description: "Transformed daily routine and wellness.", category: "Testimonials" },
@@ -537,7 +537,7 @@
         const pageStart = document.getElementById('pageStart');
         const pageEnd = document.getElementById('pageEnd');
         const totalItems = document.getElementById('totalItems');
-        
+
         // State variables
         let currentView = localStorage.getItem('wellnessView') || 'grid'; // Load from localStorage or default to grid
         let activeFilters = {
@@ -546,7 +546,7 @@
             price: null,
             rating: null
         };
-        
+
         // Pagination variables
         let currentPage = 1;
         let itemsPerPage = 12;
@@ -558,7 +558,7 @@
         function init() {
             // Set initial view based on localStorage
             switchView(currentView, true);
-            
+
             renderContent();
             setupEventListeners();
             updateResultsCount();
@@ -570,18 +570,18 @@
             // Search functionality - FIXED
             searchInput.addEventListener('input', handleSearch);
             searchButton.addEventListener('click', handleSearch);
-            
+
             // View toggle
             gridViewButton.addEventListener('click', () => switchView('grid'));
             listViewButton.addEventListener('click', () => switchView('list'));
-            
+
             // Mobile filter toggle
             mobileFilterToggle.addEventListener('click', () => {
                 filtersSidebar.style.display = 'block';
                 filtersSidebar.classList.add('fixed', 'inset-0', 'z-50', 'bg-white', 'p-6', 'overflow-y-auto');
                 document.body.style.overflow = 'hidden';
             });
-            
+
             closeFilters.addEventListener('click', () => {
                 if (window.innerWidth < 768) {
                     filtersSidebar.style.display = 'none';
@@ -589,40 +589,40 @@
                 }
                 document.body.style.overflow = 'auto';
             });
-            
+
             // Filter checkboxes and radios
             document.querySelectorAll('input[data-filter]').forEach(input => {
                 input.addEventListener('change', handleFilterChange);
             });
-            
+
             // Rating filter buttons
             document.querySelectorAll('.filter-rating').forEach(button => {
                 button.addEventListener('click', () => handleRatingFilter(button.dataset.rating));
             });
-            
+
             // Clear filters buttons (both)
             clearFiltersButton.addEventListener('click', clearFilters);
             clearFiltersTopButton.addEventListener('click', clearFilters);
-            
+
             // Sort select
             sortSelect.addEventListener('change', handleSortChange);
             sortSelectMobile.addEventListener('change', handleSortChange);
-            
+
             // Close filters when clicking outside on mobile
             document.addEventListener('click', (e) => {
-                if (window.innerWidth < 768 && 
-                    !filtersSidebar.contains(e.target) && 
-                    !mobileFilterToggle.contains(e.target) && 
+                if (window.innerWidth < 768 &&
+                    !filtersSidebar.contains(e.target) &&
+                    !mobileFilterToggle.contains(e.target) &&
                     filtersSidebar.style.display === 'block') {
                     filtersSidebar.style.display = 'none';
                     filtersSidebar.classList.remove('fixed', 'inset-0', 'z-50', 'bg-white', 'p-6', 'overflow-y-auto');
                     document.body.style.overflow = 'auto';
                 }
             });
-            
+
             // Handle window resize
             window.addEventListener('resize', handleResize);
-            
+
             // Initialize search functionality
             if (searchInput.value) {
                 handleSearch();
@@ -647,7 +647,7 @@
         // Handle search - FIXED VERSION
         function handleSearch() {
             const searchTerm = searchInput.value.trim().toLowerCase();
-            
+
             if (searchTerm === '') {
                 // If search is cleared, reset to all items
                 filteredItems = [...allItems];
@@ -685,11 +685,11 @@
                     return false;
                 });
             }
-            
+
             // Reset to first page when searching
             currentPage = 1;
             totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-            
+
             renderContent();
             updateResultsCount();
             renderPagination();
@@ -700,7 +700,7 @@
         function handleFilterChange(e) {
             const filterType = e.target.dataset.filter;
             const value = e.target.value;
-            
+
             if (filterType === 'type' || filterType === 'category') {
                 if (e.target.checked) {
                     activeFilters[filterType].push(value);
@@ -710,7 +710,7 @@
             } else if (filterType === 'price') {
                 activeFilters.price = e.target.checked ? value : null;
             }
-            
+
             // Reset to first page when filtering
             currentPage = 1;
             applyFilters();
@@ -725,10 +725,10 @@
             } else {
                 activeFilters.rating = rating;
             }
-            
+
             // Reset to first page when filtering
             currentPage = 1;
-            
+
             // Update button styles
             document.querySelectorAll('.filter-rating').forEach(button => {
                 if (button.dataset.rating === rating && activeFilters.rating === rating) {
@@ -739,7 +739,7 @@
                     button.classList.add('bg-gray-100', 'text-gray-700');
                 }
             });
-            
+
             applyFilters();
             updateActiveFiltersDisplay();
         }
@@ -747,7 +747,7 @@
         // Apply all active filters
         function applyFilters() {
             let results = [...allItems];
-            
+
             // Apply search filter if there's a search term
             const searchTerm = searchInput.value.trim().toLowerCase();
             if (searchTerm) {
@@ -784,22 +784,22 @@
                     return false;
                 });
             }
-            
+
             // Apply type filter
             if (activeFilters.type.length > 0) {
                 results = results.filter(item => activeFilters.type.includes(item.type));
             }
-            
+
             // Apply category filter
             if (activeFilters.category.length > 0) {
                 results = results.filter(item => activeFilters.category.includes(item.category));
             }
-            
+
             // Apply price filter
             if (activeFilters.price) {
                 results = results.filter(item => {
                     const [min, max] = activeFilters.price.split('-').map(val => val === '+' ? Infinity : parseInt(val));
-                    
+
                     if (activeFilters.price === '60+') {
                         return item.price >= 60;
                     } else {
@@ -807,23 +807,23 @@
                     }
                 });
             }
-            
+
             // Apply rating filter
             if (activeFilters.rating) {
                 const minRating = parseFloat(activeFilters.rating);
                 results = results.filter(item => item.rating >= minRating);
             }
-            
+
             filteredItems = results;
             totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-            
+
             // Ensure current page is valid
             if (currentPage > totalPages && totalPages > 0) {
                 currentPage = totalPages;
             } else if (totalPages === 0) {
                 currentPage = 1;
             }
-            
+
             renderContent();
             updateResultsCount();
             renderPagination();
@@ -838,28 +838,28 @@
                 price: null,
                 rating: null
             };
-            
+
             // Uncheck all checkboxes and radios
             document.querySelectorAll('input[data-filter]').forEach(input => {
                 input.checked = false;
             });
-            
+
             // Reset rating buttons
             document.querySelectorAll('.filter-rating').forEach(button => {
                 button.classList.remove('bg-blue-100', 'text-primary');
                 button.classList.add('bg-gray-100', 'text-gray-700');
             });
-            
+
             // Clear search
             searchInput.value = '';
-            
+
             // Reset to first page
             currentPage = 1;
-            
+
             // Reset items
             filteredItems = [...allItems];
             totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-            
+
             // Re-render
             renderContent();
             updateResultsCount();
@@ -870,7 +870,7 @@
         // Handle sort change
         function handleSortChange() {
             const sortBy = sortSelect.value || sortSelectMobile.value;
-            
+
             switch(sortBy) {
                 case 'rating':
                     filteredItems.sort((a, b) => b.rating - a.rating);
@@ -892,7 +892,7 @@
                     filteredItems.sort((a, b) => (b.views || 0) - (a.views || 0));
                     break;
             }
-            
+
             // Reset to first page when sorting
             currentPage = 1;
             renderContent();
@@ -902,10 +902,10 @@
         // Switch between grid and list view with persistence
         function switchView(view, initialLoad = false) {
             currentView = view;
-            
+
             // Save to localStorage
             localStorage.setItem('wellnessView', view);
-            
+
             if (view === 'grid') {
                 contentView.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-6';
                 gridViewButton.classList.add('bg-blue-100', 'text-primary');
@@ -917,7 +917,7 @@
                 gridViewButton.classList.remove('bg-blue-100', 'text-primary');
                 gridViewButton.classList.add('text-gray-500', 'hover:bg-gray-100');
             }
-            
+
             if (!initialLoad) {
                 renderContent();
             }
@@ -930,11 +930,11 @@
             const start = (currentPage - 1) * itemsPerPage + 1;
             const end = Math.min(currentPage * itemsPerPage, filteredItems.length);
             const total = filteredItems.length;
-            
+
             pageStart.textContent = start;
             pageEnd.textContent = end;
             totalItems.textContent = total;
-            
+
             resultsCount.textContent = `Showing ${start}-${end} of ${total} results`;
         }
 
@@ -942,7 +942,7 @@
         function updateActiveFiltersDisplay() {
             // Clear current filter tags
             filterTags.innerHTML = '';
-            
+
             // Add type filters
             activeFilters.type.forEach(type => {
                 const tag = document.createElement('div');
@@ -955,7 +955,7 @@
                 `;
                 filterTags.appendChild(tag);
             });
-            
+
             // Add category filters
             activeFilters.category.forEach(category => {
                 const tag = document.createElement('div');
@@ -968,7 +968,7 @@
                 `;
                 filterTags.appendChild(tag);
             });
-            
+
             // Add price filter
             if (activeFilters.price) {
                 const tag = document.createElement('div');
@@ -981,7 +981,7 @@
                 `;
                 filterTags.appendChild(tag);
             }
-            
+
             // Add rating filter
             if (activeFilters.rating) {
                 const tag = document.createElement('div');
@@ -994,43 +994,43 @@
                 `;
                 filterTags.appendChild(tag);
             }
-            
+
             // Add event listeners to remove filter buttons
             filterTags.querySelectorAll('button').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const filterType = e.target.closest('button').dataset.filter;
-                    
+
                     if (filterType === 'type' || filterType === 'category') {
                         const value = e.target.closest('button').dataset.value;
                         activeFilters[filterType] = activeFilters[filterType].filter(item => item !== value);
-                        
+
                         // Uncheck the corresponding checkbox
                         const checkbox = document.querySelector(`input[data-filter="${filterType}"][value="${value}"]`);
                         if (checkbox) checkbox.checked = false;
                     } else if (filterType === 'price') {
                         activeFilters.price = null;
-                        
+
                         // Uncheck the corresponding radio
                         document.querySelectorAll('input[data-filter="price"]').forEach(radio => {
                             radio.checked = false;
                         });
                     } else if (filterType === 'rating') {
                         activeFilters.rating = null;
-                        
+
                         // Reset rating buttons
                         document.querySelectorAll('.filter-rating').forEach(btn => {
                             btn.classList.remove('bg-blue-100', 'text-primary');
                             btn.classList.add('bg-gray-100', 'text-gray-700');
                         });
                     }
-                    
+
                     // Reset to first page when removing filters
                     currentPage = 1;
                     applyFilters();
                     updateActiveFiltersDisplay();
                 });
             });
-            
+
             // Show/hide active filters container
             const activeFiltersContainer = document.getElementById('activeFilters');
             if (activeFilters.type.length > 0 || activeFilters.category.length > 0 || activeFilters.price || activeFilters.rating) {
@@ -1043,9 +1043,9 @@
         // Render pagination controls
         function renderPagination() {
             paginationControls.innerHTML = '';
-            
+
             if (totalPages <= 1) return;
-            
+
             // Previous button
             const prevButton = document.createElement('button');
             prevButton.className = `page-item px-3 py-2 border rounded-l-lg ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-100'}`;
@@ -1061,17 +1061,17 @@
                 }
             });
             paginationControls.appendChild(prevButton);
-            
+
             // Page numbers
             const maxVisiblePages = window.innerWidth < 640 ? 3 : 5;
             let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
             let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-            
+
             // Adjust if we're near the end
             if (endPage - startPage + 1 < maxVisiblePages) {
                 startPage = Math.max(1, endPage - maxVisiblePages + 1);
             }
-            
+
             // First page with ellipsis if needed
             if (startPage > 1) {
                 const firstPageButton = document.createElement('button');
@@ -1085,7 +1085,7 @@
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
                 paginationControls.appendChild(firstPageButton);
-                
+
                 if (startPage > 2) {
                     const ellipsis = document.createElement('span');
                     ellipsis.className = 'px-3 py-2 border text-gray-500';
@@ -1093,7 +1093,7 @@
                     paginationControls.appendChild(ellipsis);
                 }
             }
-            
+
             // Page number buttons
             for (let i = startPage; i <= endPage; i++) {
                 const pageButton = document.createElement('button');
@@ -1108,7 +1108,7 @@
                 });
                 paginationControls.appendChild(pageButton);
             }
-            
+
             // Last page with ellipsis if needed
             if (endPage < totalPages) {
                 if (endPage < totalPages - 1) {
@@ -1117,7 +1117,7 @@
                     ellipsis.textContent = '...';
                     paginationControls.appendChild(ellipsis);
                 }
-                
+
                 const lastPageButton = document.createElement('button');
                 lastPageButton.className = 'page-item px-3 py-2 border text-gray-700 hover:bg-gray-100';
                 lastPageButton.textContent = totalPages;
@@ -1130,7 +1130,7 @@
                 });
                 paginationControls.appendChild(lastPageButton);
             }
-            
+
             // Next button
             const nextButton = document.createElement('button');
             nextButton.className = `page-item px-3 py-2 border rounded-r-lg ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-100'}`;
@@ -1212,12 +1212,12 @@
         // Render content based on current view
         function renderContent() {
             contentView.innerHTML = '';
-            
+
             // Calculate items for current page
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = Math.min(startIndex + itemsPerPage, filteredItems.length);
             const itemsToShow = filteredItems.slice(startIndex, endIndex);
-            
+
             if (itemsToShow.length === 0) {
                 contentView.innerHTML = `
                     <div class="col-span-full text-center py-12">
@@ -1229,15 +1229,15 @@
                         </button>
                     </div>
                 `;
-                
+
                 document.getElementById('clearFiltersFromEmpty')?.addEventListener('click', clearFilters);
                 return;
             }
-            
+
             itemsToShow.forEach(item => {
                 const itemElement = document.createElement('div');
                 itemElement.className = `bg-white rounded-xl shadow-sm overflow-hidden card-hover ${currentView === 'list' ? 'flex flex-col md:flex-row' : ''}`;
-                
+
                 if (item.type === 'video') {
                     itemElement.innerHTML = `
                         <div class="${currentView === 'list' ? 'md:w-1/3 lg:w-1/4' : ''}">
@@ -1265,9 +1265,9 @@
                                     <i class="fas fa-star text-yellow-500"></i>
                                 </div>
                             </div>
-                            
+
                             <p class="text-gray-700 mb-4">${item.description}</p>
-                            
+
                             <div class="mb-6">
                                 <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm mr-2">
                                     ${getCategoryName(item.category)}
@@ -1276,7 +1276,7 @@
                                     <i class="fas fa-clock mr-1"></i>${item.duration}
                                 </span>
                             </div>
-                            
+
                             <div class="flex justify-between items-center">
                                 <div class="text-gray-600">
                                     <i class="fas fa-user mr-1"></i>
@@ -1317,16 +1317,16 @@
                                     <i class="fas fa-star text-yellow-500"></i>
                                 </div>
                             </div>
-                            
+
                             <p class="text-gray-700 mb-4">${item.description}</p>
-                            
+
                             <div class="mb-6">
                                 <h4 class="font-medium text-gray-800 mb-2">Key Ingredients:</h4>
                                 <div class="flex flex-wrap gap-2">
                                     ${item.ingredients.map(ing => `<span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">${ing}</span>`).join('')}
                                 </div>
                             </div>
-                            
+
                             <div class="flex justify-between items-center">
                                 <div class="text-gray-600">
                                     <i class="fas fa-box mr-1"></i>
@@ -1367,9 +1367,9 @@
                                     <i class="fas fa-star text-yellow-500"></i>
                                 </div>
                             </div>
-                            
+
                             <p class="text-gray-700 mb-4">${item.description}</p>
-                            
+
                             <div class="mb-6">
                                 <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm mr-2">
                                     ${getCategoryName(item.category)}
@@ -1378,7 +1378,7 @@
                                     <i class="fas fa-book-open mr-1"></i>${item.pages} pages
                                 </span>
                             </div>
-                            
+
                             <div class="flex justify-between items-center">
                                 <div class="text-gray-600">
                                     <i class="fas fa-user-edit mr-1"></i>
@@ -1419,14 +1419,14 @@
                                     <i class="fas fa-star text-yellow-500"></i>
                                 </div>
                             </div>
-                            
+
                             <div class="mb-4 p-4 bg-blue-50 rounded-lg border-l-4 border-primary">
                                 <i class="fas fa-quote-left text-blue-400 text-xl mb-2"></i>
                                 <p class="text-gray-700 italic">"${item.quote}"</p>
                             </div>
-                            
+
                             <p class="text-gray-700 mb-6">${item.description}</p>
-                            
+
                             <div class="flex justify-between items-center">
                                 <div class="text-gray-600">
                                     <i class="fas fa-map-marker-alt mr-1"></i>
@@ -1444,7 +1444,7 @@
                         </div>
                     `;
                 }
-                
+
                 contentView.appendChild(itemElement);
             });
         }
@@ -1452,8 +1452,8 @@
         // Initialize the page
         window.addEventListener('DOMContentLoaded', init);
     </script>
- 
- 
+
+
 
 
 
