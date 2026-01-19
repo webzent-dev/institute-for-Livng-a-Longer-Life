@@ -1,7 +1,7 @@
 
 @php
     $logo = DB::table('web_settings')->where('id', 1)->first();
-@endphp    
+@endphp
 <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-20">
@@ -15,22 +15,39 @@
       </a>
 
       <!-- Desktop Navigation -->
-      
+
       <div class="sm:hidden lg:flex items-center gap-2">
         <a href="{{ url('/') }}" class="px-4 py-2 text-md font-medium rounded-md {{ request()->is('/') ? 'text-primary' : 'hover:bg-accent' }}">Home</a>
 
+        {{-- About dropdown --}}
         <div class="relative group">
-          <button type="button" class="flex items-center px-4 py-2 text-sm font-medium rounded-md {{ request()->is('about*') ? 'text-primary' : 'hover:bg-accent' }}">
-            About
-            <i data-lucide="chevron-down" class="ml-1 h-4 w-4"></i>
-          </button>
-          <div class="absolute hidden group-hover:block bg-white border border-gray-200 rounded-md shadow-lg w-56 ">
-            
-              <a href="{{ url('/about-dr-zeines') }}" class="block px-4 py-2 text-sm  {{ request()->is('about-dr-zeines') ? 'text-primary' : 'hover:bg-gray-100' }}">About Dr. Zeines</a>
-              <a href="/collaborators" class="block px-4 py-2 text-sm {{ request()->is('collaborators') ? 'text-primary' : 'hover:bg-gray-100' }}">Our Collaborators</a>
-          </div>
+                <button
+                    type="button"
+                    class="flex items-center px-4 py-2 text-sm font-medium rounded-md
+                    {{ request()->is('about*') || request()->is('collaborators') ? 'text-primary' : 'hover:bg-accent' }}">
+
+                    About
+                    <i data-lucide="chevron-down" class="ml-1 h-4 w-4"></i>
+                </button>
+
+                <div class="absolute hidden group-hover:block bg-white border border-gray-200 rounded-md shadow-lg w-56">
+
+                    <a href="{{ url('/about-dr-zeines') }}"
+                    class="block px-4 py-2 text-sm
+                    {{ request()->is('about-dr-zeines') ? 'text-primary' : 'hover:bg-gray-100' }}">
+                    About Dr. Zeines
+                    </a>
+
+                    <a href="/collaborators"
+                    class="block px-4 py-2 text-sm
+                    {{ request()->is('collaborators') ? 'text-primary' : 'hover:bg-gray-100' }}">
+                    Our Collaborators
+                    </a>
+
+                </div>
         </div>
-        
+
+
         <a href="{{ url('/intro-videos') }}" class="px-4 py-2 text-sm font-medium rounded-md {{ request()->is('intro-videos') ? 'text-primary' : 'hover:bg-accent' }}">Intro Videos</a>
         <a href="{{ url('/vital-boost') }}" class="px-4 py-2 text-sm font-medium rounded-md {{ request()->is('vital-boost') ? 'text-primary' : 'hover:bg-accent' }}">Vital Boost</a>
         <a href="{{ url('/shop') }}" class="px-4 py-2 text-sm font-medium rounded-md {{ request()->is('shop') ? 'text-primary' : 'hover:bg-accent' }}">Store</a>
@@ -146,7 +163,7 @@
 </nav>
 
 <script>
- 
+
   if (window.lucide) lucide.createIcons();
 
   // Mobile menu toggle
@@ -176,4 +193,3 @@
 
 
 
- 
