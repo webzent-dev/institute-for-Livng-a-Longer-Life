@@ -22,7 +22,7 @@
                 @foreach ($element as $page => $url)
                     @if ($page == $paginator->currentPage())
                         <li>
-                            <span class="px-3 py-1 bg-blue-600 text-white border border-gray-300">{{ $page }}</span>
+                            <span class="px-3 py-1 bg-primary text-white border border-gray-300">{{ $page }}</span>
                         </li>
                     @else
                         <li>

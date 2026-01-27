@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Front;   
+namespace App\Http\Controllers\Front;
 
-use App\Http\Controllers\Controller;    
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 
@@ -16,7 +16,7 @@ class ShopController extends Controller
 
     public function filter(Request $request)
     {
-         
+
         $search = $request->search;
     $category = $request->category;
 
@@ -28,7 +28,7 @@ class ShopController extends Controller
                     })
                     ->get();
 
- 
+
         return view('front.pages.shop', compact('products'));
     }
     public function productDetails()

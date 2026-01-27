@@ -6,6 +6,9 @@ export default {
   content: [
     "./resources/**/*.{blade.php,js,vue}",
     "./storage/framework/views/*.php",
+     "./resources/views/**/*.blade.php",
+  "./resources/js/**/*.js",
+  "./resources/**/*.vue",
     "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",
   ],
 
@@ -17,16 +20,17 @@ export default {
     },
 
     extend: {
- 
-      fontFamily: { 
-                  },
-       
-   
+
+      fontFamily: {
+        sans: ['Plus Jakarta Sans', 'sans-serif'],
+      },
+
+
       fontSize: {
-        h1: ["50px", { lineHeight: "1.2", fontWeight: "700" }],
-        h2: ["36px", { lineHeight: "1.3", fontWeight: "600" }],
-        h3: ["28px", { lineHeight: "1.3", fontWeight: "600" }],
-        p: ["18px", { lineHeight: "1.8" }],
+        h1: ["30px", { lineHeight: "1.2", fontWeight: "700" }],
+        h2: ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+        h3: ["18px", { lineHeight: "1.3", fontWeight: "600" }],
+        p: ["14px", { lineHeight: "1.8" }],
       },
 
 
@@ -67,21 +71,21 @@ export default {
         },
       },
 
-   
+
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
 
-     
+
       boxShadow: {
         soft: "var(--shadow-soft)",
         medium: "var(--shadow-medium)",
         strong: "var(--shadow-strong)",
       },
 
-   
+
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -91,7 +95,7 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-      
+
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
@@ -150,7 +154,7 @@ export default {
     },
   },
 
- 
+
   plugins: [
     plugin(function ({ addComponents }) {
       addComponents({
@@ -186,7 +190,7 @@ export default {
     }),
      function ({ addBase, theme }) {
     addBase({
-       
+
       "h1": {
         fontFamily: theme("fontFamily.display"),
         fontWeight: "700",
@@ -208,7 +212,7 @@ export default {
         },
       },
 
-      
+
       "h2": {
         fontFamily: theme("fontFamily.display"),
         fontWeight: "700",
@@ -224,14 +228,14 @@ export default {
         },
       },
 
-      
+
       "h3": {
         fontFamily: theme("fontFamily.display"),
         fontWeight: "600",
         fontSize: theme("fontSize.xl")[0],
         lineHeight: theme("fontSize.xl")[1].lineHeight,
         marginBottom: theme("spacing.3"),
-        
+
       },
       "@screen md": {
         "h3": {
@@ -240,14 +244,14 @@ export default {
         },
       },
 
-      
+
       "h4": {
         fontFamily: theme("fontFamily.display"),
         fontWeight: "600",
         fontSize: theme("fontSize.lg")[0],
         lineHeight: theme("fontSize.lg")[1].lineHeight,
         marginBottom: theme("spacing.2"),
-        
+
       },
       "@screen md": {
         "h4": {
@@ -255,10 +259,22 @@ export default {
           lineHeight: theme("fontSize.xl")[1].lineHeight,
         },
       },
+        "p": {
+        fontFamily: theme("fontFamily.display"),
+        fontSize: theme("fontSize.p")[0],
+        lineHeight: theme("fontSize.p")[1].lineHeight,
+        marginBottom: theme("spacing.4"),
+        },
+        "@screen md": {
+        "p": {
+            fontSize: theme("fontSize.lg")[0],
+            lineHeight: theme("fontSize.lg")[1].lineHeight,
+            },
+        },
     });
   },
 
-  
-  
+
+
   ],
 };

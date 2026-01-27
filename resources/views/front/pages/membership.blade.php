@@ -1,36 +1,49 @@
- @extends('front.layouts.app')  
+ @extends('front.layouts.app')
 
 
 @section('content')
 <div class="min-h-screen flex flex-col">
-   
+
   <main class="flex-1">
     {{-- Hero Section --}}
     <section class="gradient-subtle py-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h1 class="text-4xl lg:text-6xl font-bold text-foreground mb-6">
-              Membership Plans
-            </h1>
-            <p class="text-xl text-muted-foreground mb-8">
-              Choose the membership level that best supports your health and wellness goals.
-              All plans include access to our comprehensive video library and supportive community.
-            </p>
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="grid items-center gap-12 lg:grid-cols-2">
+            <div>
+                <h1 class="mb-6 text-4xl font-bold text-foreground lg:text-6xl text-left">
+                Membership Plans
+                </h1>
 
-            <div class="aspect-video rounded-2xl overflow-hidden shadow-strong">
-              <img src="./assets/expert-guidance.jpg" alt="Professional wellness expert providing personalized guidance" class="w-full h-full object-cover" />
-            </div>
-          </div>
+                <p class="mb-8 text-xl text-muted-foreground">
+                Choose the membership level that best supports your health and wellness
+                goals. All plans include access to our comprehensive video library and
+                supportive community.
+                </p>
 
-          <div class="relative">
-            <div class="aspect-video rounded-2xl overflow-hidden shadow-strong">
-              <img src="./assets/membership-benefits.jpg" alt="Comprehensive membership benefits for holistic wellness" class="w-full h-full object-cover" />
+                <div class="aspect-video overflow-hidden rounded-2xl shadow-strong">
+                <img
+                    src="/assets/expert-guidance.jpg"
+                    alt="Professional wellness expert providing personalized guidance"
+                    class="h-full w-full object-cover"
+                />
+                </div>
             </div>
-          </div>
+
+            <div class="relative">
+                <div class="aspect-video overflow-hidden rounded-2xl shadow-strong">
+                <img
+                    src="/assets/membership-benefits.jpg"
+                    alt="Comprehensive membership benefits for holistic wellness"
+                    class="h-full w-full object-cover"
+                />
+                </div>
+            </div>
+            </div>
         </div>
-      </div>
     </section>
+
+
+
 
     {{-- Membership Card Arrays --}}
 
@@ -79,25 +92,66 @@
               ],
             ],
           ];
-        
-        
-        
+
+
+
         @endphp
 
     <section class="py-20 bg-background">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid md:grid-cols-3 gap-8">
 
-            
+
             @foreach($plans as $plan)
                 <x-membership-card :plan="$plan" />
             @endforeach
 
-           
-              
+
+
         </div>
- 
-        <div class="mt-20 text-center">
+
+        <div class="mt-16 text-center">
+            <div
+                class="max-w-4xl mx-auto rounded-lg border bg-card text-card-foreground shadow-sm shadow-medium"
+            >
+                <div class="p-8">
+                        <h3 class="mb-4 text-2xl font-bold text-foreground">
+                            All Memberships Include
+                        </h3>
+
+                        <div class="grid gap-4 text-left md:grid-cols-2">
+
+                            @php
+                                $items = [
+                                    ['Secure online member portal'],
+                                    ['Mobile and desktop access'],
+                                    ['Downloadable resources and guides'],
+                                    ['Community forum and support']
+                                ];
+                            @endphp
+
+                                @foreach($items as [$text])
+                                    <div class="flex items-start">
+                                    <i data-lucide="circle-check" class="w-5 h-5 text-primary flex-shrink-0 mr-2 "></i>
+                                    <span class="text-muted-foreground">{{ $text }}</span>
+                                    </div>
+                                @endforeach
+
+                        </div>
+
+
+                </div>
+
+                <p class="mt-6 text-sm text-muted-foreground">
+                    All plans are billed monthly. You can upgrade, downgrade, or cancel at any
+                    time.
+                </p>
+                </div>
+            </div>
+        </div>
+
+
+        {{-- <div class="mt-20 text-center">
           <div class="max-w-4xl mx-auto shadow-medium bg-card rounded-2xl">
             <div class="p-8">
               <h3 class="text-2xl font-bold text-foreground mb-8">
@@ -126,18 +180,19 @@
               </p>
             </div>
           </div>
-        </div>
+        </div> --}}
+
       </div>
     </section>
   </main>
- 
+
 </div>
 
- 
+
 
 @endsection
 
- 
- 
 
- 
+
+
+

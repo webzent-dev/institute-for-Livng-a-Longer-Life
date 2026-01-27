@@ -2,90 +2,104 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-
-
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    /* Background & Foreground */
     --background: 0 0% 100%;
     --foreground: 160 15% 20%;
+
     --card: 0 0% 100%;
     --card-foreground: 160 15% 20%;
+
     --popover: 0 0% 100%;
     --popover-foreground: 160 15% 20%;
 
-    /* Primary */
-    --primary: 160 84% 39%;
+
+    /* --primary: 160 80% 40%;
+    --primary-foreground: 0 0% 100%;
+    */
+        --primary: 160 84% 39%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary */
+
     --secondary: 160 60% 95%;
     --secondary-foreground: 160 15% 20%;
 
-    /* Muted */
     --muted: 160 20% 96%;
     --muted-foreground: 160 10% 45%;
 
-    /* Accent */
-    /* --accent: 38 92% 51%; */
-    --accent: 38 92% 51%;
+    --accent: 43 96% 56%;
     --accent-foreground: 160 15% 20%;
 
-    /* Destructive */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Border & Input */
     --border: 160 20% 90%;
     --input: 160 20% 90%;
     --ring: 160 84% 39%;
 
-    /* Radius */
     --radius: 0.75rem;
 
-    /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(160 84% 39%), hsl(170 70% 45%));
     --gradient-accent: linear-gradient(135deg, hsl(43 96% 56%), hsl(38 92% 50%));
     --gradient-subtle: linear-gradient(180deg, hsl(160 60% 98%), hsl(0 0% 100%));
 
-    /* Shadows */
     --shadow-soft: 0 2px 20px -4px hsl(160 84% 39% / 0.1);
     --shadow-medium: 0 8px 30px -6px hsl(160 84% 39% / 0.15);
     --shadow-strong: 0 20px 50px -12px hsl(160 84% 39% / 0.25);
 
-    /* Sidebar */
     --sidebar-background: 0 0% 98%;
+
     --sidebar-foreground: 240 5.3% 26.1%;
+
     --sidebar-primary: 240 5.9% 10%;
+
     --sidebar-primary-foreground: 0 0% 98%;
+
     --sidebar-accent: 240 4.8% 95.9%;
+
     --sidebar-accent-foreground: 240 5.9% 10%;
+
     --sidebar-border: 220 13% 91%;
+
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
     --background: 160 30% 8%;
     --foreground: 160 20% 95%;
+
     --card: 160 25% 12%;
     --card-foreground: 160 20% 95%;
+
     --popover: 160 25% 12%;
     --popover-foreground: 160 20% 95%;
-    --primary: 160 70% 50%;
+
+    /* --primary: 160 70% 50%;
     --primary-foreground: 160 30% 8%;
+
     --secondary: 160 30% 15%;
-    --secondary-foreground: 160 20% 95%;
+    --secondary-foreground: 160 20% 95%; */
+    --primary: 160 80% 40%;
+    --primary-foreground: 160 30% 8%;
+
+    --secondary: 45 96% 56%;
+    --secondary-foreground: 160 30% 8%;
+
     --muted: 160 25% 18%;
     --muted-foreground: 160 15% 65%;
+
     --accent: 43 96% 56%;
     --accent-foreground: 160 30% 8%;
+
     --destructive: 0 62.8% 50%;
     --destructive-foreground: 160 20% 95%;
+
     --border: 160 25% 20%;
     --input: 160 25% 20%;
     --ring: 160 70% 50%;
+
     --gradient-primary: linear-gradient(135deg, hsl(160 70% 50%), hsl(170 60% 55%));
     --gradient-accent: linear-gradient(135deg, hsl(43 96% 56%), hsl(38 92% 50%));
     --gradient-subtle: linear-gradient(180deg, hsl(160 30% 10%), hsl(160 30% 8%));
@@ -99,18 +113,119 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
+@layer base {
 
+  /* GLOBAL FONT FAMILY */
+  html, body, * {
+    font-family: 'Plus Jakarta Sans', system-ui !important;
+    word-spacing: 0px;
+  }
+
+  /* --- GLOBAL TYPOGRAPHY FIX BASED ON SCREENSHOTS --- */
+
+  /* H1 (Screenshot: text-2xl lg:text-3xl font-bold) */
+  h1 {
+    font-size: 30px;  /* Desktop Screenshot */
+    font-weight: 700;
+    line-height: 36px;
+    text-align: center;
+    color: hsl(var(--foreground));
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 1024px) {
+    h1 {
+      font-size: 24px;
+      line-height: 32px;
+    }
+  }
+
+  /* H2 (Screenshot: text-xl lg:text-2xl font-bold) */
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 32px;
+    text-align: center;
+    color: hsl(var(--foreground));
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 1024px) {
+    h2 {
+      font-size: 20px;
+      line-height: 28px;
+    }
+  }
+
+  /* H3 (Screenshot Variants Found: text-lg / text-base etc.) */
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 28px;
+
+    margin-bottom: 12px;
+  }
+  h4 {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 24px;
+
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 1024px) {
+    h3 {
+      font-size: 16px;
+      line-height: 24px;
+    }
+  }
+
+  /* P (Screenshot text-sm text-muted-foreground) */
+  p {
+    font-size: 14px;
+    line-height: 20px;
+    color: hsl(var(--muted-foreground));
+    margin-bottom: 12px;
+  }
+
+  @media (min-width: 1024px) {
+    p {
+      font-size: 14px;
+      line-height: 20px;
+    }
+  }
+
+
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }
+}
 /* Base Styles */
 @layer base {
-  
+
   /* Global font */
+
+
+  :root {
+
+    --font-sans: 'Plus Jakarta Sans', system-ui;
+
+  }
+
+
   html, body {
-     
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
+
+    font-family: 'Plus Jakarta Sans', system-ui !important;
+
   }
 
   p{
-    font-family: 'Playfair Display', serif !important;
+    font-family: 'Plus Jakarta Sans', system-ui !important;
+    font-size: 14px ;
+
   }
   * {
     @apply border-border;
@@ -136,7 +251,7 @@
   }
 
 
- 
+
 
     /* Gradient Utilities */
     .gradient-primary {
@@ -184,7 +299,7 @@
 
 }
 /* Component Layer */
-@layer components 
+@layer components
 {
 
   /* Container */
@@ -198,7 +313,7 @@
   }
 
   .btn-primary {
-    @apply bg-emerald-500 text-white hover:bg-emerald-600 shadow-soft;
+    @apply gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold  rounded-md flex items-center justify-center  ;
   }
 
   .btn-secondary {
@@ -206,7 +321,7 @@
   }
 
   .btn-outline {
-    @apply border-2 border-emerald-500 text-emerald-500 bg-background hover:bg-emerald-500 hover:text-white;
+    @apply border-2 border-primary text-primary hover:bg-primary hover:text-white  rounded-md flex items-center justify-center  ;
   }
 
   .btn-ghost {
@@ -235,7 +350,7 @@
 
   /* Cards   */
   .card {
-    @apply  p-6 bg-white rounded-xl border border-gray-200  duration-300 ease-out hover:-translate-y-1  hover:shadow-xl transition-all ;
+    @apply  rounded-lg bg-card text-card-foreground shadow-sm border-2 hover:border-primary transition-all shadow-soft hover:shadow-medium ;
   }
   .card-hover {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -258,39 +373,39 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    font-size: 12px;
+    font-size: 14px;
   }
- 
+
   /* Shared button styles */
   .btn-base {
-      @apply h-11 rounded-md px-8 w-full mt-8 flex items-center justify-center duration-300 ease-out hover:-translate-y-1 font-semibold;
+      @apply h-10 rounded-md px-8 w-full mt-8 flex items-center justify-center font-semibold text-[14px];
   }
 
   /* Popular Plan Button (same gradient UI you already use) */
   .btn-popular {
-      @apply gradient-primary text-white font-semibold shadow-md hover:opacity-90 duration-300 ease-out hover:-translate-y-1;
+      @apply gradient-primary text-white font-semibold shadow-md hover:opacity-90 text-[14px] ;
   }
 
   /* Default Button */
   .btn-default {
-      @apply border border-gray-300 hover:bg-gray-100 text-gray-700 duration-300 ease-out hover:-translate-y-1;
+      @apply border border-gray-300 hover:bg-gray-100 text-gray-700 text-[14px];
   }
 
 
   .card-benefit {
-    @apply border-2 border-border hover:border-emerald-500 transition-all duration-300 p-6 rounded-lg shadow-soft hover:shadow-medium bg-white  ease-out hover:-translate-y-1;
+    @apply border-2 border-border hover:border-emerald-500 transition-all  p-6 rounded-lg shadow-soft hover:shadow-medium bg-white  text-[14px] ;
   }
 
   .card-video {
-    @apply border-2 hover:border-emerald-500 transition-all shadow-soft hover:shadow-medium bg-white rounded-lg duration-300 ease-out hover:-translate-y-1;
+    @apply border-2 hover:border-emerald-500 transition-all shadow-soft hover:shadow-medium bg-white rounded-lg  ;
   }
 
   .pricing-card {
-    @apply border-2 border-border shadow-soft p-8 rounded-lg space-y-6 text-center bg-card hover:shadow-medium transition-all duration-300;
+    @apply border-2 border-border shadow-soft p-8 rounded-lg space-y-6 text-center bg-card  ;
   }
 
   .pricing-card-featured {
-    @apply border-4 border-emerald-500 shadow-medium scale-105 relative duration-300 ease-out hover:-translate-y-1;
+    @apply border-4 border-emerald-500 shadow-medium scale-105 relative  ;
   }
 
   .badge-featured {
@@ -299,7 +414,7 @@
 
   /* Forms */
   .input-base {
-    @apply w-full px-3 py-2 border border-input rounded-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-300 ease-out hover:-translate-y-1;
+    @apply w-full px-3 py-2 border border-input rounded-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors  ;
   }
 
   .label-base {
@@ -329,26 +444,26 @@
   }
 
   .heading-1 {
-    @apply text-4xl lg:text-6xl font-bold leading-tight duration-300 ease-out hover:-translate-y-1;
+    @apply text-2xl lg:text-4xl font-bold text-foreground text-center mb-10  ;
   }
 
   .heading-2 {
-    @apply text-3xl lg:text-5xl font-bold duration-300 ease-out hover:-translate-y-1;
+    @apply text-xl lg:text-2xl font-bold text-foreground text-center mb-10 ;
   }
 
   .heading-3 {
-    @apply text-xl lg:text-2xl font-semibold duration-300 ease-out hover:-translate-y-1;
+    @apply text-xl lg:text-2xl font-semibold text-foreground ;
   }
   .heading-4 {
-    @apply text-lg lg:text-xl font-semibold duration-300 ease-out hover:-translate-y-1;
+    @apply text-lg lg:text-xl font-semibold text-foreground ;
   }
 
   /* Premium Feature Badge */
   .premium-feature {
-    @apply gradient-accent text-accent-foreground hover:opacity-90 shadow-medium font-semibold inline-block bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full ml-2 duration-300 ease-out hover:-translate-y-1;
+    @apply gradient-accent text-accent-foreground hover:opacity-90 shadow-medium font-semibold inline-block bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full ml-2 ;
   }
   .iconbg {
-    @apply w-10 h-10 rounded-sm bg-primary hover:bg-accent flex items-center justify-center flex-shrink-0 text-white text-sm font-semibold duration-300 ease-out hover:-translate-y-1;
+    @apply w-10 h-10 rounded-sm bg-primary  flex items-center justify-center flex-shrink-0 text-white text-sm font-semibold ;
     display: inline-flex;
   }
 
@@ -406,7 +521,7 @@
     opacity: 1;
     transform: translateY(0);
   }
-  
+
   .fill-primary {
     fill: hsl(var(--primary));
   }
@@ -445,8 +560,8 @@
     @apply grid place-items-center;
   }
 
-  /* Global Animation */
- 
+  /* Global Animation duration-300 ease-out hover:-translate-y-1 */
+
   .animate-on-view {
     @apply opacity-0 motion-safe:animate-slide-up duration-300 ease-out hover:-translate-y-1;
   }
@@ -471,7 +586,7 @@
   .transition-smooth {
     @apply transition-all duration-300 ease-in-out hover:-translate-y-1;
   }
-  
+
   .topic-tab {
         @apply flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300
                text-sm font-medium whitespace-nowrap
@@ -510,5 +625,15 @@
     }
   }
 
-  
-} 
+  /* Fix map tiles trying to overlap other UI elements */
+.leaflet-container {
+    z-index: 0 !important;
+}
+
+/* Fix popups and zoom controls so they show properly */
+.leaflet-top, .leaflet-bottom {
+    z-index: 400 !important;
+}
+
+
+}

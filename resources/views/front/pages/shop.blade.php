@@ -1,7 +1,7 @@
 @extends('front.layouts.app')
 @section('content')
 <div class="min-h-screen flex flex-col">
-    <section class="gradient-subtle pt-16">
+    <section class="gradient-subtle pt-16  md:pt-28 lg:pt-32">
         <div class="max-w-7xl mx-auto py-10 px-4 place-self-center">
             <div class="text-center mb-16">
                 <h1 class="text-4xl lg:text-6xl font-bold text-foreground mb-4">
@@ -20,7 +20,7 @@
         <div class="max-w-7xl mx-auto px-4">
             <!-- Active Filter Chips -->
             <div id="activeFilters" class="mb-4 flex flex-wrap gap-2"></div>
-            
+
             <!-- Results Count and Clear Button -->
             <div class="flex justify-between items-center mb-6">
                 {{-- <p id="resultsCount" class="text-lg font-medium text-gray-700"></p>  for result --}}
@@ -29,74 +29,88 @@
                     Clear All Filters
                 </button>
             </div>
-            
-            <div class="flex  lg:flex-row gap-8">
+
+
+            <div class="items-start ">
+
+
+            {{-- <div class="flex flex-col lg:flex-row gap-8"> --}}
                 <!-- Left Sidebar - Filters (25% width) -->
-                <div class="lg:w-1/4">
-                    <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
-                        <div class="flex justify-between items-center mb-6">
+                 {{-- <div class="w-full "> --}}
+                    {{-- <div class="lg:w-1/4"> --}}
+                   <div class="w-full">
+                    <div class="bg-white rounded-md shadow-sm p-4 md:p-5 lg:p-6 lg:sticky lg:top-4">
+                        <div class="grid  lg:grid-cols-5 gap-4 items-center">
+
+
+                        {{-- <div class="bg-white rounded-lg shadow-md p-6 lg:sticky1 top-4"> --}}
+                        {{-- <div class="flex justify-between items-center mb-6">
                             <h3 class="text-xl font-bold text-gray-900">Filters</h3>
-                        </div>
-                        
+                        </div> --}}
+
                         <!-- Search Input inside Filter Card -->
-                        <div class="mb-8">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Search Products</label>
+                        <div class=" ">
+                            {{-- <label class="block text-sm font-medium text-gray-700 mb-2">Search Products</label> --}}
                             <div class="relative">
                                 <input
                                     type="text"
                                     id="searchInput"
                                     placeholder="Search by name, category, or description..."
-                                    class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none text-base"
-                                />
-                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                                    class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none text-base"
+                                /><i data-lucide="search" class="h-5 w-5 absolute text-semibold left-4 text-xl top-1/2 transform -translate-y-1/2"></i>
+
                                 <button id="clearSearch" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 text-lg hidden">
                                     <i class="fas fa-times-circle"></i>
                                 </button>
                             </div>
                         </div>
-                        
+
                         <!-- Category Filter (Select Dropdown) -->
-                        <div class="mb-8">
-                            <h4 class="font-semibold text-gray-800 mb-3 text-lg">Category</h4>
+                        <div class=" ">
+                            {{-- <h4 class="font-semibold text-gray-800 mb-3 text-lg">Category</h4> --}}
                             <div class="relative">
-                                <select id="categoryFilter" 
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none bg-white">
+                                <select id="categoryFilter"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none bg-white">
                                     <option value="">All Categories</option>
                                     <!-- Categories will be populated by JavaScript -->
                                 </select>
                                 <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                    <i class="fas fa-chevron-down text-gray-400"></i>
+
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-funnel-icon lucide-funnel"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"/></svg>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Price Filter -->
-                        <div class="mb-8">
-                            <h4 class="font-semibold text-gray-800 mb-3 text-lg">Price Range</h4>
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <input 
-                                        type="number" 
-                                        id="minPrice" 
-                                        placeholder="Min $" 
-                                        min="0"
-                                        class="w-28 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                                    >
-                                    <span class="text-gray-500">to</span>
-                                    <input 
-                                        type="number" 
-                                        id="maxPrice" 
-                                        placeholder="Max $" 
-                                        min="0"
-                                        class="w-28 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                                    >
-                                </div>
-                                <button id="applyPriceFilter" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-amber-500 transition text-sm font-medium">
-                                    Apply Price
-                                </button>
                             </div>
                         </div>
 
+                        <!-- Price Filter -->
+                        <div class="">
+                            {{-- <h4 class="font-semibold text-gray-800 mb-3 text-lg">Price Range</h4> --}}
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <input
+                                        type="number"
+                                        id="minPrice"
+                                        placeholder="Min $"
+                                        min="0"
+                                        class="w-28 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                                    >
+                                    <span class="text-gray-500 space-x-2">to</span>
+                                    <input
+                                        type="number"
+                                        id="maxPrice"
+                                        placeholder="Max $"
+                                        min="0"
+                                        class="w-28 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
+                                    >
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="lg:ml-4">
+                                <button id="applyPriceFilter" class="w-full  px-4 py-2 bg-primary text-white rounded-lg  transition">
+                                    Apply Price Filter
+                                </button>
+                        </div>
                             <!-- Rating Filter -->
                         {{-- <div class="mb-8">
                             <h4 class="font-semibold text-gray-800 mb-3 text-lg">Customer Rating</h4>
@@ -148,12 +162,12 @@
                                 </div>
                             </div>
                         </div> --}}
-                        
+
                             <!-- Vendor Filter -->
                         {{-- <div class="mb-8">
                             <h4 class="font-semibold text-gray-800 mb-3 text-lg">Vendor</h4>
                             <div class="relative">
-                                <select id="vendorFilter" 
+                                <select id="vendorFilter"
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none bg-white">
                                     <option value="">All Vendors</option>
                                     <!-- Vendors will be populated by JavaScript -->
@@ -163,17 +177,17 @@
                                 </div>
                             </div>
                         </div> --}}
-                        
+                       </div>
                     </div>
                 </div>
-                
+
                 <!-- Right Content - Products Grid (75% width) -->
-                <div class="lg:w-3/4">
+                <div class="w-full my-8">
                     <!-- Products Grid -->
-                    <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div id="productsGrid" class="grid  lg:grid-cols-4 gap-8">
                         <!-- Products will be loaded here -->
                     </div>
-                    
+
                     <!-- No Results Message -->
                     <div id="noResults" class="hidden text-center py-12">
                         <div class="mb-4">
@@ -185,48 +199,76 @@
                             Reset All Filters
                         </button>
                     </div>
+
                 </div>
             </div>
         </div>
     </section>
-    
+
     {{-- Member Benefits --}}
     <section class="py-20 gradient-subtle">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="shadow-strong bg-white rounded-lg">
-                <div class="p-8">
-                    <h2 class="text-3xl font-bold text-foreground mb-4">
-                        Members Save More
-                    </h2>
-                    <p class="text-muted-foreground mb-6">
-                        Join our membership program and enjoy exclusive discounts on all products
-                    </p>
-                    <div class="grid md:grid-cols-3 gap-4 mb-6">
-                        @php
-                        $discounts = [
-                            ['title' => '10%', 'class' => 'Essential Members'],
-                            ['title' => '20%', 'class' => 'Premium Members'],
-                            ['title' => '30%', 'class' => 'Elite Members'],
-                        ];
-                        @endphp
-                        
-                        @foreach($discounts as $discount)
-                            <div class="p-4 bg-secondary rounded-lg">
-                                <div class="text-3xl font-bold text-primary bg-clip-text mb-2">{{ $discount['title'] }} </div>
-                                <div class="text-sm text-muted-foreground">{{ $discount['class'] }}</div>
-                            </div>
-                        @endforeach
+            <div class="rounded-lg border bg-card text-card-foreground shadow-sm shadow-strong">
+            <div class="p-8">
+                <h2 class="text-3xl font-bold text-foreground mb-4">
+                Members Save More
+                </h2>
+
+                <p class="text-muted-foreground mb-6">
+                Join our membership program and enjoy exclusive discounts on all
+                products
+                </p>
+
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                <div class="p-4 bg-secondary rounded-lg">
+                    <div
+                    class="text-3xl font-bold gradient-primary text-transparent bg-clip-text mb-2"
+                    >
+                    10%
                     </div>
-                    <a href="{{ route('membership') }}">
-                        <button class="btn btn-primary btn-lg">
-                            <i data-lucide="house-plus" class="mr-2 h-6 w-6"></i>
-                            Become a Member
-                        </button>
-                    </a>
+                    <div class="text-sm text-muted-foreground">
+                    Essential Members
+                    </div>
                 </div>
+
+                <div class="p-4 bg-secondary rounded-lg">
+                    <div
+                    class="text-3xl font-bold gradient-primary text-transparent bg-clip-text mb-2"
+                    >
+                    20%
+                    </div>
+                    <div class="text-sm text-muted-foreground">
+                    Premium Members
+                    </div>
+                </div>
+
+                <div class="p-4 bg-secondary rounded-lg">
+                    <div
+                    class="text-3xl font-bold gradient-primary text-transparent bg-clip-text mb-2"
+                    >
+                    30%
+                    </div>
+                    <div class="text-sm text-muted-foreground">
+                    Elite Members
+                    </div>
+                </div>
+                </div>
+
+                <a href="/membership">
+                <button
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold h-11 rounded-md px-8"
+                >
+                    Become a Member
+                </button>
+                </a>
+            </div>
             </div>
         </div>
     </section>
+
+
+
+
 </div>
 
 <!-- ===================== JS ===================== -->
@@ -234,10 +276,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Laravel products → JS
     const products = @json($products);
-    
+
     // Log products to console for debugging
     console.log('Products:', products);
-    
+
     // DOM elements
     const searchInput = document.getElementById('searchInput');
     const clearSearchBtn = document.getElementById('clearSearch');
@@ -248,14 +290,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultsCount = document.getElementById('resultsCount');
     const activeFilters = document.getElementById('activeFilters');
     const noResults = document.getElementById('noResults');
-    
+
     // Filter elements
     const minPriceInput = document.getElementById('minPrice');
     const maxPriceInput = document.getElementById('maxPrice');
     const categoryFilter = document.getElementById('categoryFilter');
     // const vendorFilter = document.getElementById('vendorFilter');
     const ratingRadios = document.querySelectorAll('input[name="rating"]');
-    
+
     // Filter state
     let filters = {
         search: '',
@@ -265,18 +307,18 @@ document.addEventListener('DOMContentLoaded', function() {
         minRating: null,
         vendor: ''
     };
-    
+
     // Initialize filters
     function initializeFilters() {
         console.log('Initializing filters...');
-        
+
         // Get unique categories and vendors
         const uniqueCategories = [...new Set(products.map(p => p.category))].sort();
         const uniqueVendors = [...new Set(products.map(p => p.vendor))].sort();
-        
+
         console.log('Unique categories:', uniqueCategories);
         console.log('Unique vendors:', uniqueVendors);
-        
+
         // Populate category dropdown
         categoryFilter.innerHTML = '<option value="">All Categories</option>';
         uniqueCategories.forEach(category => {
@@ -285,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function() {
             option.textContent = category;
             categoryFilter.appendChild(option);
         });
-        
+
         // Populate vendor dropdown
         // vendorFilter.innerHTML = '<option value="">All Vendors</option>';
         // uniqueVendors.forEach(vendor => {
@@ -294,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
         //     option.textContent = vendor;
         //     vendorFilter.appendChild(option);
         // });
-        
+
         // Add event listeners
         categoryFilter.addEventListener('change', () => {
             console.log('Category changed to:', categoryFilter.value);
@@ -303,7 +345,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateClearButton();
             updateActiveFilters();
         });
-        
+
         // vendorFilter.addEventListener('change', () => {
         //     console.log('Vendor changed to:', vendorFilter.value);
         //     filters.vendor = vendorFilter.value;
@@ -311,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
         //     updateClearButton();
         //     updateActiveFilters();
         // });
-        
+
         ratingRadios.forEach(radio => {
             radio.addEventListener('change', function() {
                 console.log('Rating changed to:', this.value);
@@ -326,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-    
+
     // Show/hide clear search button
     searchInput.addEventListener('input', () => {
         clearSearchBtn.classList.toggle('hidden', searchInput.value.length === 0);
@@ -336,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateClearButton();
         updateActiveFilters();
     });
-    
+
     // Clear search
     clearSearchBtn.addEventListener('click', () => {
         searchInput.value = "";
@@ -346,34 +388,34 @@ document.addEventListener('DOMContentLoaded', function() {
         updateClearButton();
         updateActiveFilters();
     });
-    
+
     // Apply price filter
     applyPriceFilterBtn.addEventListener('click', () => {
         const minPrice = minPriceInput.value ? parseFloat(minPriceInput.value) : null;
         const maxPrice = maxPriceInput.value ? parseFloat(maxPriceInput.value) : null;
-        
+
         console.log('Price filter applied:', minPrice, maxPrice);
-        
+
         // Validate price range
         if (minPrice !== null && maxPrice !== null && minPrice > maxPrice) {
             alert('Minimum price cannot be greater than maximum price');
             return;
         }
-        
+
         filters.minPrice = minPrice;
         filters.maxPrice = maxPrice;
         filterProducts();
         updateClearButton();
         updateActiveFilters();
     });
-    
+
     // Clear all filters
     clearAllFiltersBtn.addEventListener('click', resetAllFilters);
     resetAllFromEmptyBtn.addEventListener('click', resetAllFilters);
-    
+
     function resetAllFilters() {
         console.log('Resetting all filters...');
-        
+
         // Reset filter state
         filters = {
             search: '',
@@ -383,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
             minRating: null,
             vendor: ''
         };
-        
+
         // Reset UI
         searchInput.value = '';
         clearSearchBtn.classList.add('hidden');
@@ -392,39 +434,39 @@ document.addEventListener('DOMContentLoaded', function() {
         categoryFilter.value = '';
         // vendorFilter.value = '';
         document.querySelector('#rating-any').checked = true;
-        
+
         // Hide no results message
         noResults.classList.add('hidden');
-        
+
         filterProducts();
         updateClearButton();
         updateActiveFilters();
     }
-    
+
     // Update clear button state (show/hide based on filters)
     function updateClearButton() {
-        const hasFilters = filters.search || 
-                          filters.category || 
-                          filters.minPrice !== null || 
-                          filters.maxPrice !== null || 
-                          filters.minRating !== null || 
+        const hasFilters = filters.search ||
+                          filters.category ||
+                          filters.minPrice !== null ||
+                          filters.maxPrice !== null ||
+                          filters.minRating !== null ||
                           filters.vendor;
-        
+
         console.log('Has filters:', hasFilters);
-        
+
         if (hasFilters) {
             clearAllFiltersBtn.classList.remove('hidden');
         } else {
             clearAllFiltersBtn.classList.add('hidden');
         }
     }
-    
+
     // Main filter function
     function filterProducts() {
         console.log('Filtering products with:', filters);
-        
+
         let filtered = products;
-        
+
         // Apply search filter
         if (filters.search) {
             const searchLower = filters.search.toLowerCase();
@@ -437,12 +479,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
             });
         }
-        
+
         // Apply category filter
         if (filters.category) {
             filtered = filtered.filter(p => p.category === filters.category);
         }
-        
+
         // Apply price filter
         if (filters.minPrice !== null) {
             filtered = filtered.filter(p => parseFloat(p.price) >= filters.minPrice);
@@ -450,22 +492,22 @@ document.addEventListener('DOMContentLoaded', function() {
         if (filters.maxPrice !== null) {
             filtered = filtered.filter(p => parseFloat(p.price) <= filters.maxPrice);
         }
-        
+
         // Apply rating filter
         if (filters.minRating !== null) {
             filtered = filtered.filter(p => parseFloat(p.rating) >= filters.minRating);
         }
-        
+
         // Apply vendor filter
         if (filters.vendor) {
             filtered = filtered.filter(p => p.vendor === filters.vendor);
         }
-        
+
         console.log('Filtered products count:', filtered.length);
-        
+
         renderProducts(filtered);
         updateResultsCount(filtered.length);
-        
+
         // Show/hide no results message
         if (filtered.length === 0) {
             noResults.classList.remove('hidden');
@@ -475,55 +517,55 @@ document.addEventListener('DOMContentLoaded', function() {
             productsGrid.classList.remove('hidden');
         }
     }
-    
+
     // Update results count
     function updateResultsCount(count) {
         const total = products.length;
         resultsCount.textContent = `Showing ${count} of ${total} products`;
     }
-    
+
     // Update active filters display
     function updateActiveFilters() {
         activeFilters.innerHTML = '';
         const chips = [];
-        
+
         // Search chip
         if (filters.search) {
             chips.push(createFilterChip(`Search: "${filters.search}"`, 'clearSearchInput'));
         }
-        
+
         // Category chip
         if (filters.category) {
             chips.push(createFilterChip(`Category: ${filters.category}`, 'clearCategory'));
         }
-        
+
         // Price chip
         if (filters.minPrice !== null || filters.maxPrice !== null) {
             const min = filters.minPrice !== null ? `$${filters.minPrice}` : 'Min';
             const max = filters.maxPrice !== null ? `$${filters.maxPrice}` : 'Max';
             chips.push(createFilterChip(`Price: ${min} - ${max}`, 'clearPriceFilter'));
         }
-        
+
         // Rating chip
         if (filters.minRating !== null) {
             chips.push(createFilterChip(`Rating: ${filters.minRating}+ stars`, 'clearRatingFilter'));
         }
-        
+
         // Vendor chip
         if (filters.vendor) {
             chips.push(createFilterChip(`Vendor: ${filters.vendor}`, 'clearVendor'));
         }
-        
+
         if (chips.length > 0) {
             chips.forEach(chip => {
                 activeFilters.innerHTML += chip;
             });
-            
+
             // Add event listeners to remove buttons
             document.querySelectorAll('.remove-filter').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const action = this.getAttribute('data-action');
-                    
+
                     if (action === 'clearSearchInput') clearSearchInput();
                     else if (action === 'clearCategory') clearCategory();
                     else if (action === 'clearPriceFilter') clearPriceFilter();
@@ -533,19 +575,19 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-    
+
     function createFilterChip(label, action) {
         return `
             <div class="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-full text-sm">
                 <span>${label}</span>
-                <button type="button" class="remove-filter text-gray-500 hover:text-gray-700 ml-1" 
+                <button type="button" class="remove-filter text-gray-500 hover:text-gray-700 ml-1"
                         data-action="${action}">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
         `;
     }
-    
+
     // Individual clear functions
     function clearSearchInput() {
         searchInput.value = '';
@@ -555,7 +597,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateClearButton();
         updateActiveFilters();
     }
-    
+
     function clearCategory() {
         categoryFilter.value = '';
         filters.category = '';
@@ -563,7 +605,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateClearButton();
         updateActiveFilters();
     }
-    
+
     function clearPriceFilter() {
         minPriceInput.value = '';
         maxPriceInput.value = '';
@@ -573,7 +615,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateClearButton();
         updateActiveFilters();
     }
-    
+
     function clearRatingFilter() {
         document.querySelector('#rating-any').checked = true;
         filters.minRating = null;
@@ -581,7 +623,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateClearButton();
         updateActiveFilters();
     }
-    
+
     function clearVendor() {
         // vendorFilter.value = '';
         filters.vendor = '';
@@ -589,11 +631,11 @@ document.addEventListener('DOMContentLoaded', function() {
         updateClearButton();
         updateActiveFilters();
     }
-    
+
     // Render products
     function renderProducts(list) {
         console.log('Rendering products:', list.length);
-        
+
         if (!list.length) {
             productsGrid.innerHTML = '';
             return;
@@ -621,8 +663,8 @@ productsGrid.innerHTML = list.map(product => {
 
                     ${
                         product.image
-                        ? `<img 
-                                src="${imageUrl}" 
+                        ? `<img
+                                src="${imageUrl}"
                                 alt="${product.name ?? ''}"
                                 class="max-h-48 mx-auto object-contain"
                                 loading="lazy"
@@ -630,16 +672,17 @@ productsGrid.innerHTML = list.map(product => {
                         : `<div class="text-gray-300">No Image Available</div>`
                     }
 
+
+
+                </div>
+            </div>
                     ${
                         product.discount
-                        ? `<span class="absolute top-3 right-3 badge gradient-accent text-accent-foreground border-0">
+                        ? `<span class="absolute top-0 right-0  badge gradient-accent text-accent-foreground border-0">
                                 ${product.discount}% OFF
                            </span>`
                         : ``
                     }
-
-                </div>
-            </div>
 
             <div class="p-5">
                 <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
@@ -671,41 +714,39 @@ productsGrid.innerHTML = list.map(product => {
                 </div>
             </div>
 
-            <div class="p-4 pt-0">
-                <button class="btn btn-primary w-full">
-                    Add to Cart
-                </button>
+            <div class="py-4 pt-0 justify-self-center w-full px-4">
+                 <x-button-use  label="Add to Cart" variant="primary" icon="shopping-cart" iconPosition="left" class="w-full"/>
             </div>
 
         </div>
     `;
 }).join('');
 
-        
+
         // Initialize Lucide icons
         if (window.lucide) {
             lucide.createIcons();
         }
     }
-    
+
     // Generate star rating HTML
     function generateStarRating(rating) {
         let stars = '';
         const fullStars = Math.floor(rating);
         const hasHalfStar = rating % 1 >= 0.5;
-        
+
         for (let i = 1; i <= 5; i++) {
             if (i <= fullStars) {
-                stars += '<i class="fas fa-star text-yellow-400"></i>';
+                stars += '<i data-lucide="star" class="w-4 h-4 fill-accent text-accent"></i>';
             } else if (i === fullStars + 1 && hasHalfStar) {
-                stars += '<i class="fas fa-star-half-alt text-yellow-400"></i>';
+                stars += '<i data-lucide="star-half" class="w-4 h-4 fill-accent text-accent"></i>';
             } else {
-                stars += '<i class="far fa-star text-yellow-400"></i>';
+                stars += '<i data-lucide="star" class="w-4 h-4 fill-accent text-accent"></i>';
             }
         }
         return `<span class="flex">${stars}</span>`;
     }
-    
+
     // Initialize
     console.log('Initializing product filter...');
     initializeFilters();
@@ -715,119 +756,104 @@ productsGrid.innerHTML = list.map(product => {
 });
 </script>
 
-<style>
-/* Custom scrollbar for filter containers */
-.sticky {
-    position: sticky;
-}
+     <style>
+            /* Custom scrollbar for filter containers */
 
-/* Smooth transitions */
-.transition {
-    transition: all 0.3s ease;
-}
 
-/* Line clamp for text */
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
+            /* Smooth transitions */
+            .transition {
+                transition: all 0.3s ease;
+            }
 
-/* Better select styling */
-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-}
+            /* Line clamp for text */
+            .line-clamp-2 {
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
 
-/* Product card hover effect */
-.hover\:-translate-y-1:hover {
-    transform: translateY(-4px);
-}
+            /* Better select styling */
 
-/* Ensure product cards have equal height */
-.h-full {
-    height: 100%;
-}
 
-.flex-col {
-    display: flex;
-    flex-direction: column;
-}
+            /* Product card hover effect */
+            .hover\:-translate-y-1:hover {
+                transform: translateY(-4px);
+            }
 
-.flex-grow {
-    flex-grow: 1;
-}
+            /* Ensure product cards have equal height */
+            .h-full {
+                height: 100%;
+            }
 
-.mt-auto {
-    margin-top: auto;
-}
+            .flex-col {
+                display: flex;
+                flex-direction: column;
+            }
 
-/* Hidden class for clear button */
-.hidden {
-    display: none;
-}
+            .flex-grow {
+                flex-grow: 1;
+            }
 
-/* Active filter chips */
-#activeFilters .inline-flex {
-    animation: fadeIn 0.3s ease;
-}
+            .mt-auto {
+                margin-top: auto;
+            }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-/* Clear all button animation */
-#clearAllFilters:not(.hidden) {
-    animation: slideIn 0.3s ease;
-}
+            /* Active filter chips */
+            #activeFilters .inline-flex {
+                animation: fadeIn 0.3s ease;
+            }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-5px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
 
-/* Grid layout for products */
-.grid {
-    display: grid;
-}
+            /* Clear all button animation */
+            #clearAllFilters:not(.hidden) {
+                animation: slideIn 0.3s ease;
+            }
 
-.grid-cols-1 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-}
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
 
-@media (min-width: 640px) {
-    .sm\:grid-cols-2 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
+            /* Grid layout for products */
+            .grid {
+                display: grid;
+            }
 
-@media (min-width: 1024px) {
-    .lg\:grid-cols-3 {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
+            .grid-cols-1 {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
 
-.gap-8 {
-    gap: 2rem;
-}
-</style>
+            @media (min-width: 640px) {
+                .sm\:grid-cols-2 {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+            }
+
+            @media (min-width: 1024px) {
+                .lg\:grid-cols-3 {
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                }
+            }
+
+    </style>
+
+
 @endsection

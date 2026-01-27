@@ -1,10 +1,10 @@
 
 @extends('front.layouts.app')
 @section('content')
-<main class="flex-1  font-jakarta">     
+<main class="flex-1  font-jakarta">
           <section class="section-base relative overflow-hidden mb-0">
               <div class="container-base ">
-                  
+
                           <div class="flex flex-col sm:flex-row justify-center gap-4 ">
                               <div class="left-0 -mt-16">
                                   <img src="{{asset('assets/leaf-1.webp')}}"
@@ -12,7 +12,7 @@
                                   <img src="{{asset('assets/leaf-2.webp')}}"
                                       class="absolute left-6   w-20 opacity-80 hidden md:block" />
                               </div>
-                              
+
                               <div class="right-0 -mt-16 ">
                                   <img src="{{asset('assets/leaf-1.webp')}}"
                                       class="absolute right-6 w-20 opacity-80 hidden md:block mt-2" />
@@ -23,7 +23,7 @@
                       <div class="max-w-6xl mx-auto px-6 text-center  pb-12">
 
                           <!-- Heading -->
-                          
+
                           <x-badge>WELCOME TO</x-badge>
                           <h1 class=" text-3xl md:text-4xl lg:text-5xl font-semibold tracking-wide">
                           <br class="hidden sm:block">
@@ -35,12 +35,12 @@
                           </p>
 
                           <!-- CTA -->
-                          
+
                           <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
-                              
+
                               <x-button-use href="{{ route('membership') }}" label="Join The Community" variant="primary" icon="send" />
                               <x-button-use href="{{ route('intro-videos') }}" label="View Intro Videos" variant="outline" icon="video" />
-                              
+
                           </div>
 
                           <!-- Main Illustration -->
@@ -74,7 +74,7 @@
                       </div>
               </div>
 
-        
+
           </section>
 
       <!-- ================= WELLNESS INFO SECTION ================= -->
@@ -83,7 +83,7 @@
             <h2 class="heading-2">
               Your Personalized Journey to Wellness
             </h2>
-              @php  
+              @php
                     $arr = [
                         [
                             'icon' => 'circle-check-big',
@@ -116,14 +116,14 @@
                         {{ $item['title'] }}
                       </h3>
                     </div>
-                  @endforeach 
+                  @endforeach
               </div>
               <div class="flex justify-center">
                    <x-button-use href="{{ route('about-dr-zeines') }}" label="Learn More" variant="outline" icon="arrow-right" class=" " />
               </div>
-             
 
-             
+
+
          </div>
 
 
@@ -162,7 +162,7 @@
         </div>
       </div>
       </div>
-      
+
 
     </section>
 
@@ -179,7 +179,7 @@
         </div>
 
         <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
-           <div className="space-y-8"> 
+           <div className="space-y-8">
               <div class="grid sm:grid-cols-2 gap-6">
             <!-- Benefit Card -->
             @php
@@ -216,11 +216,11 @@
                 <p class="text-muted-foreground">{{ $benefit['description'] }}</p>
               </div>
             @endforeach
-          </div>  
-          
           </div>
-           
-          
+
+          </div>
+
+
 
           <div class="aspect-[4/3] rounded-lg overflow-hidden shadow-strong">
             <img src="./assets/healthy-lifestyle.jpg" alt="Healthy active lifestyle" class="w-full h-full object-cover" />
@@ -232,7 +232,7 @@
     </section>
 
 
- 
+
       <!-- Membership Section -->
     <section class="section-base py-20 gradient-subtle bg-stone-50">
       <div class="contatiner-base max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -295,13 +295,13 @@
                 <x-membership-card :plan="$plan" />
             @endforeach
 
-          
+
         </div>
       </div>
     </section>
       {{-- Intro Videos --}}
       @php
-          $features = 
+          $features =
                       [
                         [
                           'icon' => 'message-Circle',
@@ -319,7 +319,7 @@
                           'description' => 'These sessions aren\'t just educational - they\'re fun! Connect with like-minded members and share in a journey of health and learning.',
                         ],
                       ];
-           $lectureTopics = 
+           $lectureTopics =
                             [
                                   "Understanding Periodontal Disease",
                                   "The Basics of Herbology",
@@ -336,7 +336,7 @@
                                   "Exploring Color Therapy",
                                   "The Future of STEM Cells",
                             ];
-            $benefits1 = 
+            $benefits1 =
                             [
                               [
                                 'icon' => 'leaf',
@@ -360,7 +360,7 @@
                               ],
                             ];
 
-                          $testimonials1 = 
+                          $testimonials1 =
                                           [
                                                 [
                                                     'name' => 'Sarah M.',
@@ -393,12 +393,12 @@
                     </h2>
 
                     {{-- Video placeholder --}}
-                    <div class="max-w-3xl mx-auto mb-16"> 
+                    <div class="max-w-3xl mx-auto mb-16">
                         {{-- <div class="relative aspect-video bg-foreground/20 rounded-2xl overflow-hidden group cursor-pointer shadow-glow"> --}}
                           <a href="https://player.vimeo.com/video/817940268?h=5e53563" target="_blank" class="relative aspect-video bg-foreground/20 rounded-2xl overflow-hidden group cursor-pointer shadow-strong">
                           <div class="relative aspect-video bg-cover bg-center rounded-2xl overflow-hidden group" style="background-image: url('{{ asset('assets/home-bg.png') }}');">
                             <div class="absolute inset-0 bg-gradient-to-br from-primary-dark/80 to-primary/80 flex items-center justify-center">
-                                <div class="w-20 h-20 rounded-full bg-primary-foreground flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg"> 
+                                <div class="w-20 h-20 rounded-full bg-primary-foreground flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                                     <i data-lucide="play" class="h-8 w-8 text-primary ml-1"></i>
                                 </div>
                             </div>
@@ -417,9 +417,9 @@
                             <div class="text-center">
                                 <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-primary-foreground/10 flex items-center justify-center">
                                     {{-- dynamic icon blade component --}}
-                                    <i data-lucide="{{ $feature['icon'] }}" class="h-8 w-8 text-primary-foreground" > </i>  
+                                    <i data-lucide="{{ $feature['icon'] }}" class="h-8 w-8 text-primary-foreground" > </i>
                                 </div>
-                                <h3 class="font-display text-xl font-semibold text-primary-foreground mb-3">        
+                                <h3 class="font-display text-xl font-semibold text-primary-foreground mb-3">
                                     {{ $feature['title'] }}
                                 </h3>
                                 <p class="text-primary-foreground/80 text-sm leading-relaxed">
@@ -487,7 +487,7 @@
                         @foreach ($lectureTopics as $topic)
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full gradient-primary flex items-center justify-center flex-shrink-0">
-                                     
+
                                     <i data-lucide="circle-check-big" class="h-5 w-5 text-primary-foreground"></i>
                                 </div>
                                 <span class="text-foreground">{{ $topic }}</span>
@@ -500,18 +500,18 @@
                         Ready to learn more? Join our community to access our full range of comprehensive videos and resources, all designed to guide you to a healthier lifestyle.
                     </p>
 
-                    {{-- CTAs --}} 
+                    {{-- CTAs --}}
                     <div class="flex flex-col sm:flex-row justify-center gap-4">
                         <x-button-use href="{{ route('membership') }}" label="Join The Community" variant="outline" icon="send" />
                         <x-button-use href="{{ route('intro-videos') }}" label="View Intro Videos" variant="outline" icon="tv-minimal" />
-                         
+
                     </div>
 
                 </div>
             </div>
       </section>
 
- 
+
       {{-- vital boost --}}
       <section class="section-base bg-gray-100 bg-background relative overflow-hidden" style="background-image: url('{{ asset('assets/features_product_dots.png')}}')">
             <div class="container-base  ">
@@ -519,12 +519,12 @@
                     <span class="text-primary  bg-gray-100 hover:shadow-md px-4 py-2 rounded-full  text-sm font-semibold uppercase tracking-wider">
                           ** Unlock the Power of Vital Boost **
                       </span>
-               
+
               </div>
-                    
-                      
-            
-                
+
+
+
+
 
               <div class=" mx-auto px-4 lg:px-8" >
                   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-10">
@@ -540,7 +540,7 @@
 
                       {{-- Content --}}
                       <div>
-                          
+
 
                           <h2 class="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mt-2 mb-6">
                               {{ $product->name}}
@@ -555,8 +555,8 @@
                               @foreach ($benefits1 as $benefit)
                                   <div class="flex items-start gap-3">
                                       <div class="w-10 h-10 rounded-full gradient-primary flex items-center justify-center flex-shrink-0">
-                                       
-                                          
+
+
                                           <i data-lucide="{{$benefit['icon']}}" class="h-5 w-5 text-primary-foreground" ></i>
                                       </div>
 
@@ -572,7 +572,7 @@
                           <div class="flex justify-center ">
                               <x-button-use href="/vital-boost" label="Learn More" variant="primary" icon="arrow-right" class="w-2/3 self-center" />
                           </div>
-                          
+
 
                       </div>
 
@@ -606,7 +606,7 @@
 
                               {{-- Play icon on hover --}}
                               <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <div class="w-16 h-16 rounded-full bg-primary-foreground flex items-center justify-center shadow-lg"> 
+                                  <div class="w-16 h-16 rounded-full bg-primary-foreground flex items-center justify-center shadow-lg">
                                       <i data-lucide="play" class="h-6 w-6 text-primary ml-1"></i>
                                   </div>
                               </div>
@@ -628,7 +628,7 @@
 
         {{-- newsletter section --}}
         <section class="py-20 bg-primary relative overflow-hidden">
-           
+
             <img
                 src="{{ asset('assets/leaf-1.webp') }}"
                 alt=""
@@ -639,7 +639,7 @@
                 alt=""
                 class="absolute bottom-10 right-10 w-32 opacity-20 scale-x-[-1] animate-float-delayed"
             />
-              
+
             <div class="container mx-auto px-4 lg:px-8 relative z-10">
                 <div class="max-w-4xl mx-auto text-center">
                     <span class="text-primary-foreground/70 text-sm uppercase tracking-wider">
@@ -649,13 +649,13 @@
                         Subscribe to Our Newsletter
                     </h2>
                     <div class="w-full flex justify-center">
-                      
-                    
+
+
 
                     <p class="text-primary-foreground/80 mb-8 leading-relaxed px-2">
                         <strong class="heading-4">Exclusive Content:<br></strong> Get access to insightful articles, breakthroughs, and expert advice not found anywhere else.
                     </p>
-                      
+
                     <p class="text-primary-foreground/80 mb-8 leading-relaxed px-2">
                         <strong class="heading-4">Personalized Tips:<br></strong> Receive tailor-made wellness tips that cater uniquely to your health journey.
                     </p>
@@ -674,24 +674,24 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <x-form.input name="firstName" placeholder="First Name" />
-                            @error('firstName')
+                            {{-- @error('firstName')
                                 <p class="text-red-800 text-sm mt-1">{{ $message }}</p>
-                            @enderror
+                            @enderror --}}
                         </div>
 
                         <div>
                             <x-form.input name="lastName" placeholder="Last Name" />
-                            @error('lastName')
+                            {{-- @error('lastName')
                                 <p class="text-red-800 text-sm mt-1">{{ $message }}</p>
-                            @enderror
+                            @enderror --}}
                         </div>
                     </div>
 
                     <div>
                         <x-form.input name="email" placeholder="Email..." />
-                        @error('email')
+                        {{-- @error('email')
                             <p class="text-red-800 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        @enderror --}}
                     </div>
 
                     <div>
@@ -727,7 +727,7 @@
               Looking Forward to Seeing You There
             </h2>
             <p class="text-2xl  mb-4">In health and happiness,</p>
-            <p class="text-2xl font-semibold text-emerald-500  mb-8 ">Victor Zeines</p> 
+            <p class="text-2xl font-semibold text-emerald-500  mb-8 ">Victor Zeines</p>
               <div class="max-w-64 mx-auto">
                   <a href="/membership" class=" sm:w-auto flex items-center justify-center font-semibold px-5 py-3 rounded-md bg-emerald-500 border-2 hover:bg-orange-600  text-white  ">
               Join Our Community

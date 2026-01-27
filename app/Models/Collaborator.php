@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Collaborator extends Model
 {
-   
+
     use HasFactory;
 
     protected $fillable = [
@@ -24,10 +25,10 @@ class Collaborator extends Model
         'role',
     ];
 
-  
+
     protected $casts = [
         'experience' => 'integer',
     ];
-    
-    
+
+
 }

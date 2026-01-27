@@ -1,4 +1,3 @@
-
 @props([
     'href'      => null,
     'label'     => null,
@@ -7,12 +6,13 @@
     'size'      => 'md',
     'variant'   => 'primary',
     'isPopular' => false,
-    'class'     => 'font-semibold',
+    'class'     => 'font-semibold  text-[14px]',
     'icon'      => null,
-
-    // ✅ ADD ONLY THESE
     'method'    => 'get',
     'onclick'   => null,
+
+    // NEW:
+    'iconPosition' => 'left', // left | right
 ])
 
 
@@ -20,14 +20,14 @@
     // Size classes
     $sizes = [
         'sm' => 'px-3 py-1.5 text-sm h-9',
-        'md' => 'px-4 py-2 text-base h-11',
-        'lg' => 'px-6 py-3 text-lg h-14',
-        'full' => 'w-full px-4 py-3 h-12'
+        'md' => 'px-5 py-2 text-base h-10',
+        'lg' => 'px-6 py-2 text-lg h-10',
+        'full' => 'w-full px-6 py-2 h-10'
     ];
 
     // Variants
     $variants = [
-        'primary' => 'bg-primary text-white hover:bg-accent',
+        'primary' => 'gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold h-10 px-4 py-2 ',
         'outline' => 'border-2 border-primary text-primary hover:bg-primary hover:text-white',
         'danger'  => 'bg-red-600 text-white hover:bg-red-700',
         'success' => 'bg-green-600 text-white hover:bg-green-700',
@@ -52,157 +52,67 @@
 
 
 {{-- ===================== --}}
-{{--    LINK VERSION        --}}
+{{--    FORM LINK VERSION   --}}
 {{-- ===================== --}}
 @if($href && strtolower($method) !== 'get')
-    {{-- FORM LINK (POST, DELETE, etc.) --}}
-    <form
-        method="POST"
-        action="{{ $href }}"
-        class="inline"
-        @if($onclick) onsubmit="{{ $onclick }}" @endif
-    >
+    <form method="POST" action="{{ $href }}" class="inline"
+          @if($onclick) onsubmit="{{ $onclick }}" @endif>
         @csrf
         @method(strtoupper($method))
 
-        <button
-            type="submit"
+        <button type="submit"
             @if($id) id="{{ $id }}" @endif
-            {{ $attributes->merge(['class' => $classes]) }}
-        >
-            @if($icon)
-                <i data-lucide="{{ $icon }}" class="w-5 h-5"></i>
+            {{ $attributes->merge(['class' => $classes]) }}>
+
+            @if($icon && $iconPosition === 'left')
+                <i data-lucide="{{ $icon }}" class="w-5 h-5 mr-2"></i>
             @endif
 
             {{ $label ?? $slot }}
+
+            @if($icon && $iconPosition === 'right')
+                <i data-lucide="{{ $icon }}" class="w-5 h-5 ml-2"></i>
+            @endif
         </button>
     </form>
 
+
+{{-- ===================== --}}
+{{--    NORMAL LINK        --}}
+{{-- ===================== --}}
 @elseif($href)
-    {{-- NORMAL LINK --}}
-    <a
-        href="{{ $href }}"
-        @if($id) id="{{ $id }}" @endif
-        {{ $attributes->merge(['class' => $classes]) }}
-    >
-        @if($icon)
-            <i data-lucide="{{ $icon }}" class="w-5 h-5"></i>
+    <a href="{{ $href }}"
+       @if($id) id="{{ $id }}" @endif
+       {{ $attributes->merge(['class' => $classes]) }}>
+
+        @if($icon && $iconPosition === 'left')
+            <i data-lucide="{{ $icon }}" class="w-4 h-4 mr-2"></i>
         @endif
 
         {{ $label ?? $slot }}
-    </a>
 
+        @if($icon && $iconPosition === 'right')
+            <i data-lucide="{{ $icon }}" class="w-5 h-5 ml-2"></i>
+        @endif
+    </a>
 
 
 {{-- ===================== --}}
 {{--    BUTTON VERSION     --}}
 {{-- ===================== --}}
 @else
-    <button
-        type="{{ $type }}"
+    <button type="{{ $type }}"
         @if($id) id="{{ $id }}" @endif
-        {{ $attributes->merge(['class' => $classes]) }}
-    >
-        @if($icon)
-            <i data-lucide="{{ $icon }}" class="w-5 h-5"></i>
+        {{ $attributes->merge(['class' => $classes]) }}>
+
+        @if($icon && $iconPosition === 'left')
+            <i data-lucide="{{ $icon }}" class="w-5 h-5 mr-2"></i>
         @endif
 
         {{ $label ?? $slot }}
+
+        @if($icon && $iconPosition === 'right')
+            <i data-lucide="{{ $icon }}" class="w-5 h-5 ml-2"></i>
+        @endif
     </button>
 @endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{{-- 
-@props([
-    'href' => null,          // if null → button
-    'isPopular' => false,
-    'label' => 'Get Started',
-    'type' => 'button',
-    'id' => null,            // dynamic id
-    'class' => '', 
-    'sizes' => '',
-    'variant' => '',          // dynamic class (user can override/add)
-])
-
-
-@php
-    // Size classes
-    $sizes = [
-        'sm' => 'px-3 py-1.5 text-sm',
-        'md' => 'px-4 py-2 text-base',
-        'lg' => 'px-6 py-3 text-lg',
-    ];
-
-    // Variant classes
-    $variants = [
-        'primary' => 'bg-primary text-white hover:bg-primary/90 ',
-        'outline' => 'border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground',
-        'danger'  => 'bg-red-600 text-white hover:bg-red-700',
-        'success' => 'bg-green-600 text-white hover:bg-green-700',
-        'muted'   => 'bg-gray-200 text-gray-700 hover:bg-gray-300',
-    ];
- 
-    // Static base classes
-    $baseClasses = "h-11 rounded-md px-8 w-full mt-8 flex items-center justify-center";
-
-    // Conditional classes
-    $variantClasses = $isPopular
-        ?'gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold'
-        : ($variants[$variant] ?? $variants['primary']);
-
-        //  "gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold"
-        // : "border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground";
-
-    // Final merged classes
-    $classes = trim("$baseClasses $variantClasses $class");
-@endphp
-
-
-@if($href)
-    <!-- LINK VERSION -->
-    <a 
-        href="{{ $href }}" 
-        @if($id) id="{{ $id }}" @endif
-        class="{{ $classes }}"
-    >
-        {{ $label }}
-    </a>
-
-@else
-    <!-- BUTTON VERSION -->
-    <button 
-        type="{{ $type }}" 
-        @click="$dispatch('open-register-modal', { plan: @js($plan) })"
-        @if($id) id="{{ $id }}" @endif
-        class='{{ $classes }}'.($sizes[$size] ?? $sizes['md']) . ' ' .
-            ($variants[$variant] ?? $variants['primary']
-        size                        
-    >
-        {{ $label }}
-    </button>
-@endif --}}
-
-
-
-
- 
-
-

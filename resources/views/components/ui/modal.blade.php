@@ -1,19 +1,19 @@
 @props(['name'])
 
-<div 
+<div
     x-data="{ open: false }"
     x-on:open-modal.window="if($event.detail === '{{ $name }}') open = true"
     x-on:close-modal.window="open = false"
 >
     <!-- Backdrop -->
-    <div 
+    <div
         class="fixed inset-0 bg-black/40 z-40"
         x-show="open"
         x-transition.opacity
     ></div>
 
     <!-- Modal Box -->
-    <div 
+    <div
         class="fixed inset-0 z-50 flex items-center justify-center"
         x-show="open"
         x-transition
@@ -28,9 +28,9 @@
 {{-- Usage Example --}}
 
 {{-- ✔ Open modal from ANYWHERE:
-<button 
-    @click="$dispatch('open-modal', 'signupModal')" 
-    class="btn-primary">
+<button
+    @click="$dispatch('open-modal', 'signupModal')"
+    class="btn-primary h-10 px-4 py-2 ">
     Open Modal
 </button> --}}
 
@@ -43,9 +43,9 @@
 <button @click="$dispatch('close-modal')">Close</button> --}}
 
 
-{{-- <button 
+{{-- <button
     @click="$dispatch('open-modal', '{{ $name }}')"
     class="px-4 py-2 bg-blue-600 text-white rounded-lg"
 >
-    Open Modal    
+    Open Modal
 </button> --}}

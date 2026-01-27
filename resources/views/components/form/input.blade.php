@@ -57,7 +57,9 @@
         name="{{ $name }}"
         accept="image/*"
         @if($required) required @endif
-        class="w-full input-base file:cursor-pointer"
+        class="w-full disabled:opacity-60 disabled:cursor-not-allowed border border-input rounded-md px-3 py-2
+       text-[14px] placeholder:text-[14px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+       @error($name) border-red-500 @enderror"
     >
 
     {{-- Preview if enabled + image exists --}}
@@ -147,7 +149,7 @@
 
 
 
-{{-- 
+{{--
 
 USAGE
 1️⃣ For Text Input
@@ -168,12 +170,12 @@ USAGE
 6️⃣ For Image Edit Case (DB value exists)
 <x-form.input name="profile_image" type="file" preview :value="{{ $user->profile_image }}" />
 
-    Text input  
+    Text input
 <x-form.input name="username"  type="text" :value="$user->username ?? ''" />
 
- Image upload with preview  
+ Image upload with preview
 <x-form.input  name="logo"  type="file" preview="true" :value="$user->profile_image ?? null"/>
-    
+
 Text Input With Existing DB Value
 <x-form.input  name="username"  :value="$user->username ?? null"/>
 
@@ -182,7 +184,7 @@ Filter	Behavior
 alpha	A–Z only
 numeric	0–9 only
 alphanumeric	A–Z + 0–9
-email	email allowed chars 
+email	email allowed chars
 
 
 

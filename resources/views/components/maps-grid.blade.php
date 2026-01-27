@@ -1,10 +1,10 @@
-@php 
+@php
     use App\Models\Location;
     $locations = Location::all();
 @endphp
 
 <section class="py-6 bg-gray-50">
-   
+
         <div class="section-base max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                  @foreach($locations as $index => $location)
@@ -28,12 +28,13 @@
                         </div>
 
                         {{-- Dynamic Map ID --}}
-                        <div id="map{{ $index }}" class="w-full h-72 md:h-96 relative rounded-b-2xl"></div>
+                       <div id="map{{ $index }}" class="w-full h-72 md:h-96 relative rounded-b-2xl" style="z-index: 1;"></div>
+
 
                     </div>
                 @endforeach
         </div>
-       
+
 
     </div>
 
@@ -53,7 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!location.latitude || !location.longitude) return;
 
         const map = L.map(`map${index}`, {
-            zoomControl: false
+            zoomControl: false,
+            preferCanvas: true
         }).setView(
             [parseFloat(location.latitude), parseFloat(location.longitude)],
             14

@@ -1,6 +1,6 @@
 
 @extends('front.layouts.app')
-@section('content') 
+@section('content')
 
 
 <div class="max-w-7xl mx-auto">
@@ -193,7 +193,7 @@
             <header class="mb-8">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6">
                     <div class="mb-4 md:mb-0">
-                        <h1 class="text-3xl md:text-4xl font-bold text-gray-800" style="font-family: 'Playfair Display', serif;">
+                        <h1 class="text-3xl md:text-4xl font-bold text-gray-800" >
                             <span class="text-primary">Wellness</span> Marketplace
                         </h1>
                         <p class="text-gray-600 mt-1">Your journey to better health starts here</p>

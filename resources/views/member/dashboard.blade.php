@@ -5,7 +5,7 @@
 
 <!-- Dashboard Page -->
 {{-- <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8"> --}}
-  
+
   <div class="max-w-7xl mx-auto">
           <!-- Welcome Message -->
         <div class="mb-8">
@@ -82,7 +82,7 @@
             <!-- Tab Content -->
             <div id="upcoming-content" class="tab-content">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-6">Upcoming Sessions</h2>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Upcoming sessions will be rendered here by JavaScript -->
                 </div>
@@ -91,7 +91,7 @@
             <div id="archives-content" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-semibold text-gray-800">Archives & Recordings</h2>
-                    
+
                     <!-- Filter Dropdown -->
                     <div class="relative">
                         <select id="filter-type" class="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-4 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
@@ -104,7 +104,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Archived sessions will be rendered here by JavaScript -->
                 </div>
@@ -122,7 +122,7 @@
             <h2 class="text-xl font-semibold text-gray-900">Getting Started</h2>
           </div>
           <p class="text-gray-600 mb-6">Quick guide to maximize your membership</p>
-          
+
           <ol class="space-y-4 text-sm text-gray-700">
             <li class="flex items-center">
               <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3">
@@ -155,7 +155,7 @@
 
 
 
-   
+
 
     <!-- Data Arrays -->
     <script>
@@ -269,91 +269,91 @@
             const upcomingContent = document.getElementById('upcoming-content');
             const archivesContent = document.getElementById('archives-content');
             const filterType = document.getElementById('filter-type');
-            
+
             // Tab switching functionality
             upcomingTab.addEventListener('click', function() {
                 switchToUpcoming();
             });
-            
+
             archivesTab.addEventListener('click', function() {
                 switchToArchives();
             });
-            
+
             // Filter functionality for archived sessions
             filterType.addEventListener('change', function() {
                 renderArchivedSessions(this.value);
             });
-            
+
             // Initial render
             renderUpcomingSessions();
             renderArchivedSessions('all');
-            
+
             // Tab switching functions
             function switchToUpcoming() {
                 upcomingTab.classList.add('tab-active');
                 upcomingTab.classList.remove('text-gray-500');
                 archivesTab.classList.remove('tab-active');
                 archivesTab.classList.add('text-gray-500');
-                
+
                 upcomingContent.classList.remove('hidden');
                 archivesContent.classList.add('hidden');
             }
-            
+
             function switchToArchives() {
                 archivesTab.classList.add('tab-active');
                 archivesTab.classList.remove('text-gray-500');
                 upcomingTab.classList.remove('tab-active');
                 upcomingTab.classList.add('text-gray-500');
-                
+
                 archivesContent.classList.remove('hidden');
                 upcomingContent.classList.add('hidden');
             }
-            
+
             // Render upcoming sessions
             function renderUpcomingSessions() {
                 const container = upcomingContent.querySelector('.grid');
                 container.innerHTML = '';
-                
+
                 ZoomSession.forEach(session => {
                     const sessionCard = createUpcomingSessionCard(session);
                     container.appendChild(sessionCard);
                 });
             }
-            
+
             // Render archived sessions with optional filtering
             function renderArchivedSessions(filter = 'all') {
                 const container = archivesContent.querySelector('.grid');
                 container.innerHTML = '';
-                
+
                 let sessionsToRender = ArchivedSession;
-                
+
                 if (filter !== 'all') {
                     sessionsToRender = ArchivedSession.filter(session => session.type === filter);
                 }
-                
+
                 sessionsToRender.forEach(session => {
                     const sessionCard = createArchivedSessionCard(session);
                     container.appendChild(sessionCard);
                 });
             }
-            
+
             // Create HTML for an upcoming session card
             function createUpcomingSessionCard(session) {
                 const card = document.createElement('div');
                 card.className = 'session-card bg-white rounded-xl shadow-md p-6 border border-gray-100';
-                
+
                 // Badge for session type
-                const typeBadge = session.type === 'monthly' 
+                const typeBadge = session.type === 'monthly'
                     ? '<span class="inline-block bg-blue-100 text-primary text-xs font-semibold px-2.5 py-0.5 rounded-full">Monthly</span>'
                     : '<span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Weekly</span>';
-                
+
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-xl font-bold text-gray-900">${session.title}</h3>
                         ${typeBadge}
                     </div>
                     <p class="text-gray-600 mb-4">${session.host}</p>
-                    
+
                     <div class="space-y-2 mb-4">
                         <div class="flex items-center text-gray-700">
                             <i class="fas fa-calendar-alt mr-2 text-gray-500"></i>
@@ -364,9 +364,9 @@
                             <span>${session.time} (${session.duration})</span>
                         </div>
                     </div>
-                    
+
                     <p class="text-gray-700 mb-5">${session.description}</p>
-                    
+
                     <div class="flex justify-between items-center mb-5">
                         <div class="text-sm font-semibold ${session.spots < 10 ? 'text-amber-600' : 'text-gray-700'}">
                             <i class="fas fa-user-friends mr-1"></i>
@@ -376,44 +376,44 @@
                             <i class="far fa-calendar-plus mr-1"></i>Add to Calendar
                         </button>
                     </div>
-                    
+
                     <div class="flex space-x-3">
-                        <button class="btn-primary flex-1 py-3 px-4 rounded-lg font-medium" onclick="joinSession(${session.id})">
+                        <button class="btn-primary h-10   py-3 px-4 rounded-lg font-medium" onclick="joinSession(${session.id})">
                             Join Session
                         </button>
-                        <button class="btn-outline py-3 px-4 rounded-lg font-medium" onclick="shareSession(${session.id})">
+                        <button class="btn-outline h-10   py-3 px-4 rounded-lg font-medium" onclick="shareSession(${session.id})">
                             <i class="fas fa-share-alt mr-2"></i>Share
                         </button>
                     </div>
                 `;
-                
+
                 return card;
             }
-            
+
             // Create HTML for an archived session card
             function createArchivedSessionCard(session) {
                 const card = document.createElement('div');
                 card.className = 'session-card bg-white rounded-xl shadow-md p-6 border border-gray-100';
-                
+
                 // Badge for session type
-                const typeBadge = session.type === 'monthly' 
+                const typeBadge = session.type === 'monthly'
                     ? '<span class="inline-block bg-blue-100 text-primary text-xs font-semibold px-2.5 py-0.5 rounded-full">Monthly</span>'
                     : '<span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">Weekly</span>';
-                
+
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-xl font-bold text-gray-900">${session.title}</h3>
                         ${typeBadge}
                     </div>
                     <p class="text-gray-600 mb-4">${session.host}</p>
-                    
+
                     <div class="flex items-center text-gray-700 mb-4">
                         <i class="fas fa-calendar-alt mr-2 text-gray-500"></i>
                         <span>${session.date} • ${session.duration}</span>
                     </div>
-                    
+
                     <p class="text-gray-700 mb-5">${session.description}</p>
-                    
+
                     <div class="flex justify-between items-center">
                         <div class="text-gray-600">
                             <i class="fas fa-eye mr-1"></i>
@@ -424,10 +424,10 @@
                         </button>
                     </div>
                 `;
-                
+
                 return card;
             }
-            
+
             // Function to simulate joining a session
             window.joinSession = function(id) {
                 const session = ZoomSession.find(s => s.id === id);
@@ -440,7 +440,7 @@
                     }
                 }
             };
-            
+
             // Function to add a session to calendar
             window.addToCalendar = function(id) {
                 const session = ZoomSession.find(s => s.id === id);
@@ -449,7 +449,7 @@
                     // In a real app, this would generate an .ics file or connect to calendar APIs
                 }
             };
-            
+
             // Function to watch a recording
             window.watchRecording = function(id) {
                 const session = ArchivedSession.find(s => s.id === id);
@@ -458,7 +458,7 @@
                     // In a real app, this would open a video player
                 }
             };
-            
+
             // Function to share a session
             window.shareSession = function(id) {
                 const session = ZoomSession.find(s => s.id === id);
@@ -469,7 +469,7 @@
             };
         });
     </script>
- 
+
 
 @endsection
 

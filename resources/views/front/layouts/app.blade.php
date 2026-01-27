@@ -4,13 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Living Longer Institute')</title>
-   {{-- <link rel="icon" type="image/png" href="{{ asset('assets/logo.png') }}"> --}}
- 
+   <link rel="icon" type="image/png" href="{{ asset('assets/logo.png') }}">
+
      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
- 
- <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script> 
+
+ <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
     {{-- Load Vite compiled CSS & JS --}}
      @vite(['resources/css/app.css', 'resources/js/app.js'])
+     {{-- <link rel="stylesheet" href="{{ asset('build/assets/app-Bz59QJus.css') }}">
+<script src="{{ asset('build/assets/app-ovrmPlgd.js') }}" defer></script> --}}
 
     <script src="{{ asset('js/validators.js') }}"></script>
     <script src="{{ asset('js/formEngine.js') }}"></script>
@@ -43,12 +45,12 @@
     @yield('content')
 
     @include('front.layouts.footer')
- 
+
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <script> lucide.createIcons(); </script>
  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
- 
+
 </body>
 
 </html>

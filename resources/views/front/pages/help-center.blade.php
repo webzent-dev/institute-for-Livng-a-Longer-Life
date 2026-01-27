@@ -25,36 +25,42 @@
             </div>
 
               <!-- Search + Category functionality-->
-                <div class="my-8 flex flex-col md:flex-row gap-4  justify-center ">
+                <div class="my-8 flex flex-col md:flex-row gap-4  justify-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
                         <div class="relative ">
-                        <input
-                            type="text"
-                            id="searchInput"
-                            placeholder="Search helpTopics..."
-                            class="w-full pl-12 pr-12 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-lg search-select"
-                        />
-                        <i class="fas fa-search absolute left-4 top-3 text-gray-500 text-xl"></i>
+                            <input
+                                type="text"
+                                id="searchInput"
+                                placeholder="Search helpTopics..."
+                                class="w-full pl-12 pr-12 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-lg search-select"
+                            /><i data-lucide="search" class="h-5 w-5 absolute text-semibold left-4 top-3 text-xl "></i>
+                            {{-- <i class="fas fa-search absolute left-4 top-3 text-gray-500 text-xl"></i> --}}
 
-                        <button id="clearSearch" class="absolute right-3 top-4 text-gray-500 hover:text-gray-700 text-2xl hidden">
-                            <i class="fas fa-times-circle"></i>
-                        </button>
+                            <button id="clearSearch" class="absolute right-3 top-4 text-gray-500 hover:text-gray-700 text-2xl hidden">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
                         </div>
-                        <div class=" w-full md:w-80 ">
-                                <select  id="topicSelect" class="pl-12 pr-12 py-3 max-w-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-lg search-select" >
+
+
+
+                        <div class="  relative ">
+                            <select  id="topicSelect" class="w-full min-w-0 pl-12 pr-12 py-2 rounded-lg border border-gray-300 text-lg search-select" >
                                 <option value="all" >All Titles</option>
 
-                        <!-- Options will be populated by JavaScript -->
-                        </select>
+                                <!-- Options will be populated by JavaScript  <i data-lucide="search" class="h-4 w-4"></i> -->
+                            </select>
                         </div>
-                        
+
                 </div>
 
                 {{-- Menu and tabbed navigation for topics. --}}
                 {{-- MENU + TABBED NAVIGATION --}}
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
 
+
+
                     <!-- Mobile Scroll Menu -->
-                    <div class="flex md:hidden gap-3 overflow-x-auto pb-3">
+                    <div class="flex flex-col md:hidden gap-3 whitespace-nowrap overflow-x-auto scroll-smooth pb-3">
+                    {{-- <div class="flex md:hidden gap-3 overflow-x-auto pb-3"> --}}
                         <button
                             class="topic-tab active-tab"
                             data-topic="all">
@@ -86,18 +92,18 @@
                                 <i data-lucide="{{ strtolower($topic['icon']) }}" class="w-4 h-4 mr-2"></i>
                                 {{ $topic['title'] }}
                             </button>
-                            
+
                         @endforeach
                     </div>
 
                 </div>
 
-        </section> 
-            
+        </section>
+
         {{-- HELP TOPICS GRID --}}
         <section class="py-4 bg-background">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              
+
                   <!-- Search Stats -->
                         {{-- <div id="searchStats" class="mt-3 text-sm text-gray-500 hidden">
                             Showing <span id="resultCount" class="font-semibold"></span> of <span id="totalCount" class="font-semibold"></span> topics
@@ -106,7 +112,7 @@
                     <div id="helpTopicsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Cards will be populated by JavaScript -->
                     </div>
-                    
+
                     <!-- No Results Message -->
                     <div id="noResults" class="hidden no-results text-center py-12">
                         <div class="mb-4">
@@ -114,8 +120,8 @@
                         </div>
                         <h3 class="text-xl font-semibold text-gray-700 mb-2">No results found</h3>
                         <p class="text-gray-500">Try adjusting your search or filter to find what you're looking for.</p>
-                        <x-button-use 
-                            type="button" 
+                        <x-button-use
+                            type="button"
                             id="resetFilters" varient="accent"
                             class="mt-4 px-4 py-2   text-white rounded-lg  ">
                             Reset Filters
@@ -128,45 +134,97 @@
             </div>
         </section>
 
-        {{-- QUICK START GUIDE --}}
-        <section class="py-20 gradient-subtle">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-
-                <x-card class="shadow-strong">
-
-                    <x-card-header class="text-center">
-                        <x-card-title class="text-3xl  mb-4">Quick Start Guide</x-card-title>
+                {{-- QUICK START GUIDE --}}
+            <section class="gradient-subtle py-20">
+                <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+                    <div
+                    class="rounded-lg border bg-card text-card-foreground shadow-sm shadow-strong"
+                    >
+                    <div class="flex flex-col space-y-1.5 p-6 text-center">
+                        <h3 class="mb-4 text-3xl font-semibold tracking-tight">
+                        Quick Start Guide
+                        </h3>
                         <p class="text-muted-foreground">
-                            New to the platform? Follow these simple steps to get started
+                        New to the platform? Follow these simple steps to get started
                         </p>
-                    </x-card-header>
+                    </div>
 
-                    <x-card-content class="space-y-6">
-                        @foreach ([
-                            ['1', 'Choose Your Membership', 'Select the plan that best fits your wellness goals and budget'],
-                            ['2', 'Complete Registration', 'Fill out your profile information and set up your account'],
-                            ['3', 'Access Your Dashboard', 'Log in to explore content and resources'],
-                            ['4', 'Start Learning', 'Watch videos, join live sessions, begin your journey']
-                        ] as $step)
+                    <div class="space-y-6 p-6 pt-0">
+                        <div class="flex items-start space-x-4">
+                        <div
+                            class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full gradient-primary"
+                        >
+                            <span class="text-xl font-bold text-primary-foreground">1</span>
+                        </div>
 
-                            <div class="flex items-start space-x-4">
-                                <div class="w-12 h-12 rounded-full gradient-primary flex items-center justify-center flex-shrink-0">
-                                    <span class="text-xl font-bold text-primary-foreground">{{ $step[0] }}</span>
-                                </div>
+                        <div class="flex-1">
+                            <h3 class="mb-1 text-lg font-semibold text-foreground">
+                            Choose Your Membership
+                            </h3>
+                            <p class="text-muted-foreground">
+                            Select the plan that best fits your wellness goals and budget
+                            </p>
+                        </div>
+                        </div>
 
-                                <div class="flex-1">
-                                    <h3 class="text-lg font-semibold text-foreground mb-1">{{ $step[1] }}</h3>
-                                    <p class="text-muted-foreground">{{ $step[2] }}</p>
-                                </div>
-                            </div>
+                        <div class="flex items-start space-x-4">
+                        <div
+                            class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full gradient-primary"
+                        >
+                            <span class="text-xl font-bold text-primary-foreground">2</span>
+                        </div>
 
-                        @endforeach
-                    </x-card-content>
+                        <div class="flex-1">
+                            <h3 class="mb-1 text-lg font-semibold text-foreground">
+                            Complete Registration
+                            </h3>
+                            <p class="text-muted-foreground">
+                            Fill out your profile information and set up your account
+                            </p>
+                        </div>
+                        </div>
 
-                </x-card>
+                        <div class="flex items-start space-x-4">
+                        <div
+                            class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full gradient-primary"
+                        >
+                            <span class="text-xl font-bold text-primary-foreground">3</span>
+                        </div>
 
-            </div>
-        </section>
+                        <div class="flex-1">
+                            <h3 class="mb-1 text-lg font-semibold text-foreground">
+                            Access Your Dashboard
+                            </h3>
+                            <p class="text-muted-foreground">
+                            Log in to explore available content, upcoming sessions, and
+                            resources
+                            </p>
+                        </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                        <div
+                            class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full gradient-primary"
+                        >
+                            <span class="text-xl font-bold text-primary-foreground">4</span>
+                        </div>
+
+                        <div class="flex-1">
+                            <h3 class="mb-1 text-lg font-semibold text-foreground">
+                            Start Learning
+                            </h3>
+                            <p class="text-muted-foreground">
+                            Watch intro videos, join live sessions, and begin your health
+                            journey
+                            </p>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </section>
+
+
 
         {{-- CONTACT SECTION --}}
         <section class="py-20 bg-background">
@@ -180,7 +238,7 @@
                 <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
 
                        @foreach ($contactOptions as $option)
-                        <x-card class="shadow-medium">
+                        <x-card class="shadow-medium hover:border-gray-200">
                             <x-card-content class="p-8 text-center">
 
                                 <div class="w-16 h-16 rounded-full gradient-primary flex items-center justify-center mx-auto mb-4">
@@ -211,29 +269,29 @@
                         </x-card>
                     @endforeach
                 </div>
-                 
-                <div class="flex justify-center mt-12 gap-2">
-                    <x-button-use href="/faq" variant="outline" size="lg" icon="badge-question-mark">
+
+                <div class="flex flex-col items-center justify-center mt-12 gap-2">
+                    <x-button-use href="/faq" variant="outline" size="lg"  >
                         View Frequently Asked Questions
                     </x-button-use>
                     {{--Direct users to support ticket or contact. --}}
-                    <x-button-use href="/contact" variant="outline" size="lg" icon="user-pen">
-                        Support Center      
+                    <x-button-use href="/contact" variant="outline" size="lg"  >
+                        Support Center
                     </x-button-use>
                 </div>
 
-                
+
 
             </div>
         </section>
 
-    </main> 
+    </main>
 
 </div>
 <script src="https://unpkg.com/lucide@latest"></script>
  <script>
         // Help topics data
-       
+
 
         const helpTopics = @json($helpTopics);
          console.log(helpTopics);
@@ -266,7 +324,7 @@
             helpTopics.forEach(topic => {
                 const topicOption = document.createElement('option');
                 topicOption.value = `${topic.title}`;
-                topicOption.textContent = `${topic.title}`; 
+                topicOption.textContent = `${topic.title}`;
                 topicSelect.appendChild(topicOption);
             });
 
@@ -285,56 +343,56 @@
         // Render help topic cards
         function renderHelpTopics(topicsToRender, searchTerm = '') {
             helpTopicsContainer.innerHTML = '';
-            
+
             if (topicsToRender.length === 0) {
                 noResults.classList.remove('hidden');
                 helpTopicsContainer.classList.add('hidden');
                 return;
             }
-            
+
             noResults.classList.add('hidden');
             helpTopicsContainer.classList.remove('hidden');
-            
+
             topicsToRender.forEach(topic => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                
+
                 // Highlight matching text in title and description
                 const highlightedTitle = highlightText(topic.title, searchTerm);
                 const highlightedDescription = highlightText(topic.description, searchTerm);
                 const icon = topic.icon.toLowerCase();
                 console.log("icon.....",icon);
 
-                
+
                 // Generate HTML for articles list with highlighting
                 let articlesHTML = '';
                 topic.articles.forEach(article => {
                     const highlightedArticle = highlightText(article.title, searchTerm);
-                    articlesHTML += `<li class="flex items-start py-2"><a href="#" class="text-primary hover:underline flex items-center">
-                        <i class="fas fa-file-alt  mt-1 mr-3 text-sm"></i>
+                    articlesHTML += `<li class="flex items-start"><a href="#" class="text-primary hover:underline flex items-center">
+                        <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2"></span>
                         <span>${highlightedArticle}</span>
                     </li>`;
                 });
-                
+
                 card.innerHTML = `
-                    <div class="flex items-start mb-4">
-                       
+                    <div class="px-6 pt-6 items-start ">
+
                                  <div class="w-14 h-14 iconbg mb-4 mr-2">
-                                    <i data-lucide="${icon}" class="h-7 w-7 text-white"></i>  
+                                    <i data-lucide="${icon}" class="h-7 w-7 text-white"></i>
                                 </div>
                         <div>
                             <h3 class="heading-4 font-semibold  mb-1">${highlightedTitle}</h3>
                             <p class="text-sm text-muted-foreground">${highlightedDescription}</p>
                         </div>
                     </div>
-                    <div class="border-t border-gray-100 pt-4">
-                        
+                    <div class=" px-6 pb-4">
+
                         <ul class="space-y-2">
                             ${articlesHTML}
                         </ul>
                     </div>
                 `;
-                
+
                 helpTopicsContainer.appendChild(card);
             });
              lucide.createIcons();
@@ -343,7 +401,7 @@
         // Highlight matching text in content
         function highlightText(text, searchTerm) {
             if (!searchTerm || searchTerm.trim() === '') return text;
-            
+
             const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
             return text.replace(regex, '<span class="highlight">$1</span>');
         }
@@ -357,40 +415,40 @@
         function filterHelpTopics() {
             const searchTerm = searchInput.value.toLowerCase().trim();
             const selectedValue = topicSelect.value;
-            
+
             let filteredTopics = helpTopics;
-            
+
             // Apply search filter if search term exists
             if (searchTerm) {
                 filteredTopics = helpTopics.filter(topic => {
                     // Check if topic title or description contains search term
                     const titleMatch = topic.title.toLowerCase().includes(searchTerm);
                     const descMatch = topic.description.toLowerCase().includes(searchTerm);
-                    
+
                     // Check if any article contains search term
-                    const articleMatch = topic.articles.some(article => 
+                    const articleMatch = topic.articles.some(article =>
                         article.toLowerCase().includes(searchTerm)
                     );
-                    
+
                     return titleMatch || descMatch || articleMatch;
                 });
             }
-            
+
             // Apply select filter if something is selected
             if (selectedValue) {
                 if (selectedValue.startsWith('topic:')) {
                     const selectedTopic = selectedValue.replace('topic:', '');
-                    filteredTopics = filteredTopics.filter(topic => 
+                    filteredTopics = filteredTopics.filter(topic =>
                         topic.title === selectedTopic
                     );
                 } else if (selectedValue.startsWith('article:')) {
                     const selectedArticle = selectedValue.replace('article:', '');
-                    filteredTopics = filteredTopics.filter(topic => 
+                    filteredTopics = filteredTopics.filter(topic =>
                         topic.articles.some(article => article === selectedArticle)
                     );
                 }
             }
-            
+
             // Render filtered topics
             renderHelpTopics(filteredTopics, searchTerm);
             updateStats(filteredTopics.length, helpTopics.length);
@@ -400,7 +458,7 @@
         function updateStats(filteredCount, total) {
             totalCount.textContent = total;
             resultCount.textContent = filteredCount;
-            
+
             if (filteredCount !== total || searchInput.value || topicSelect.value) {
                 searchStats.classList.remove('hidden');
             } else {
@@ -425,19 +483,19 @@
         clearButton.className = 'absolute inset-y-0 right-0 pr-3 flex items-center hidden';
         clearButton.innerHTML = '<i class="fas fa-times text-gray-400 hover:text-gray-600"></i>';
         clearButton.type = 'button';
-        
+
         clearButton.addEventListener('click', function() {
             searchInput.value = '';
             searchInput.focus();
             filterHelpTopics();
             updateClearButton();
         });
-        
+
         searchContainer.appendChild(clearButton);
         searchContainer.classList.add('relative');
-        
+
         searchInput.addEventListener('input', updateClearButton);
-        
+
         function updateClearButton() {
             if (searchInput.value) {
                 clearButton.classList.remove('hidden');

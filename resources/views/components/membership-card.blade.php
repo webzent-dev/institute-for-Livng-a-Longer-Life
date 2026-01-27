@@ -5,7 +5,7 @@
                 @php
                   $isPopular = isset($plan['popular']) && $plan['popular'] === true;
                   $isCurrentPlan = isset($plan['current']) && $plan['current'] === true;
-                  
+
                 @endphp
               <div class="relative"   x-data="{ selectedPlan: { name: '', price: '', period: '' } }">
                     <div class="flex flex-col {{ $isPopular ? 'border-primary border-4 shadow-strong md:scale-105 bg-card' : 'border-2 shadow-medium bg-card' }} rounded-2xl  ">
@@ -13,7 +13,7 @@
                             <div class="relative">
                                 <div class="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                                     <span class="gradient-accent px-6 py-2 rounded-full text-sm font-semibold text-accent-foreground shadow-medium inline-flex items-center">
-                                    
+
                                     <i data-lucide="star" class="w-4 h-4  flex-shrink-0 mr-2 "></i>
                                     Most Popular
                                     </span>
@@ -22,7 +22,7 @@
                                 @if($isCurrentPlan)
                                 <div class=" w-10 h-10 absolute -top-5 -right-6  -translate-x-1/2 z-10">
                                     <span class="w-10 h-10  gradient-accent px-6 py-2 rounded-full text-sm font-semibold text-accent-foreground shadow-medium inline-flex justify-center text-white items-center">
-                                    
+
                                     <i data-lucide="check-check" class="w-4 h-4 font-extrabold flex-shrink-0  "></i>
                                     {{-- Current Plan --}}
                                     </span>
@@ -31,7 +31,7 @@
                             </div>
 
                         @endif
-                        
+
 
                         <div class="text-center pb-8 pt-12 px-6">
                             <h3 class="text-2xl font-bold text-foreground mb-2">{{ $plan['name'] }}</h3>
@@ -41,8 +41,8 @@
                             <span class="text-muted-foreground ml-2">{{ $plan['period'] }}</span>
                             </div>
                         </div>
-                        
-                        <div class="border-t border-gray-200 flex-1 flex flex-col px-6 pb-6">
+
+                        <div class=" border-gray-200 flex-1 flex flex-col px-6 pb-6">
                         <div class="space-y-6 flex-1">
                             <div>
                             <h4 class="font-semibold text-foreground mb-3 mt-1">Features</h4>
@@ -56,7 +56,7 @@
                             </ul>
                             </div>
                             {{-- Benefits part --}}
-                            @if(isset($plan['benefits']) && is_array($plan['benefits']))  
+                            @if(isset($plan['benefits']) && is_array($plan['benefits']))
 
                             <div>
                             <h4 class="font-semibold text-foreground mb-3">Benefits</h4>
@@ -71,25 +71,25 @@
                             </div>
                             @endif
                         </div>
-                        
+
                            {{-- If URL exists → use data-url | else → open modal --}}
                                 {{-- @if (!empty($plan['url']))
-                                
+
                                       <a href="{{ $plan['url'] }}"
-                                        type="button" 
-                                        
+                                        type="button"
+
                                             class="{{ $isPopular ? 'gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold' : 'border-2 border-primary text-center content-center  text-primary hover:bg-primary hover:text-primary-foreground' }} h-11 rounded-md px-8 w-full mt-8 text-center content-center"
-                                            
+
                                             >
-                                            Get Started 
+                                            Get Started
                                         </a>
-                                
-                                   
+
+
                                 @else --}}
-                                
+
                                     <button
-                                        type="button" 
-                                        
+                                        type="button"
+
                                             class="{{ $isPopular ? 'gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold' : 'border-2 border-primary   text-primary hover:bg-primary hover:text-primary-foreground' }} h-11 rounded-md px-8 w-full mt-8"
                                             command="show-modal" commandfor="dialog"
 
@@ -97,20 +97,20 @@
                                                 data-plan-name="{{ $plan['name'] }}"
                                                 data-plan-price="{{ $plan['price'] }}"
                                                 data-plan-period="{{ $plan['period'] }}"
-                                                
+
                                                 onclick="openPlanModal(this)"
-            
+
                                             >
-                                            Get Started 
+                                            Get Started
                                     </button>
-                                
+
                                 {{-- @endif --}}
-                      
-                         
-                          
+
+
+
                             <el-dialog>
 
-                                
+
                             <dialog id="dialog" aria-labelledby="dialog-title" class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
 
                                 <el-dialog-backdrop class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"></el-dialog-backdrop>
@@ -118,25 +118,25 @@
                                 <div tabindex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0">
 
                                 <el-dialog-panel class="relative transform overflow-hidden rounded-lg bg-transparent text-left   transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95 px-8">
-                                    
+
                                     <div  class=" z-50 w-full max-w-lg bg-white rounded-lg shadow-lg p-6 mx-4" >
-                                    
-                                    <button type="button" command="close" commandfor="dialog"  onclick="document.getElementById('modal-2').classList.add('hidden')"   
+
+                                    <button type="button" command="close" commandfor="dialog"  onclick="document.getElementById('modal-2').classList.add('hidden')"
                                     class="absolute top-3 right-3 text-gray-600 font-extrabold shadow-sm hover:text-red-700   p-2  text-xl">✕</button>
 
                                     <div class="py-5">
                                                  <h2 class="font-semibold tracking-tight text-2xl">
                                         Join <span x-text="selectedPlan.name"></span>
                                     </h2>
-                                        
-                                      
+
+
                                     <p class="text-sm text-gray-600 my-4">
                                         Complete your registration to start your wellness journey. <br> <span x-text="selectedPlan.pricePeriod" class="text-orange-500"></span>
                                     </p>
                                     </div>
-                                   
 
-                                 
+
+
                                    <div class="max-w-md mx-auto p-4">
 
     {{-- ================= LOGGED IN USER ================= --}}
@@ -307,7 +307,7 @@ function openPlanModal(button) {
     document.querySelector("[x-text='selectedPlan.name']").innerText = name;
     document.querySelector("[x-text='selectedPlan.pricePeriod']").innerText = `${price} ${period}`;
 
-   
+
 }
 
     function membershipForm() {
@@ -327,8 +327,8 @@ function openPlanModal(button) {
         successMsg: "",
         clearError(field) {
             delete this.errors[field];
-        },            
-        validate() 
+        },
+        validate()
         {
             this.errors = {};
             this.successMsg = "";
@@ -450,4 +450,3 @@ function openPlanModal(button) {
 
 
 
- 

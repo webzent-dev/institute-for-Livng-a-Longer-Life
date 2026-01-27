@@ -12,25 +12,24 @@
     'iconBg'     => 'bg-primary/10',
     'iconSize'   => 'w-12 h-12',
 
-    // Optional image instead of icon
     'image'      => null,
 ])
 
 <section class="section-base py-20 gradient-subtle">
-    <div class="{{ $container }} mx-auto px-4 sm:px-6 lg:px-8">
-        
+    <div class="{{ $container }} mx-auto px-4 sm:px-4 lg:px-8">
+
         <x-card class="{{ $cardClass }}">
 
             <div class="{{ $padding }} text-{{ $align }}">
 
                 {{-- ICON (optional) --}}
-                @if($icon)
-                    <div class="flex justify-center mb-6">
-                        <div class="{{ $iconBg }} p-4 rounded-full inline-flex items-center justify-center">
-                            <i data-lucide="{{ $icon }}" class="{{ $iconSize }} text-primary"></i>
+                    @if($icon)
+                        <div class="flex justify-center mb-6">
+                            <div class="{{ $iconBg }} p-4 rounded-full inline-flex items-center justify-center">
+                                <i data-lucide="{{ $icon }}" class="{{ $iconSize }} text-primary"></i>
+                            </div>
                         </div>
-                    </div>
-                @endif
+                    @endif
 
                 {{-- IMAGE (optional) --}}
                 @if($image)
@@ -63,7 +62,7 @@
                 {{-- BUTTON GROUP --}}
                 <div class="flex flex-col sm:flex-row gap-4 justify-{{ $align == 'center' ? 'center' : 'start' }}">
                     @foreach ($buttons as $btn)
-                        
+
                         @php
                             $href = $btn['href'] ?? null;
                             if(isset($btn['route'])) {

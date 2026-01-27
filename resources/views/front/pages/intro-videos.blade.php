@@ -63,12 +63,12 @@
         @endphp
 
 <div class="min-h-screen flex flex-col">
-    
- 
+
+
 
     <main class="flex-1">
 
-        {{-- HERO SECTION --}}
+            {{-- HERO SECTION --}}
         <section class="gradient-subtle py-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
@@ -77,14 +77,14 @@
                             Introduction Videos
                         </h1>
                         <p class="text-xl text-muted-foreground">
-                            Start your wellness journey with these foundational videos from Dr. Zeines 
-                            and our expert collaborators. Learn the essential principles of healthy living.
+                            Start your wellness journey with these foundational videos from Dr. Zeines
+                            and our expert collaborators. Learn the<br> essential principles of healthy living.
                         </p>
                     </div>
 
                     <div class="relative">
                         <div class="aspect-video rounded-2xl overflow-hidden shadow-strong">
-                            <img 
+                            <img
                                 src="{{ asset('assets/video-learning.jpg') }}"
                                 alt="Modern video learning platform for wellness education"
                                 class="w-full h-full object-cover"
@@ -95,12 +95,12 @@
             </div>
         </section>
 
-        {{-- Featured Videos --}}
+            {{-- Featured Videos --}}
         <section class="py-12 bg-background">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl font-bold text-foreground mb-8">Featured Videos</h2>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+                <h2 class="text-3xl font-bold text-foreground mb-8 text-left">Featured Videos</h2>
 
-                <div class="grid md:grid-cols-2 gap-8 mb-12">
+                <div class="grid md:grid-cols-2 gap-8 mb-12 ">
                     @foreach ($videos as $video)
                         @if ($video['featured'])
                             <x-card class="">
@@ -114,45 +114,41 @@
                                                     <i data-lucide="play" class="w-10 h-10 text-white text-primary-foreground ml-1"></i>
                                                 </div>
                                             </div>
- 
+
                                             @if ($video['featured'])
                                                 <x-badge class="absolute top-4 left-4 gradient-accent text-accent-foreground border-0">
                                                     Featured
                                                 </x-badge>
                                             @endif
 
-                                             
+
                                                 <x-badge class="bg-gray-200 text-black absolute top-4 right-4 gradient-accent text-accent-foreground border-0 hover:text-white hover:bg-emerald-500">
                                                     {{ $video['duration'] }}
                                                 </x-badge>
 
                                         </div>
- 
-                                        <h2 class="text-2xl mb-2 font-bold text-teal-950">{{ $video['title'] }}</h2>
-                                        <div class="flex items-center text-sm text-muted-foreground text-neutral-500">
+
+                                        <h2 class="font-semibold tracking-tight text-2xl mb-2 text-left">{{ $video['title'] }}</h2>
+                                        <div class="flex items-center text-sm text-muted-foreground text-[16px]">
                                             <i data-lucide="user" class="h-4 w-4 mr-1"></i>
                                             {{ $video['instructor']}}
                                             <span class="mx-2">•</span>
-                                            <span class="bg-gray-200 px-3 py-1 rounded-full text-sm font-semibold  text-teal-950">{{ $video ['category'] }}</span>
+                                            <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground">{{ $video ['category'] }}</span>
+                                        </div>
+                                        <div class=" pt-0">
+                                            <p class="text-muted-foreground mb-4 text-[16px]">A{{ $video['description'] }}</p>
                                         </div>
                                     </x-card-header>
 
                                     <x-card-content>
-                                        <p class="text-muted-foreground mb-4 text-neutral-500">
-                                            {{ $video['description'] }}
-                                        </p>
+                                         <x-button-use href="{{ route('membership') }}" label="Watch Now" variant="primary" icon="play"  />
 
-                                        
-                                        <button class="  w-full   font-semibold  px-2 py-3 rounded-md  bg-emerald-500 hover:bg-orange-600 text-white  flex items-center justify-center">
-                                                <i data-lucide="play" class="h-5 w-5   mr-2"></i>
-                                                <span class="ml-2">Watch Now </span>
-                                            </button>
 
 
                                     </x-card-content>
 
                             </x-card>
-                        @endif 
+                        @endif
 
 
                     @endforeach
@@ -167,7 +163,7 @@
 
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach ($videos as $video)
-                     
+
                             <x-card class="">
                                 <x-card-header class="pb-4 ">
                                     <div class="aspect-video bg-gradient-to-tr  from-green-50 to-amber-100  rounded-lg mb-4 flex items-center justify-center relative">
@@ -189,55 +185,55 @@
                                             {{ $video['title'] }}
                                         </h3>
 
-                                      
+
 
                                         <div class="flex items-center text-sm text-muted-foreground text-neutral-500">
                                             <i data-lucide="user" class="h-3 w-3 mr-1"></i>
                                             {{ $video['instructor']}}
-                                            
-                                            <span class="bg-gray-200 px-3 py-1 rounded-full text-sm font-semibold  text-teal-950">{{ $video ['category'] }}</span>
+
+                                            {{-- <span class="bg-gray-200 px-3 py-1 rounded-full text-sm font-semibold  text-teal-950">{{ $video ['category'] }}</span> --}}
+                                            <span class="ml-2 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground">{{ $video ['category'] }}</span>
                                         </div>
 
-                                        
+
                                     </div>
 
                                     <p class="text-sm text-muted-foreground line-clamp-2">
                                         {{ $video['description'] }}
                                     </p>
 
-                                     
-                                    <button class="  w-full   font-semibold  px-2 py-3 rounded-md  bg-emerald-500 hover:bg-orange-600 text-white  flex items-center justify-center">
-                                                <i data-lucide="play" class="h-5 w-5   mr-2"></i>
-                                                <span class="ml-2">Watch Now </span>
-                                            </button>
+                                    <x-button-use href="{{ route('membership') }}" label="Watch Now" variant="outline"  icon="play" />
+
 
                                 </x-card-content>
 
-                            </x-card>   
+                            </x-card>
 
                     @endforeach
                 </div>
             </div>
         </section>
 
-        {{-- CTA  --}}
-             <x-ui.cta-section 
-                icon="check-circle"
+        {{-- CTA  icon="check-circle" --}}
+             <x-ui.cta-section
+
                 align="center"
                 title="Ready for More?"
-                subtitle="Become a member to access our complete video library with hundreds of 
+                subtitle="Become a member to access our complete video library with hundreds of
                             hours of expert content on health, nutrition, exercise, and longevity."
-                
+                padding="p-2 md:p-2 lg:p-20"
+                cardClass="hover:border-gray-200"
+
                 :buttons="[
                     ['route' => 'membership',   'label' => 'Explore Membership Plans', 'variant' => 'outline', 'icon' => 'external-link'],
-                    
+
                 ]"
-            /> 
-        
+            />
+
 
     </main>
 
- 
+
 
 </div>
 @endsection
