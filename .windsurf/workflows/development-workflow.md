@@ -132,16 +132,19 @@ The project includes GitHub Actions workflow that automatically deploys when cod
    - `KEY`
    
    **For FTP:**
-   - `FTP_SERVER` (your FTP server address)
-   - `FTP_USERNAME` (your FTP username)
-   - `FTP_PASSWORD` (your FTP password)
+   - `FTP_SERVER` (your FTP server IP: 190.92.174.27)
+   - `FTP_USERNAME` (your FTP username: living@bikewrapt.com)
+   - `FTP_PASSWORD` (your FTP password: webzent@123)
    
    **FTP Setup Steps:**
    1. Go to GitHub repo settings
    2. Navigate to Secrets and variables > Actions
    3. Click "New repository secret"
-   4. Add the three FTP secrets above
-   5. Make sure your server directory is `/public_html/` or update in deploy.yml
+   4. Add the three FTP secrets above:
+      - FTP_SERVER = 190.92.174.27
+      - FTP_USERNAME = living@bikewrapt.com
+      - FTP_PASSWORD = webzent@123
+   5. Server directory is already set to `/home/bike/public_html`
 
 ### Deployment Commands
 
