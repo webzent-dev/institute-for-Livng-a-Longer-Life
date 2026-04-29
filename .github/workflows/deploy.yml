@@ -35,9 +35,10 @@ jobs:
     - name: Deploy to server via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
-        server: 190.92.174.27
+        server: ftp.bikewrapt.com
         username: living@bikewrapt.com
         password: webzent@123
-        local-dir: ./
-        server-dir: /home/bike/public_html/
+        server-dir: /
+        protocol: ftp
+        port: 21
         exclude: .git*, .github/**, node_modules/**, .env*, storage/logs/**, storage/framework/cache/**, storage/framework/sessions/**, storage/framework/testing/**, storage/framework/views/**, bootstrap/cache/**, vendor/**, old/**, tests/**, .gitignore, README.md, artisan, composer.json, composer.lock, package.json, package-lock.json, phpunit.xml, postcss.config.js, tailwind.config.js, npm, .editorconfig, .gitattributes
