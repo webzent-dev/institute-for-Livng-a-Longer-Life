@@ -1,0 +1,311 @@
+<meta name="csrf-token" content="{{ csrf_token() }}">
+    <el-dialog>
+        <dialog id="dialog" aria-labelledby="dialog-title" class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
+            <el-dialog-backdrop class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"></el-dialog-backdrop>
+            <div tabindex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0">            
+                <el-dialog-panel class="relative transform overflow-hidden rounded-lg bg-transparent text-left   transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95 px-8">
+                    <div  class=" z-50 w-full max-w-lg bg-white rounded-lg shadow-lg p-6 mx-4" >
+                        <button type="button" command="close" commandfor="dialog"  onclick="document.getElementById('modal-2').classList.add('hidden')" class="absolute top-3 right-3 text-gray-600 font-extrabold shadow-sm hover:text-red-700   p-2  text-xl">✕</button>
+                        <div class="py-5">
+                            <h2 class="font-semibold tracking-tight text-2xl">Join <span x-text="selectedPlan.name"></span></h2>
+                            <p class="text-sm text-gray-600 my-4">
+                                Complete your registration to start your wellness journey. <!--<br> <span x-text="selectedPlan.pricePeriod" class="text-orange-500"></span>-->
+                            </p>
+                        </div>
+
+                        <div class="max-w-md mx-auto p-4">
+                            {{-- ================= LOGGED IN USER ================= --}}
+                            @php
+                                $isPopular = isset($plan['popular']) && $plan['popular'] === true;
+                            @endphp
+
+                            @auth
+                            <div class="flex items-baseline justify-center">
+                                <span class="text-5xl font-bold text-foreground" x-text="selectedPlan.price">${{ $plan['membership_price'] }}</span>
+                                <span class="text-muted-foreground ml-2" x-text="selectedPlan.period">/{{ $plan['membership_period'] }}</span>
+                            </div>
+
+                            <div class="p-5 border rounded-lg bg-gray-50 space-y-3">
+                                <h2 class="text-xl font-bold text-green-700">
+                                    Welcome 👋 {{ auth()->user()->first_name }}
+                                </h2>
+
+                                <div class="text-gray-700 space-y-1">
+                                    <p><strong>Name:</strong> {{ auth()->user()->first_name }}</p>
+                                    <p><strong>Email:</strong> {{ auth()->user()->email }}</p>
+                                </div>
+                            
+                                <!-- Logout -->
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="mt-3 w-full border border-red-500 text-red-600 py-2 rounded hover:bg-red-500 hover:text-white transition">Logout</button>
+                                </form>
+
+                                <form method="POST" action="{{ route('member.upgrade-membership') }}">
+                                    @csrf
+                                    {{-- Selected plan info --}}
+                                    <input type="hidden" name="plan_id" id="plan_id" value="{{ $plan['id'] }}">
+                                    <input type="hidden" name="plan_name" id="plan_name" value="{{ $plan['membership_name'] }}">
+                                    <input type="hidden" name="plan_price" id="plan_price" value="{{ $plan['membership_price'] }}">
+                                    <input type="hidden" name="plan_period" id="plan_period" value="{{ $plan['membership_period'] }}">
+                                    <button type="submit" class="mt-3 w-full bg-primary text-white py-2 rounded hover:opacity-90 transition">
+                                        Proceed to Checkout 💳
+                                    </button>
+                                </form>
+                            </div>
+                            @endauth
+                        </div>
+                        
+                        {{-- ================= GUEST USER ================= --}}
+                        @guest
+                            <form x-data="membershipForm({{ $plan['id'] }})" @submit.prevent="submitForm" class="space-y-3">
+                                {{-- NAME --}}
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <input class="input-base"
+                                            :class="{ 'border-red-500': errors.firstName }"
+                                            placeholder="First Name"
+                                            x-model="form.firstName"
+                                            @input="clearError('firstName')">
+                                        <p class="text-red-500 text-sm" x-text="errors.firstName"></p>
+                                    </div>
+
+                                    <div>
+                                        <input class="input-base"
+                                            :class="{ 'border-red-500': errors.lastName }"
+                                            placeholder="Last Name"
+                                            x-model="form.lastName"
+                                            @input="clearError('lastName')">
+                                        <p class="text-red-500 text-sm" x-text="errors.lastName"></p>
+                                    </div>
+                                </div>
+
+                                {{-- EMAIL --}}
+                                <div>
+                                    <input type="email" class="input-base"
+                                        :class="{ 'border-red-500': errors.email }"
+                                        placeholder="Email"
+                                        x-model="form.email"
+                                        @input="clearError('email')">
+                                    <p class="text-red-500 text-sm" x-text="errors.email"></p>
+                                </div>
+
+                                {{-- PHONE --}}
+                                <div>
+                                    <input type="tel" class="input-base"
+                                        :class="{ 'border-red-500': errors.phone }"
+                                        placeholder="Phone"
+                                        x-model="form.phone"
+                                        @input="clearError('phone')">
+                                    <p class="text-red-500 text-sm" x-text="errors.phone"></p>
+                                </div>
+
+                                {{-- PASSWORD --}}
+                                <div class="relative">
+                                    <input :type="showPass ? 'text' : 'password'"
+                                        class="input-base"
+                                        :class="{ 'border-red-500': errors.password }"
+                                        placeholder="Password"
+                                        x-model="form.password"
+                                        @input="clearError('password')">
+
+                                    <button type="button" class="absolute right-3 top-3"
+                                        @mousedown="showPass = true"
+                                        @mouseup="showPass = false"
+                                        @mouseleave="showPass = false">
+                                        <i data-lucide="eye"
+                                            :class="showPass ? 'text-green-600' : 'text-gray-400'"></i>
+                                    </button>
+
+                                    <p class="text-red-500 text-sm" x-text="errors.password"></p>
+                                </div>
+
+                                {{-- CONFIRM PASSWORD --}}
+                                <div class="relative">
+                                    <input :type="showConfirm ? 'text' : 'password'"
+                                        class="input-base"
+                                        :class="{ 'border-red-500': errors.confirmPassword }"
+                                        placeholder="Confirm Password"
+                                        x-model="form.confirmPassword"
+                                        @input="clearError('confirmPassword')">
+
+                                    <button type="button" class="absolute right-3 top-3"
+                                        @mousedown="showConfirm = true"
+                                        @mouseup="showConfirm = false"
+                                        @mouseleave="showConfirm = false">
+                                        <i data-lucide="eye"
+                                            :class="showConfirm ? 'text-green-600' : 'text-gray-400'"></i>
+                                    </button>
+
+                                    <p class="text-red-500 text-sm" x-text="errors.confirmPassword"></p>
+                                </div>
+
+                                {{-- BUTTONS --}}
+                                <div class="flex gap-3">
+                                    <button type="submit" id="register" class="w-1/2 bg-primary text-white py-2 rounded">Register Now</button>
+                                    <button type="button" class="w-1/2 border border-primary py-2 rounded hover:bg-primary hover:text-white">Cancel</button>
+                                </div>
+
+                                {{-- SUCCESS --}}
+                                <p x-show="successMsg" class="text-green-600 font-semibold" x-text="successMsg"></p>
+                                <input type="hidden" id="membership_plan_id" name="plan_id">
+                            </form>
+                        @endguest
+                    </div>
+                </el-dialog-panel>
+            </div>
+        </dialog>
+    </el-dialog>
+    
+</div>
+</div>
+</div>
+<script>
+function openPlanModal(button) {
+    // Read plan info from button attributes
+    const id  = button.getAttribute("data-plan-id");
+    const name = button.getAttribute("data-plan-name");
+    const price = button.getAttribute("data-plan-price");
+    const period = button.getAttribute("data-plan-period");
+    document.getElementById("dialog").show();
+
+    // Update modal values
+    document.querySelector("[x-text='selectedPlan.name']").innerText = name;
+    document.querySelector("[x-text='selectedPlan.price']").innerText = '$'+price;
+    document.querySelector("[x-text='selectedPlan.period']").innerText = period;
+    document.getElementById("plan_id").value = id;
+    document.getElementById("membership_plan_id").value = id;
+    document.getElementById("plan_name").value = name;
+    document.getElementById("plan_price").value = price;
+    document.getElementById("plan_period").value = period;
+}
+
+function membershipForm(id) {
+    return {
+        showPass: false,
+        showConfirm: false,
+        form: {
+            firstName: "",
+            lastName: "",
+            email: "",
+            phone: "",
+            password: "",
+            confirmPassword: ""
+        },
+
+        errors: {},
+        successMsg: "",
+        clearError(field) {
+            delete this.errors[field];
+        },
+        validate()
+        {
+            this.errors = {};
+            this.successMsg = "";
+
+            // FIRST NAME
+            if (!this.form.firstName.trim())
+                this.errors.firstName = "First name is required";
+            else if (!/^[A-Za-z]{3,40}$/.test(this.form.firstName))
+                this.errors.firstName = "Min 3 letters, max 40";
+
+            // LAST NAME
+            if (!this.form.lastName.trim())
+                this.errors.lastName = "Last name is required";
+            else if (!/^[A-Za-z]{3,40}$/.test(this.form.lastName))
+                this.errors.lastName = "Min 3 letters, max 40";
+
+            // EMAIL (RFC-like full validation)
+            const emailRegex =
+                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
+
+            if (!this.form.email)
+                this.errors.email = "Email is required";
+            else if (!emailRegex.test(this.form.email))
+                this.errors.email = "Invalid email address";
+
+            // PHONE (min 10 digits, global formats allowed)
+            const phoneRegex = /^[0-9\-\+\(\)\s]{10,}$/;
+
+            if (!this.form.phone)
+                this.errors.phone = "Phone number is required";
+            else if (!phoneRegex.test(this.form.phone))
+                this.errors.phone = "Phone number must be at least 10 digits";
+
+            // PASSWORD (strong)
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
+
+            if (!this.form.password.trim())
+                this.errors.password = "Password is required";
+            // else if (!passwordRegex.test(this.form.password))
+            //     this.errors.password = "Min 8 chars with upper, lower, number & special char";
+
+            // CONFIRM PASSWORD
+            if (!this.form.confirmPassword.trim())
+                this.errors.confirmPassword = "Confirm password is required";
+            else if (this.form.password !== this.form.confirmPassword)
+                this.errors.confirmPassword = "Passwords do not match";
+
+            return Object.keys(this.errors).length === 0;
+        },
+
+        submitForm() {
+        if (!this.validate()) {
+            console.log("Validation errors:", this.errors);
+            return;
+        }
+
+        let base_url = $('meta[name=base-url]').attr("content");
+
+        $('#register').prop('disabled', true);
+        $('#register').text('Submitting...');
+        fetch(base_url+'/membership/store', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute('content')
+            },
+            body: JSON.stringify({
+                first_name: this.form.firstName,
+                last_name: this.form.lastName,
+                email: this.form.email,
+                phone: this.form.phone,
+                password: this.form.password,
+                password_confirmation: this.form.confirmPassword,
+                plan_id: id
+            })
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) throw data;
+            return data;
+        })
+        .then(data => {
+            this.successMsg = data.message;
+            if (data.redirect) {
+                // Redirect to Stripe immediately
+                window.location.href = data.redirect;
+            } else {
+                // Only re-enable the button if there's no redirect happening
+                $('#register').prop('disabled', false);
+                $('#register').text('Register');
+            }
+        })
+        .catch(err => {
+            if (err.errors) {
+                this.errors = err.errors; // Laravel validation errors
+            } else {
+                alert(err.message || 'Something went wrong');
+            }
+        });
+    }
+    // close() {
+    //     console.log("Modal closed.");
+    // }
+    };
+}
+</script>

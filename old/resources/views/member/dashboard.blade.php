@@ -1,0 +1,241 @@
+@extends('member.member')
+@section('member-content')
+<main class="bg-white text-foreground p-6">
+    {{-- Cards --}}
+    <div class="">
+        <div>
+            <h1 class="text-3xl font-bold text-foreground text-left">Dashboard</h1>
+            <p class="text-muted-foreground ">Welcome back! Access your membership benefits below.</p>
+        </div>
+        <!-- Feature Cards Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Video Library -->
+            <div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                <div class="flex flex-col space-y-1.5 p-6">
+                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video h-6 w-6 text-primary">
+                            <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"></path>
+                            <rect x="2" y="6" width="14" height="12" rx="2"></rect>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold leading-none tracking-tight">Video Library</h3>
+                    <p class="text-base text-muted-foreground mt-1">Access all educational videos and wellness content</p>
+                </div>
+                <div class="p-6 pt-0">
+                    <a href="{{url('/member/video-library')}}">
+                        <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm h-10 px-4 py-2 w-full">View Videos</button>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Member Store -->
+            <div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                <div class="flex flex-col space-y-1.5 p-6">
+                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-bag h-6 w-6 text-primary">
+                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                            <path d="M3 6h18"></path>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold leading-none tracking-tight">Member Store</h3>
+                    <p class="text-base text-muted-foreground mt-1">Browse products with exclusive member discounts</p>
+                </div>
+                <div class="p-6 pt-0">
+                    <a href="{{url('/member/store')}}">
+                        <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ... bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm h-10 px-4 py-2 w-full">Browse Store</button>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Collaborators -->
+            <div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                <div class="flex flex-col space-y-1.5 p-6">
+                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users h-6 w-6 text-primary">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold leading-none tracking-tight">Collaborators</h3>
+                    <p class="text-base text-muted-foreground mt-1">Connect with wellness experts and specialists</p>
+                </div>
+                <div class="p-6 pt-0">
+                    <a href="{{url('/collaborators')}}">
+                        <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ... bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm h-10 px-4 py-2 w-full">View Collaborators</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm  p-6">
+        <div class="flex  gap-2 mb-4   ">
+            <i data-lucide="calendar" class="h-5 w-5 text-primary  mt-1"></i>
+            <h2 class="text-2xl font-semibold text-left">Zoom Sessions</h2>
+        </div>
+        <div class="space-y-8" x-data="{ tab: 'upcoming_sessions' }">
+            {{-- Tabs --}}
+            <div>
+                <div class="grid w-full max-w-full grid-cols-2 bg-gray-100 rounded-md p-1">
+                    <button @click="tab='upcoming_sessions'" :class="tab=='upcoming_sessions' ? 'bg-white shadow font-semibold' : ''" class="px-3 py-2 text-sm rounded-md">Upcoming Sessions</button>
+                    <button @click="tab='archieves_and_recordings'" :class="tab=='collaborator' ? 'bg-white shadow font-semibold' : ''" class="px-3 py-2 text-sm rounded-md">Archieves & Recordings</button>
+                </div>
+
+                {{-- Tab1 --}}
+                <div x-show="tab=='upcoming_sessions'" class="mt-6 space-y-8">
+                    @if(count($upcomingSessions) > 0)
+                        @foreach($upcomingSessions as $session)
+                        @php
+                            $response = json_decode($session->meeting_response);
+                            $hostDetail = DB::table('users')->where('id', $session->host)->first();
+                        @endphp
+                        <div class="rounded-lg border-2 bg-card shadow-sm hover:border-primary transition-all">
+                            <div class="p-5">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+                                    <div class="flex-1 space-y-3">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <h3 class="font-semibold text-lg text-foreground">{{$session->session_title}}</h3>
+                                            <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-primary/10 text-primary border-primary/30 flex-shrink-0">monthly</div>
+                                        </div>
+                                        <div class="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                                            <div class="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user h-4 w-4 mr-1.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                                {{$hostDetail->first_name}} {{$hostDetail->last_name}}
+                                            </div>
+                                            <div class="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar h-4 w-4 mr-1.5"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>
+                                                {{ \Carbon\Carbon::parse($session->date)->format('M d, Y') }}
+                                            </div>
+                                            <div class="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock h-4 w-4 mr-1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                {{$session->time}} ({{$session->duration}})
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-muted-foreground">{{ \Illuminate\Support\Str::limit(strip_tags($session->description), 80) }}</p>
+                                        <div class="flex items-center gap-2">
+                                            <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-primary/10 text-primary border-primary/30">
+                                                12 spots available
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col gap-3 min-w-[140px]">
+                                        <a href="{{$response->join_url}}" target="_blank">
+                                            <button class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"></path><rect x="2" y="6" width="14" height="12" rx="2"></rect></svg>
+                                                Join Session
+                                            </button>
+                                        </a>
+                                        <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none
+                                        focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground h-9 rounded-md px-3 w-full">
+                                            Add to Calendar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    @else
+                        No upcoming sessions found.
+                    @endif
+                </div>
+
+                {{-- Tab2 --}}
+                <div x-show="tab=='archieves_and_recordings'" class="mt-6">
+                    @if(count($recordedSessions) > 0)
+                        @foreach($recordedSessions as $session)
+                        @php
+                            $response = json_decode($session->meeting_response);
+                            $hostDetail = DB::table('users')->where('id', $session->host)->first();
+                        @endphp
+                        <div class="rounded-lg border-2 bg-card shadow-sm hover:border-primary transition-all">
+                            <div class="p-5">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+                                    <div class="flex-1 space-y-3">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <h3 class="font-semibold text-lg text-foreground">{{$session->session_title}}</h3>
+                                            <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-primary/10 text-primary border-primary/30 flex-shrink-0">monthly</div>
+                                        </div>
+                                        <div class="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                                            <div class="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user h-4 w-4 mr-1.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                                {{$hostDetail->first_name}} {{$hostDetail->last_name}}
+                                            </div>
+                                            <div class="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar h-4 w-4 mr-1.5"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>
+                                                {{ \Carbon\Carbon::parse($session->date)->format('M d, Y') }}
+                                            </div>
+                                            <div class="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock h-4 w-4 mr-1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                {{$session->time}} ({{$session->duration}})
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-muted-foreground">{{ \Illuminate\Support\Str::limit(strip_tags($session->description), 80) }}</p>
+                                        <div class="flex items-center gap-2">
+                                            <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-primary/10 text-primary border-primary/30">
+                                                12 views
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col gap-3 min-w-[140px]">
+                                        <a href="{{$response->join_url}}" target="_blank">
+                                            <button class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"></path><rect x="2" y="6" width="14" height="12" rx="2"></rect></svg>
+                                                Watch Recording
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    @else
+                        No recordings found.
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Getting Started -->
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm mt-4 ">
+        <div class="flex flex-col space-y-1.5 p-6 text-left">
+            <h3 class="text-2xl font-semibold leading-none tracking-tight flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open h-6 w-6 mr-2 text-primary">
+                    <path d="M12 7v14"></path>
+                    <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
+                </svg>
+                Getting Started
+            </h3>
+            <p class="text-base text-muted-foreground ">Quick guide to maximize your membership</p>
+        </div>
+        <div class="p-6 pt-0">
+            <div class="space-y-4">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">1</div>
+                    <div>
+                        <h4 class="font-semibold text-foreground">Watch the Introduction Videos</h4>
+                        <p class="text-base text-muted-foreground ">Start with our welcome series to understand all your benefits</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">2</div>
+                    <div>
+                        <h4 class="font-semibold text-foreground">Explore the Product Store</h4>
+                        <p class="text-base text-muted-foreground ">Browse wellness products with your exclusive member discount</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">3</div>
+                    <div>
+                        <h4 class="font-semibold text-foreground">Connect with Experts</h4>
+                        <p class="text-base text-muted-foreground  ">Learn from our network of wellness collaborators and specialists</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+@endsection

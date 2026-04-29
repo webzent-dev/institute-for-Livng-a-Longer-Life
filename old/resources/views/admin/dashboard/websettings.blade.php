@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>@yield('title', 'Dashboard')</title>
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="https://unpkg.com/alpinejs" defer></script>
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <link rel="stylesheet" href="{{asset('css/toastr.min.css')}}" />
+        <script src="{{asset('js/toastr.min.js')}}"></script>
+    </head>
+    
+    @if (session('success'))
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="fixed top-5 right-5 bg-green-600 text-white px-5 py-3 rounded-lg shadow-lg z-50">
+        {{ session('success') }}
+    </div>
+    @endif
+
+    @if (session('error'))
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="fixed top-5 right-5 bg-red-600 text-white px-5 py-3 rounded-lg shadow-lg z-50">
+        {{ session('error') }}
+    </div>
+    @endif
+
+    <div id="toast" class="hidden fixed top-5 right-5 px-5 py-3 rounded-lg shadow-lg text-white z-50"></div>
+    <body  x-data="{  sidebarOpen: true,  mobileSidebar: false  }"  class="bg-slate-50 antialiased">
+        <div class="flex min-h-screen">
+            <x-dashboard.sidebar.sidebar />
+            <div class="flex-1 flex flex-col">
+                <x-dashboard.sidebar.header />
+                <main class="flex-1 p-8  bg-white ">
+                    <div class="space-y-6">
+                        <!-- Header -->
+                        <div class="flex justify-between items-center ">
+                            <div class="">
+                                <h1 class="text-3xl font-bold text-left mb-0">Settings</h1>
+                                <p class="text-muted-foreground text-lg">Manage site configuration and preferences</p>
+                            </div>
+                        </div>
+                        <!-- General Settings -->
+                        <div class="py-4 rounded-lg border bg-card text-card-foreground shadow-sm">
+                            <div class="flex flex-col space-y-1.5 p-6">
+                                <h3 class="text-2xl font-semibold leading-none tracking-tight">General Settings</h3>
+                            </div>
+                            <form method="POST" class="space-y-3 overflow-y-auto scrollbar-custom scroll-smooth px-5">
+                                <x-form.input label="Site Name" type="text" name="site_name" placeholder="Enter Site Name*" autocomplete="off" required />
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Site Description <span class="required" style="color: red;">*</span></label>
+                                    <textarea name="site_description" rows="3" placeholder="Enter site description*" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"></textarea>
+                                </div>
+                                <x-form.input label="Contact Email" type="email" name="contact_email" placeholder="admin@example.com" autocomplete="off" required />
+                                <div class="w-1/6 mt-3">
+                                    <x-button-use label="Save Changes" type="submit" variant="primary" class="w-full"/>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Email Settings-->
+                        <div class="py-4 rounded-lg border bg-card text-card-foreground shadow-sm">
+                            <div class="flex flex-col space-y-1.5 p-6">
+                                <h3 class="text-2xl font-semibold leading-none tracking-tight">Email Settings</h3>
+                            </div>
+                            <!-- FORM -->
+                            <form @submit.prevent="submitForm" class="space-y-3 overflow-y-auto scrollbar-custom  scroll-smooth px-5">
+                                <x-form.input name="Course_Title" type="text" placeholder="smtp.example.com" label="SMTP Host" />
+                                <x-form.input name="Course_Title" type="text" placeholder="587" label="SMTP Port" />
+                                <div class=" w-1/6 mt-3">
+                                    <x-button-use label="Save Changes" variant="primary"  class="w-full"/>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Security Settings-->
+                        <div class="py-4 rounded-lg border bg-card text-card-foreground shadow-sm">
+                            <div class="flex flex-col space-y-1.5 p-6">
+                                <h3 class="text-2xl font-semibold leading-none tracking-tight">Security Settings</h3>
+                            </div>
+                            <!-- FORM -->
+                            <form @submit.prevent="submitForm" class="space-y-3 overflow-y-auto scrollbar-custom  scroll-smooth px-5">
+                                <x-form.input name="Course_Title" type="text" placeholder="60" label="Session Timeout (minutes)" />
+                                <div class=" w-1/6 mt-3">
+                                    <x-button-use label="Save Changes" variant="primary"  class="w-full"/>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </main>
+                @yield('content')
+            </div>
+        </div>
+        <x-dashboard.sidebar.mobile-sidebar />
+        <script>lucide.createIcons()</script>
+        <script>
+            const tabs = document.querySelectorAll('[role="tab"]');
+            const contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => {
+                        t.setAttribute('aria-selected', 'false');
+                        t.setAttribute('data-state', 'inactive');
+                        t.classList.remove('bg-background', 'shadow-sm');
+                    });
+                
+                    contents.forEach(c => c.classList.add('hidden'));
+                    tab.setAttribute('aria-selected', 'true');
+                    tab.setAttribute('data-state', 'active');
+                    tab.classList.add('bg-background', 'shadow-sm');
+                    const activeContent = document.getElementById(tab.dataset.tab);
+                    if (activeContent) {
+                        activeContent.classList.remove('hidden');
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
