@@ -32,9 +32,9 @@ jobs:
     - name: Deploy to server via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
+        server: 190.92.174.27
+        username: living@bikewrapt.com
+        password: webzent@123
         local-dir: ./
         server-dir: /home/bike/public_html
         exclude: .git*
