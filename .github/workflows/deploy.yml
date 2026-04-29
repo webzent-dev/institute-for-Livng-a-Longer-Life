@@ -37,26 +37,4 @@ jobs:
         password: webzent@123
         local-dir: ./
         server-dir: /home/bike/public_html/
-        exclude: .git*
-          - .github/**
-          - node_modules/**
-          - .env
-          - storage/logs/**
-          - storage/framework/cache/**
-          - storage/framework/sessions/**
-          - storage/framework/testing/**
-          - storage/framework/views/**
-          - bootstrap/cache/**
-          - vendor/**
-          - .gitignore
-          - README.md
-          - artisan
-          - composer.json
-          - composer.lock
-          - package.json
-          - package-lock.json
-          - phpunit.xml
-          - postcss.config.js
-          - tailwind.config.js
-          - vite.config.js
-        
+        exclude: .git*, .github/**, node_modules/**, .env*, storage/logs/**, storage/framework/cache/**, storage/framework/sessions/**, storage/framework/testing/**, storage/framework/views/**, bootstrap/cache/**, vendor/**, old/**, tests/**, .gitignore, README.md, artisan, composer.json, composer.lock, package.json, package-lock.json, phpunit.xml, postcss.config.js, tailwind.config.js, npm, .editorconfig, .gitattributes
