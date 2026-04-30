@@ -81,8 +81,6 @@ jobs:
         protocol: ftp
         port: 21
         local-dir: ./
-        dangerous-clean-slate: false
-        # Only exclude truly unnecessary files for production
+                # Only exclude truly unnecessary files for production
         exclude: .git/**, .git*, .github/**, node_modules/**, storage/logs/**, storage/framework/cache/**, storage/framework/sessions/**, storage/framework/testing/**, storage/framework/views/**, bootstrap/cache/**, vendor/**
-        # Force complete deployment
-        sync: false
+        
