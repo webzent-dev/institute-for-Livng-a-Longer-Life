@@ -8,6 +8,7 @@ class Product extends Model
 {
     protected $fillable = [
         'user_id',
+        'sku',
         'product_type',        
         'name',
         'slug',
@@ -21,6 +22,12 @@ class Product extends Model
         'stock_quantity',
         'image',
         'status',
+        'weight',
+        'length',
+        'width',
+        'height',
+        'shipping_template',
+        'requires_shipping',
     ];
 
     public function user()

@@ -6,6 +6,7 @@
     'value' => null,
     'required' => false,
     'type' => null,
+    'step' => null,
     'filter' => null,
     'lockOnValue' => false,
     'preview' => false,
@@ -69,6 +70,7 @@
         value="{{ old($name, $value) }}"
         @if($model) x-model="form.{{ $model }}" @endif
         @if($required) required @endif
+        @if($step) step="{{ $step }}" @endif
         @if($lockOnValue && $hasValue) disabled @endif
         class="flex h-10 w-full rounded-md
             border border-input
