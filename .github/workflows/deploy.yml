@@ -32,7 +32,42 @@ jobs:
     - name: Clean up node_modules
       run: rm -rf node_modules
       
-    - name: Deploy to server via FTP
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v40
+      with:
+        files: |
+          **/*.php
+          **/*.js
+          **/*.css
+          **/*.html
+          **/*.json
+          public/**
+          resources/**
+          app/**
+          config/**
+          database/**
+          routes/**
+          
+    - name: List all changed files
+      run: |
+        echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
+        
+    - name: Create deployment directory with changed files
+      if: steps.changed-files.outputs.any_changed == 'true'
+      run: |
+        mkdir -p deploy
+        rsync -av --files-from=<(echo "${{ steps.changed-files.outputs.all_changed_files }}" | tr ' ' '\n') . deploy/ 2>/dev/null || true
+        # Copy directories that contain changed files
+        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          if [ -f "$file" ]; then
+            mkdir -p "deploy/$(dirname "$file")"
+            cp "$file" "deploy/$file"
+          fi
+        done
+        
+    - name: Deploy only changed files to server via FTP
+      if: steps.changed-files.outputs.any_changed == 'true'
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: ftp.bikewrapt.com
@@ -41,4 +76,5 @@ jobs:
         server-dir: /
         protocol: ftp
         port: 21
+        local-dir: deploy/
         exclude: .git/**, .git*, .github/**, node_modules/**, .env*, storage/logs/**, storage/framework/cache/**, storage/framework/sessions/**, storage/framework/testing/**, storage/framework/views/**, bootstrap/cache/**, vendor/**, old/**, tests/**, .gitignore, README.md, artisan, composer.json, composer.lock, package.json, package-lock.json, phpunit.xml, postcss.config.js, tailwind.config.js, npm, .editorconfig, .gitattributes
