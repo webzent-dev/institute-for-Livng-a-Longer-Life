@@ -1,5 +1,5 @@
 
-import validators from './validators.js';
+// Use global validators object loaded before this script
 window.formEngine = function(initialForm = {}) {
     return {
         showPass: "",

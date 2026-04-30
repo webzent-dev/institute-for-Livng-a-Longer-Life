@@ -84,6 +84,7 @@
                                     ['value' => 'book', 'label' => 'Book']
                                 ]"
                             />
+                            <x-form.input label="SKU" type="text" name="sku" value="{{ $productDetail->sku }}" placeholder="Enter product SKU*" autocomplete="off" required />
                             <x-form.input label="Product Name" type="text" name="product_name" value="{{ $productDetail->name }}" placeholder="Enter product name*" autocomplete="off" required />
                             <div class="space-y-2">
                                 <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Description <span class="required" style="color: red;">*</span></label>
@@ -96,6 +97,44 @@
                                 <div class="space-y-2">
                                     <x-form.input label="Stock Quantity" type="number" name="stock_quantity" value="{{ $productDetail->stock_quantity }}" placeholder="0" automcomplete="off" required />
                                 </div>
+                            </div>
+                            
+                            <!-- Product Attributes Section -->
+                            <div class="border-t pt-4 mt-4">
+                                <h4 class="text-lg font-semibold mb-3">Product Attributes</h4>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Weight (lbs) <span class="required" style="color: red;">*</span></label>
+                                        <input type="number" step="0.01" name="weight" value="{{ $productDetail->weight ?? '0.00' }}" placeholder="0.00" autocomplete="off" required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                                        <p class="text-xs text-muted-foreground">Weight in pounds</p>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Shipping Template</label>
+                                        <input type="text" name="shipping_template" value="{{ $productDetail->shipping_template }}" placeholder="e.g., small_box" autocomplete="off" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                                        <p class="text-xs text-muted-foreground">Package template type</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-3 gap-4 mt-4">
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Length (inches) <span class="required" style="color: red;">*</span></label>
+                                        <input type="number" step="0.01" name="length" value="{{ $productDetail->length ?? '0.00' }}" placeholder="0.00" autocomplete="off" required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Width (inches) <span class="required" style="color: red;">*</span></label>
+                                        <input type="number" step="0.01" name="width" value="{{ $productDetail->width ?? '0.00' }}" placeholder="0.00" autocomplete="off" required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Height (inches) <span class="required" style="color: red;">*</span></label>
+                                        <input type="number" step="0.01" name="height" value="{{ $productDetail->height ?? '0.00' }}" placeholder="0.00" autocomplete="off" required class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-2 mt-4">
+                                    <input type="checkbox" name="requires_shipping" id="requires_shipping" {{ $productDetail->requires_shipping ? 'checked' : '' }} class="rounded border-gray-300">
+                                    <label for="requires_shipping" class="text-sm font-medium">Requires Shipping</label>
+                                </div>
+                            </div>
                                 <!-- <div class="space-y-2">
                                     <x-form.input name="url" type="text" placeholder="/placeholder.svg" label="Image URL"  />
                                 </div>

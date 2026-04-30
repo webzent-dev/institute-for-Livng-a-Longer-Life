@@ -77,11 +77,22 @@ class CollaboratorProductController extends Controller
         //Add validation for check slug
         $slug = Str::slug($request->product_name);
         $slugCount = Product::where('slug', $slug)->count();
+        
+        //Add validation for check SKU
+        $skuCount = Product::where('sku', $request->sku)->count();
+        
         if($slugCount > 0){
             return redirect()->back()->with('error', 'Product with the same name & slug already exists. Please choose a different name.')->withInput();
-        }else{
+        }
+        
+        if($skuCount > 0){
+            return redirect()->back()->with('error', 'Product with the same SKU already exists. Please choose a different SKU.')->withInput();
+        }
+        
+        if($slugCount == 0 && $skuCount == 0){
             $product = Product::create([
                 'user_id' => Auth::id(),
+                'sku' => $request->sku,
                 'product_type' => $request->product_type,
                 'category' => 'collaborator',
                 'name' => $request->product_name,
@@ -89,6 +100,12 @@ class CollaboratorProductController extends Controller
                 'description' => $request->description,
                 'price' => $request->price,
                 'stock_quantity' => $request->stock_quantity,
+                'weight' => $request->weight ?? 0,
+                'length' => $request->length,
+                'width' => $request->width,
+                'height' => $request->height,
+                'shipping_template' => $request->shipping_template,
+                'requires_shipping' => $request->has('requires_shipping') ? 1 : 0,
                 'status' => 'active'
             ]);
 
@@ -174,20 +191,33 @@ class CollaboratorProductController extends Controller
         //Add validation for check slug
         $slug = Str::slug($request->product_name);
         $slugCount = Product::where('slug', $slug)->where('id', '!=', $id)->count();
+        
+        //Add validation for check SKU
+        $skuCount = Product::where('sku', $request->sku)->where('id', '!=', $id)->count();
+        
         if($slugCount > 0){
             return redirect()->back()->with('error', 'Product with the same name & slug already exists. Please choose a different name.')->withInput();
-        }else{
+        }
+        
+        if($skuCount > 0){
+            return redirect()->back()->with('error', 'Product with the same SKU already exists. Please choose a different SKU.')->withInput();
+        }
+        
+        if($slugCount == 0 && $skuCount == 0){
             $product->update([
                 'product_type' => $request->product_type,
+                'sku' => $request->sku,
                 'name' => $request->product_name,
                 'slug' => $slug,
                 'description' => $request->description,
                 'price' => $request->price,
-                //'discount' => $request->discounted_price,
-                //'originalPrice' => $request->original_price,
-                //'rating' => $request->rating,
-                //'reviews' => $request->reviews,
-                'stock_quantity' => $request->stock_quantity
+                'stock_quantity' => $request->stock_quantity,
+                'weight' => $request->weight ?? 0,
+                'length' => $request->length,
+                'width' => $request->width,
+                'height' => $request->height,
+                'shipping_template' => $request->shipping_template,
+                'requires_shipping' => $request->has('requires_shipping') ? 1 : 0
             ]);
 
             // Check if images exist

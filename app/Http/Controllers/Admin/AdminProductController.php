@@ -94,9 +94,18 @@ class AdminProductController extends Controller
         $slugCount = Product::where('slug', $slug)->count();
         if($slugCount > 0){
             return redirect()->back()->with('error', 'Product with the same name & slug already exists. Please choose a different name.')->withInput();
-        }else{
+        }
+        
+        //Add validation for check SKU
+        $skuCount = Product::where('sku', $request->sku)->count();
+        if($skuCount > 0){
+            return redirect()->back()->with('error', 'Product with the same SKU already exists. Please choose a different SKU.')->withInput();
+        }
+        
+        if($slugCount == 0 && $skuCount == 0){
             $product = Product::create([
                 'user_id' => $request->user_id,
+                'sku' => $request->sku,
                 'product_type' => $request->product_type,
                 'category' => $request->category,
                 'name' => $request->product_name,
@@ -104,6 +113,12 @@ class AdminProductController extends Controller
                 'description' => $request->description,
                 'price' => $request->price,
                 'stock_quantity' => $request->stock_quantity,
+                'weight' => $request->weight ?? 0,
+                'length' => $request->length,
+                'width' => $request->width,
+                'height' => $request->height,
+                'shipping_template' => $request->shipping_template,
+                'requires_shipping' => $request->has('requires_shipping') ? 1 : 0,
                 'status' => 'active'
             ]);
 
@@ -169,18 +184,17 @@ class AdminProductController extends Controller
         $product = Product::findOrFail($id);
 
         $request->validate([
+            'sku' => 'required|string|unique:products,sku,'.$id,
             'category' => 'required',
             'product_type' => 'required',
             'product_name' => 'required',
             'description' => 'required',
             'price' => 'required',
-            //'discounted_price' => 'nullable|numeric',
-            //'original_price' => 'nullable|numeric',
-            //'category' => 'nullable|string',
-            //'rating' => 'nullable|string',
-            //'reviews' => 'nullable|string',
             'stock_quantity' => 'required|integer',
-            //'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'weight' => 'required|numeric|min:0',
+            'length' => 'required|numeric|min:0',
+            'width' => 'required|numeric|min:0',
+            'height' => 'required|numeric|min:0',
         ]);
 
         /*if ($request->hasFile('image')) {
@@ -197,21 +211,32 @@ class AdminProductController extends Controller
         $slugCount = Product::where('slug', $slug)->where('id', '!=', $id)->count();
         if($slugCount > 0){
             return redirect()->back()->with('error', 'Product with the same name & slug already exists. Please choose a different name.')->withInput();
-        }else{
+        }
+        
+        //Add validation for check SKU
+        $skuCount = Product::where('sku', $request->sku)->where('id', '!=', $id)->count();
+        if($skuCount > 0){
+            return redirect()->back()->with('error', 'Product with the same SKU already exists. Please choose a different SKU.')->withInput();
+        }
+        
+        if($slugCount == 0 && $skuCount == 0){
             //Update product
             $product->update([
                 'user_id' => $request->user_id,
+                'sku' => $request->sku,
                 'product_type' => $request->product_type,
                 'category' => $request->category,
                 'name' => $request->product_name,
                 'slug' => $slug,
                 'description' => $request->description,
                 'price' => $request->price,
-                //'discount' => $request->discounted_price,
-                //'originalPrice' => $request->original_price,
-                //'rating' => $request->rating,
-                //'reviews' => $request->reviews,
-                'stock_quantity' => $request->stock_quantity
+                'stock_quantity' => $request->stock_quantity,
+                'weight' => $request->weight ?? 0,
+                'length' => $request->length,
+                'width' => $request->width,
+                'height' => $request->height,
+                'shipping_template' => $request->shipping_template,
+                'requires_shipping' => $request->has('requires_shipping') ? 1 : 0
             ]);
 
             // Check if images exist

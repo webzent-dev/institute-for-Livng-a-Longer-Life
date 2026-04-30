@@ -234,7 +234,7 @@
                                         <label class="block text-sm font-medium text-gray-700 mb-1">State/Province <span class="text-red-500">*</span></label>
                                         <div id="state-field-container">
                                             <!-- Text input for non-US countries -->
-                                            <input type="text" id="state-text-input" name="state" value="{{ old('state') }}"  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter State/Province*" autocomplete="off" required>
+                                            <input type="text" id="state-text-input" name="state_text" value="{{ old('state') }}"  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter State/Province*" autocomplete="off" required>
                                             
                                             <!-- US States dropdown (hidden by default) -->
                                             <select id="state-dropdown" name="state" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent hidden">
@@ -325,7 +325,7 @@
                     <!-- Navigation -->
                     <div class="flex justify-between">
                         <a href="{{ route('cart') }}" class="btn btn-secondary "><i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back to Cart</a>
-                        <button type="submit" class="btn btn-primary">Continue to Delivery <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i></button>
+                        <button type="submit" id="continue-to-delivery-btn" class="btn btn-primary">Continue to Delivery <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i></button>
                     </div>
                 </form>
             </div>
@@ -388,6 +388,64 @@
     </div>
 </div>
 <script>
+// Function to check if address form is valid and enable/disable button
+function checkAddressFormValidity() {
+    const submitButton = $('#continue-to-delivery-btn');
+    const selectedAddressId = $('input[name="address_id"]:checked').val();
+    console.log('checkAddressFormValidity called - selectedAddressId:', selectedAddressId);
+    
+    // Check if a saved address is selected first
+    if (selectedAddressId && selectedAddressId !== 'new') {
+        console.log('Saved address selected, enabling button');
+        submitButton.prop('disabled', false).removeAttr('title');
+
+        // Also, ensure new address fields are not required if a saved address is selected
+        const newAddressFields = document.getElementById('new-address-fields');
+        const inputs = newAddressFields.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.removeAttribute('required');
+            if (input.name === 'state') {
+                input.removeAttribute('name');
+            }
+        });
+
+        return;
+    }
+    
+    // For new address, check country and form fields
+    const country = $('select[name="country"]').val();
+    
+    // Disable if country is not US
+    if (country !== 'US') {
+        submitButton.prop('disabled', true).attr('title', 'Please select United States as your country');
+        return;
+    }
+    
+    // If new address is selected, check if all required fields are filled
+    if (selectedAddressId === 'new' || !selectedAddressId) {
+        const newAddressFields = $('#new-address-fields');
+        if (!newAddressFields.hasClass('hidden')) {
+            const firstName = $('input[name="first_name"]').val().trim();
+            const lastName = $('input[name="last_name"]').val().trim();
+            const addressLine1 = $('input[name="address_line_1"]').val().trim();
+            const city = $('input[name="city"]').val().trim();
+            const state = $('#state-dropdown').is(':visible') ? $('select[name="state"]').val() : $('#state-text-input').val();
+            const postalCode = $('input[name="postal_code"]').val().trim();
+            const email = $('input[name="email"]').val().trim();
+            const phone = $('input[name="phone"]').val().trim();
+            
+            // Check if all required fields are filled
+            if (firstName && lastName && addressLine1 && city && state && postalCode && email && phone) {
+                submitButton.prop('disabled', false).removeAttr('title');
+            } else {
+                submitButton.prop('disabled', true).attr('title', 'Please fill in all required fields');
+            }
+        } else {
+            submitButton.prop('disabled', true).attr('title', 'Please select an address');
+        }
+    }
+}
+
 // Handle checkout type selection visual feedback
 @if(!auth()->check())
     document.querySelectorAll('input[name="checkout_type"]').forEach(radio => {
@@ -411,6 +469,7 @@
 @if(auth()->check() && $addresses && $addresses->count() > 0)
 document.querySelectorAll('input[name="address_id"]').forEach(radio => {
     radio.addEventListener('change', function() {
+        console.log('Address selection changed to:', this.value);
         // style handling
         document.querySelectorAll('input[name="address_id"]').forEach(r => {
             r.closest('label').classList.remove('border-primary', 'bg-primary/5');
@@ -428,14 +487,24 @@ document.querySelectorAll('input[name="address_id"]').forEach(radio => {
                 if(input.name !== 'address_line_2'){
                     input.setAttribute('required', true);
                 }
+                // Restore name attribute for state field
+                if (input.id === 'state-text-input') {
+                    input.setAttribute('name', 'state');
+                }
             });
         } else {
             newAddressFields.classList.add('hidden');
             // remove required validation
             inputs.forEach(input => {
                 input.removeAttribute('required');
+                // Remove name attribute for state field to prevent validation conflicts
+                if (input.name === 'state') {
+                    input.removeAttribute('name');
+                }
             });
         }
+        // Check form validity when address selection changes
+        checkAddressFormValidity();
     });
 });
 
@@ -549,8 +618,8 @@ $('select[name="country"]').on('change', function() {
     
     if (country === 'US') {
         // Show US states dropdown, hide text input
-        stateTextInput.addClass('hidden').prop('required', false);
-        stateDropdown.removeClass('hidden').prop('required', true);
+        stateTextInput.addClass('hidden').prop('required', false).removeAttr('name');
+        stateDropdown.removeClass('hidden').prop('required', true).attr('name', 'state');
         
         // Update postal code placeholder for US ZIP codes
         postalCodeInput.attr('placeholder', 'Enter ZIP Code (12345 or 12345-6789)');
@@ -573,8 +642,8 @@ $('select[name="country"]').on('change', function() {
         submitButton.prop('disabled', false);
     } else {
         // Show text input, hide US states dropdown
-        stateTextInput.removeClass('hidden').prop('required', true);
-        stateDropdown.addClass('hidden').prop('required', false);
+        stateTextInput.removeClass('hidden').prop('required', true).attr('name', 'state');
+        stateDropdown.addClass('hidden').prop('required', false).removeAttr('name');
         
         // Reset postal code placeholder for international
         postalCodeInput.attr('placeholder', 'Enter Postal Code');
@@ -587,10 +656,28 @@ $('select[name="country"]').on('change', function() {
         countrySelect.after('<div class="country-validation-message text-red-500 text-sm mt-1">Currently we only ship within United States. Please select United States.</div>');
         submitButton.prop('disabled', true).attr('title', 'Please select United States as your country');
     }
+    
+    // Check form validity when country changes
+    checkAddressFormValidity();
 });
 
 // Trigger country change on page load
 $('select[name="country"]').trigger('change');
+
+// Initialize state field names correctly on page load
+$(document).ready(function() {
+    const country = $('select[name="country"]').val();
+    const stateTextInput = $('#state-text-input');
+    const stateDropdown = $('#state-dropdown');
+    
+    if (country === 'US') {
+        stateTextInput.removeAttr('name');
+        stateDropdown.attr('name', 'state');
+    } else {
+        stateTextInput.attr('name', 'state');
+        stateDropdown.removeAttr('name');
+    }
+});
 
 // Add address validation feedback
 $('input[name="address_line_1"]').on('blur', function() {
@@ -628,6 +715,31 @@ $('input[name="postal_code"]').on('blur', function() {
             $(this).next('.zip-hint').remove();
         }
     }
+});
+
+// Add event listeners for form fields to check validity
+$('input[name="first_name"], input[name="last_name"], input[name="address_line_1"], input[name="city"], input[name="postal_code"], input[name="email"], input[name="phone"]').on('input blur', checkAddressFormValidity);
+$('select[name="state"], #state-text-input').on('change input', checkAddressFormValidity);
+
+// Check initial form validity on page load
+$(document).ready(function() {
+    console.log('Page loaded - checking initial form validity');
+    const selectedAddressId = $('input[name="address_id"]:checked').val();
+    console.log('Initial selected address ID:', selectedAddressId);
+    
+    // If a saved address is selected on page load, ensure new address fields are not required
+    if (selectedAddressId && selectedAddressId !== 'new') {
+        const newAddressFields = document.getElementById('new-address-fields');
+        const inputs = newAddressFields.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.removeAttribute('required');
+            if (input.name === 'state') {
+                input.removeAttribute('name');
+            }
+        });
+    }
+    
+    checkAddressFormValidity();
 });
 </script>
 @endsection

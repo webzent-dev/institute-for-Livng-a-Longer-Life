@@ -168,15 +168,50 @@ class ShippingService
 
             \Log::info('Processing product: ' . $product->name . ', requires_shipping: ' . ($product->requires_shipping ?? 'null'));
             
-            // Check if product requires shipping (treat as true if not set)
+            // Check if product requires shipping
+            // If requires_shipping is explicitly set to 0/false, treat as digital product
+            // Otherwise, treat as physical product that needs shipping
             if (!isset($product->requires_shipping) || $product->requires_shipping) {
                 $requiresShipping = true;
-                $totalWeight += ($product->weight ?? 1) * $quantity; // Default 1lb if not set
+                
+                // Use product weight if available and > 0, otherwise use default based on product type
+                $productWeight = $product->weight ?? 0;
+                if ($productWeight <= 0) {
+                    // Default weight estimation based on product name/type
+                    if (stripos($product->name, 'book') !== false || stripos($product->name, 'guide') !== false) {
+                        $productWeight = 1.0; // Books typically weigh around 1lb
+                    } elseif (stripos($product->name, 'pdf') !== false || stripos($product->name, 'e-book') !== false) {
+                        $productWeight = 0.1; // Digital products are very light
+                    } else {
+                        $productWeight = 2.0; // Default to 2lbs for other physical products
+                    }
+                }
+                $totalWeight += $productWeight * $quantity;
+
+                // Use product dimensions if available and > 0, otherwise use defaults
+                $productLength = $product->length ?? 0;
+                $productWidth = $product->width ?? 0;
+                $productHeight = $product->height ?? 0;
+                
+                if ($productLength <= 0 || $productWidth <= 0 || $productHeight <= 0) {
+                    // Default dimensions based on product type
+                    if (stripos($product->name, 'book') !== false || stripos($product->name, 'guide') !== false) {
+                        $defaultLength = 9; $defaultWidth = 6; $defaultHeight = 1; // Book dimensions
+                    } elseif (stripos($product->name, 'pdf') !== false || stripos($product->name, 'e-book') !== false) {
+                        $defaultLength = 1; $defaultWidth = 1; $defaultHeight = 0.1; // Digital products
+                    } else {
+                        $defaultLength = 10; $defaultWidth = 8; $defaultHeight = 4; // Default package dimensions
+                    }
+                    
+                    $productLength = $productLength > 0 ? $productLength : $defaultLength;
+                    $productWidth = $productWidth > 0 ? $productWidth : $defaultWidth;
+                    $productHeight = $productHeight > 0 ? $productHeight : $defaultHeight;
+                }
 
                 // Use largest dimensions for packaging
-                $maxLength = max($maxLength, $product->length ?? 10);
-                $maxWidth = max($maxWidth, $product->width ?? 8);
-                $maxHeight = max($maxHeight, $product->height ?? 4);
+                $maxLength = max($maxLength, $productLength);
+                $maxWidth = max($maxWidth, $productWidth);
+                $maxHeight = max($maxHeight, $productHeight);
             }
         }
 
