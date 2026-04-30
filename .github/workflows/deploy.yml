@@ -60,21 +60,26 @@ jobs:
         echo "=========================="
         
     - name: Create deployment directory with changed files
-      if: steps.changed-files.outputs.any_changed == 'true'
       run: |
         echo "=== CREATING DEPLOYMENT DIRECTORY ==="
         mkdir -p deploy
         echo "Created deploy directory"
         
-        # List files to be copied
-        echo "Files to copy:"
-        echo "${{ steps.changed-files.outputs.all_changed_files }}" | tr ' ' '\n' | while read file; do
-          if [ -n "$file" ] && [ -f "$file" ]; then
-            echo "  - $file"
-            mkdir -p "deploy/$(dirname "$file")"
-            cp "$file" "deploy/$file"
-          fi
-        done
+        # Always copy some essential files if no changes detected
+        if [ "${{ steps.changed-files.outputs.any_changed }}" == "true" ]; then
+          echo "Files to copy:"
+          echo "${{ steps.changed-files.outputs.all_changed_files }}" | tr ' ' '\n' | while read file; do
+            if [ -n "$file" ] && [ -f "$file" ]; then
+              echo "  - $file"
+              mkdir -p "deploy/$(dirname "$file")"
+              cp "$file" "deploy/$file"
+            fi
+          done
+        else
+          echo "No changes detected, creating minimal deployment"
+          # Create a minimal file to ensure deploy directory exists
+          echo "Deployment test file" > deploy/deployment-test.txt
+        fi
         
         # Show deploy directory contents
         echo "Deploy directory contents:"
@@ -82,7 +87,6 @@ jobs:
         echo "======================================"
         
     - name: Deploy only changed files to server via FTP
-      if: steps.changed-files.outputs.any_changed == 'true' || true
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: ftp.bikewrapt.com
@@ -93,6 +97,5 @@ jobs:
         port: 21
         local-dir: deploy/
         dangerous-clean-slate: false
-        sync: false
         state-name: .ftp-deploy-sync-state.json
         exclude: .git/**, .git*, .github/**, node_modules/**, .env*, storage/logs/**, storage/framework/cache/**, storage/framework/sessions/**, storage/framework/testing/**, storage/framework/views/**, bootstrap/cache/**, vendor/**, old/**, tests/**, .gitignore, README.md, artisan, composer.json, composer.lock, package.json, package-lock.json, phpunit.xml, postcss.config.js, tailwind.config.js, npm, .editorconfig, .gitattributes
