@@ -77,4 +77,7 @@ jobs:
         protocol: ftp
         port: 21
         local-dir: deploy/
+        dangerous-clean-slate: false
+        sync: false
+        state-name: .ftp-deploy-sync-state.json
         exclude: .git/**, .git*, .github/**, node_modules/**, .env*, storage/logs/**, storage/framework/cache/**, storage/framework/sessions/**, storage/framework/testing/**, storage/framework/views/**, bootstrap/cache/**, vendor/**, old/**, tests/**, .gitignore, README.md, artisan, composer.json, composer.lock, package.json, package-lock.json, phpunit.xml, postcss.config.js, tailwind.config.js, npm, .editorconfig, .gitattributes
