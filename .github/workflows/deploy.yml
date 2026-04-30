@@ -66,7 +66,12 @@ jobs:
         echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
         echo "====================="
         
-    - name: Deploy changed files to server via FTP
+    - name: Force full deployment by removing sync state
+      run: |
+        echo "Removing sync state file to force full deployment..."
+        rm -f .ftp-deploy-sync-state.json
+        
+    - name: Deploy all files to server via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: ftp.bikewrapt.com
@@ -79,3 +84,5 @@ jobs:
         dangerous-clean-slate: false
         state-name: .ftp-deploy-sync-state.json
         exclude: .git/**, .git*, .github/**, node_modules/**, .env*, storage/logs/**, storage/framework/cache/**, storage/framework/sessions/**, storage/framework/testing/**, storage/framework/views/**, bootstrap/cache/**, vendor/**, old/**, tests/**, .gitignore, README.md, artisan, composer.json, composer.lock, package.json, package-lock.json, phpunit.xml, postcss.config.js, tailwind.config.js, npm, .editorconfig, .gitattributes
+        # Force deploy all files by removing state file
+        sync: false
