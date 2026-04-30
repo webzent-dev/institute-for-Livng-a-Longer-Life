@@ -307,7 +307,7 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Postal Code <span class="text-red-500">*</span></label>
                                         <input type="text" name="postal_code" value="{{ old('postal_code') }}"  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter Postal Code" autocomplete="off" required>
-                                        @error('postal_code') 
+                                        @error('postal_codes') 
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
