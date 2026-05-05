@@ -96,7 +96,11 @@
                                         @else
                                             <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                                                 <div class="text-sm text-yellow-800">
-                                                    Shipping rates not available for this seller. Please contact support.
+                                                    @if(isset($sellerRates['no_shipping_message']))
+                                                        {{ $sellerRates['no_shipping_message'] }}
+                                                    @else
+                                                        Shipping rates not available for this seller. Please contact support.
+                                                    @endif
                                                 </div>
                                             </div>
                                         @endif

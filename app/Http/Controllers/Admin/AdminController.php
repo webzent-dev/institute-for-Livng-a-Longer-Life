@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\CollaboratorActiveMail;
 use App\Models\Order;
+use App\Models\AdminBusinessDetails;
+use Illuminate\Support\Facades\Validator;
 
 
 class AdminController extends Controller
@@ -143,5 +145,61 @@ class AdminController extends Controller
 
         return view('admin.orders.index', compact('orders','orderCount','activeCollaboratorsCount'));
     }*/
+
+    /**
+     * Show admin business details page
+     */
+    public function businessDetails()
+    {
+        $businessDetails = AdminBusinessDetails::where('user_id', Auth::id())->first();
+        return view('admin.business-details', compact('businessDetails'));
+    }
+
+    /**
+     * Store admin business details
+     */
+    public function storeBusinessDetails(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'business_name' => 'required|string|max:255',
+            'business_type' => 'required|string|max:255',
+            'business_address' => 'required|string|max:500',
+            'business_city' => 'required|string|max:255',
+            'business_state' => 'required|string|max:255',
+            'business_zip_code' => 'required|string|max:20',
+            'business_country' => 'required|string|max:255',
+            'business_phone' => 'required|string|max:20',
+            'business_email' => 'required|email|max:255',
+            'business_website' => 'nullable|url|max:255',
+            'business_description' => 'nullable|string|max:1000',
+            'tax_id' => 'nullable|string|max:50',
+            'ein_number' => 'nullable|string|max:50',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->with('error', $validator->errors()->first())->withInput();
+        }
+
+        AdminBusinessDetails::updateOrCreate(
+            ['user_id' => Auth::id()],
+            [
+                'business_name' => $request->business_name,
+                'business_type' => $request->business_type,
+                'business_address' => $request->business_address,
+                'business_city' => $request->business_city,
+                'business_state' => $request->business_state,
+                'business_zip_code' => $request->business_zip_code,
+                'business_country' => $request->business_country,
+                'business_phone' => $request->business_phone,
+                'business_email' => $request->business_email,
+                'business_website' => $request->business_website,
+                'business_description' => $request->business_description,
+                'tax_id' => $request->tax_id,
+                'ein_number' => $request->ein_number,
+            ]
+        );
+
+        return redirect()->back()->with('success', 'Business details have been saved successfully.');
+    }
 
 }

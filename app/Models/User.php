@@ -85,6 +85,11 @@ class User extends Authenticatable
         return $this->hasOne(CollaboratorBankDetails::class);
     }
 
+    public function adminBusinessDetails()
+    {
+        return $this->hasOne(AdminBusinessDetails::class);
+    }
+
     public function subOrders()
     {
         return $this->hasMany(SubOrder::class, 'seller_id');

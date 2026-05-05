@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\CollaboratorBusinessDetails;
+use App\Models\AdminBusinessDetails;
 use App\Services\ShippoService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
@@ -34,7 +35,19 @@ class ShippingService
 
             $originAddress = $this->getSellerPickupAddress($seller);
             if (!$originAddress) {
-                continue; // Skip sellers without valid addresses
+                // Include seller with no shipping available message
+                $shippingQuotes[$sellerId] = [
+                    'seller_name' => $seller->first_name . ' ' . $seller->last_name,
+                    'seller_id' => $sellerId,
+                    'origin_address' => null,
+                    'items' => $sellerItems,
+                    'package_details' => $this->calculatePackageDetails($sellerItems),
+                    'rates' => null, // No rates available
+                    'selected_rate' => null,
+                    'handling_fee' => 0,
+                    'no_shipping_message' => 'No shipping available. Please contact support.',
+                ];
+                continue;
             }
 
             $packageDetails = $this->calculatePackageDetails($sellerItems);
@@ -89,7 +102,7 @@ class ShippingService
      */
     private function getSellerPickupAddress(User $seller): ?array
     {
-        // For collaborators, use business address
+        // Handle collaborator business address
         if ($seller->role === 'collaborator') {
             $businessDetails = CollaboratorBusinessDetails::where('user_id', $seller->id)->first();
             if ($businessDetails && $this->isValidAddress($businessDetails)) {
@@ -100,6 +113,8 @@ class ShippingService
                     'state' => $businessDetails->business_state,
                     'zip_code' => $businessDetails->business_zip_code,
                     'country' => $businessDetails->business_country,
+                    'email' => $seller->email,
+                    'phone' => $businessDetails->business_phone ?? $seller->phone,
                 ];
                 
                 // Validate seller address if enabled
@@ -118,25 +133,55 @@ class ShippingService
                             'seller_id' => $seller->id,
                             'validation' => $validation
                         ]);
-                        // Fall back to institute address
-                    } else {
-                        return $address; // Use validated address
+                        return null; // Return null if validation fails
                     }
                 }
                 
-                return $address;
+                return $address; // Return collaborator address
             }
         }
 
-        // For institute or fallback, use default address
-        return [
-            'name' => 'Institute for Living a Longer Life',
-            'address_line_1' => config('shipping.institute.address_line_1', '123 Institute St'),
-            'city' => config('shipping.institute.city', 'New York'),
-            'state' => config('shipping.institute.state', 'NY'),
-            'zip_code' => config('shipping.institute.zip_code', '10001'),
-            'country' => config('shipping.institute.country', 'US'),
-        ];
+        // Handle admin business address
+        if ($seller->role === 'admin') {
+            $businessDetails = AdminBusinessDetails::where('user_id', $seller->id)->first();
+            if ($businessDetails && $this->isValidAddress($businessDetails)) {
+                $address = [
+                    'name' => $seller->first_name . ' ' . $seller->last_name,
+                    'address_line_1' => $businessDetails->business_address,
+                    'city' => $businessDetails->business_city,
+                    'state' => $businessDetails->business_state,
+                    'zip_code' => $businessDetails->business_zip_code,
+                    'country' => $businessDetails->business_country,
+                    'email' => $businessDetails->business_email ?? $seller->email,
+                    'phone' => $businessDetails->business_phone ?? $seller->phone,
+                ];
+                
+                // Validate seller address if enabled
+                if (config('shipping.validation.address_validation.enabled', true)) {
+                    $addressValidation = app(AddressValidationService::class);
+                    $validation = $addressValidation->validateAddress([
+                        'address_line_1' => $address['address_line_1'],
+                        'city' => $address['city'],
+                        'state' => $address['state'],
+                        'zip_code' => $address['zip_code'],
+                        'country' => $address['country']
+                    ]);
+                    
+                    if (!$validation['valid']) {
+                        Log::warning('Admin business address validation failed', [
+                            'seller_id' => $seller->id,
+                            'validation' => $validation
+                        ]);
+                        return null; // Return null if validation fails
+                    }
+                }
+                
+                return $address; // Return admin address
+            }
+        }
+
+        // No default fallback - return null if no valid address found
+        return null;
     }
 
     /**
@@ -335,6 +380,18 @@ class ShippingService
         
         if ($seller->role === 'collaborator') {
             $businessDetails = CollaboratorBusinessDetails::where('user_id', $seller->id)->first();
+            
+            if (!$businessDetails) {
+                $errors[] = 'Business details are required for shipping';
+            } else {
+                if (!$this->isValidAddress($businessDetails)) {
+                    $errors[] = 'Complete business address is required';
+                }
+            }
+        }
+
+        if ($seller->role === 'admin') {
+            $businessDetails = AdminBusinessDetails::where('user_id', $seller->id)->first();
             
             if (!$businessDetails) {
                 $errors[] = 'Business details are required for shipping';
