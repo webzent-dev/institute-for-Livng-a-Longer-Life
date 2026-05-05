@@ -10,6 +10,7 @@
     <x-dashboard.sidebar.nav_link icon="shopping-cart" label="Orders" route="admin.orders" />
     <x-dashboard.sidebar.nav_link icon="graduation-cap" label="Courses"  route="admin.courses" />
     <x-dashboard.sidebar.nav_link icon="user-plus" label="Memberships Plans"  route="admin.manage-membership" />
+    <x-dashboard.sidebar.nav_link icon="briefcase" label="Admin Business Details" route="admin.business-details" />
     <x-dashboard.sidebar.nav_link icon="settings" label="Settings" route="admin.settings.index"  />
     <x-dashboard.sidebar.nav_link icon="dollar-sign" label="Zoom Sessions" route="admin.zoom-sessions" />
     <x-dashboard.sidebar.nav_link icon="globe" label="Content Management" route="admin.content.management" />

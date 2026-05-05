@@ -256,6 +256,11 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
     Route::post('/email/update', [EmailManagementController::class, 'updateEmailTemplate'])->name('admin.email.update');
     //------------Email Management end here--------//
 
+    //------------Admin Business Details start here--------//
+    Route::get('/business-details', [AdminController::class, 'businessDetails'])->name('admin.business-details');
+    Route::post('/business-details', [AdminController::class, 'storeBusinessDetails'])->name('admin.business-details.store');
+    //------------Admin Business Details end here--------//
+
     Route::post('/intro-videos/{id}/status', [AdminIntroVideosController::class, 'updateStatus'])->name('admin.intro-videos.status');
     //------------Intro Videos management end here--------//
 

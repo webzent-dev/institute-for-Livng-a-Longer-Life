@@ -19,6 +19,8 @@ return [
         'state' => env('INSTITUTE_STATE', 'NY'),
         'zip_code' => env('INSTITUTE_ZIP_CODE', '10001'),
         'country' => env('INSTITUTE_COUNTRY', 'US'),
+        'email' => env('INSTITUTE_EMAIL', 'contact@institute.com'),
+        'phone' => env('INSTITUTE_PHONE', '+1-555-0123'),
     ],
 
     'carriers' => [

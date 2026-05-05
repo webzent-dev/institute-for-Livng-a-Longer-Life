@@ -110,6 +110,8 @@ class ShippoService
             'state' => $addressFrom['state'],
             'zip' => $addressFrom['zip_code'],
             'country' => $addressFrom['country'],
+            'email' => $addressFrom['email'] ?? '',
+            'phone' => $addressFrom['phone'] ?? '',
         ];
         
         $shippoAddressTo = [
