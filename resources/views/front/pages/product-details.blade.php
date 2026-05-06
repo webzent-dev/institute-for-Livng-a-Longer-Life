@@ -226,48 +226,50 @@
                 <!-- Product Title & Brand -->
                 <div class="mb-4">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 text-left">{{$product->name}}</h1>
-                    <!-- <div class="flex items-center mt-2">
-                        <span class="text-gray-600">Brand: </span>
-                        <span class="font-semibold text-green-600 ml-2">Superfood</span>
-                        <span class="mx-3 text-gray-300">|</span>
-                        <span class="text-gray-600">Wellness: </span>
-                        <span class="font-semibold ml-2">Healthy Life</span>
-                    </div> -->
+                    
+                    <!-- Ratings & Reviews -->
+                    <div class="flex items-center mt-3 mb-4">
+                        <div class="flex text-yellow-400">
+                            <i data-lucide="star" class="h-5 w-5 fill-current"></i>
+                            <i data-lucide="star" class="h-5 w-5 fill-current"></i>
+                            <i data-lucide="star" class="h-5 w-5 fill-current"></i>
+                            <i data-lucide="star" class="h-5 w-5 fill-current"></i>
+                            <i data-lucide="star" class="h-5 w-5 fill-current"></i>
+                        </div>
+                        <span class="ml-2 text-gray-600">(1 review)</span>
+                    </div>
                 </div>
                 
-                <!-- Ratings & Reviews -->
-                <!-- <div class="flex items-center mb-6">
-                    <div class="flex items-center bg-green-50 px-3 py-1 rounded-md">
-                        <span class="text-amber-500 font-bold text-lg mr-1">4.5</span>
-                        <div class="flex text-amber-500 mr-2">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
-                        <span class="text-gray-700 font-medium">12,345 Ratings</span>
-                    </div>
-                    <span class="mx-4 text-gray-300">|</span>
-                    <div>
-                        <span class="text-green-600 font-medium hover:underline cursor-pointer">4,231 Reviews</span>
-                    </div>
-                </div> -->
-                
                 <!-- Price Section -->
-                <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                    <div class="flex items-center mb-2">
-                        <span class="text-3xl font-bold text-gray-900">${{number_format($product->price, 2)}}</span>
-                        <!-- <span class="text-lg text-gray-500 line-through ml-3">₹1,024</span>
-                        <span class="ml-3 bg-red-100 text-amber-800 text-sm font-semibold px-2 py-1 rounded">12% off</span> -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-4">
+                        @if($product->compare_price || $product->originalPrice)
+                            <span class="text-gray-500 line-through text-xl mr-3">₹{{ number_format($product->compare_price ?? $product->originalPrice, 2) }}</span>
+                        @endif
+                        <span class="text-3xl font-bold text-red-600">₹{{ number_format($product->price, 2) }}</span>
+                        @if($product->compare_price || $product->originalPrice)
+                            <span class="ml-3 bg-green-500 text-white text-sm font-semibold px-2 py-1 rounded">Save {{ round((($product->compare_price ?? $product->originalPrice - $product->price) / ($product->compare_price ?? $product->originalPrice)) * 100) }}%</span>
+                        @endif
                     </div>
-                    <!-- <div class="text-green-700 font-medium">
-                        <i class="fas fa-bolt mr-1"></i> Special price ends in <span class="font-bold">2 days</span>
+                    
+                    <!-- Stock Status & View Count -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i data-lucide="eye" class="h-4 w-4 mr-1"></i> 
+                            <span data-viewing-count data-current-count="20">20 people are viewing this right now</span>
+                        </div>
+                        <div class="flex items-center text-sm text-green-600 font-medium">
+                            <i data-lucide="check-circle" class="h-4 w-4 mr-1"></i> {{ $product->stock_quantity ?? 20 }} left in stock
+                        </div>
                     </div>
-                    <div class="mt-3 text-sm text-gray-600">
-                        <span>EMI starts at $4,299/month. </span>
-                        <span class="text-green-600 font-medium hover:underline cursor-pointer">View plans</span>
-                    </div> -->
+                    
+                    <!-- Vendor Information -->
+                    @if($product->user)
+                    <div class="flex items-center text-sm text-gray-600">
+                        <span class="font-medium">Vendor:</span>
+                        <span class="ml-2 font-semibold text-blue-600">{{ $product->user->first_name }} {{ $product->user->last_name }}</span>
+                    </div>
+                    @endif
                 </div>
                 
                 <!-- Offers -->
@@ -378,30 +380,27 @@
                     </div>
                 </div> -->
                 
+                <!-- Quantity Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Quantity:</label>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center border border-gray-300 rounded-lg">
+                            <button type="button" onclick="decreaseQuantity()" class="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100">
+                                <i data-lucide="minus" class="h-4 w-4"></i>
+                            </button>
+                            <input type="number" id="quantity" value="1" min="1" max="{{ $product->stock_quantity ?? 99 }}" class="w-16 text-center border-0 focus:ring-0">
+                            <button type="button" onclick="increaseQuantity()" class="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100">
+                                <i data-lucide="plus" class="h-4 w-4"></i>
+                            </button>
+                        </div>
+                        <span class="text-sm text-gray-500">Max: {{ $product->stock_quantity ?? 99 }} items</span>
+                    </div>
+                </div>
+                
                 @php ($cartVal = Session::get('cart', [])) @endphp
                 <!-- Action Buttons -->
-                <!-- <div class="flex flex-col sm:flex-row gap-4 mb-12">
-                    <button id="add_to_cart_button_{{$product->id}}" onclick="addToCart({{$product->id}})" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition duration-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shopping-cart" aria-hidden="true" class="lucide lucide-shopping-cart w-5 h-5 mr-2"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg> 
-                        @if(array_key_exists($product->id, $cartVal))
-                            @php echo $cartVal[$product->id] @endphp 
-                            @if($cartVal[$product->id] > 1)
-                                items
-                            @else
-                                item
-                            @endif 
-                            in Cart
-                        @else
-                            Add to Cart
-                        @endif
-                    </button>
-                    <button id="buyNowBtn" onclick="addToCart({{$product->id}})" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition duration-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bolt" aria-hidden="true" class="lucide lucide-bolt w-5 h-5 mr-2"><path d="M13 11h4a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-6a２ ２ ０ ０１２－２Ｚ"></path><path d="M13.598779388976968,1.598779388976968 L1.598779388976968,13.598779388976968"></path></svg>
-                        Buy Now
-                    </button>
-                </div> -->
                 <div class="flex mb-12">
-                    <button id="add_to_cart_button_{{$product->id}}" onclick="addToCart({{$product->id}})" class="inline-flex bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-8 rounded-lg items-center justify-center transition duration-200">
+                    <button id="add_to_cart_button_{{$product->id}}" onclick="addToCart({{$product->id}})" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg flex items-center justify-center transition duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart w-5 h-5 mr-2">
                             <circle cx="8" cy="21" r="1"></circle>
                             <circle cx="19" cy="21" r="1"></circle>
@@ -499,38 +498,55 @@
             </div>
             
             <div class="mt-8 p-6 bg-white rounded-lg shadow-sm">
-                <!-- <h2 class="text-2xl font-bold mb-6">Product Description</h2> -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div>
-                        {{ $product->description }}
-                        <!-- <h3 class="text-lg font-semibold mb-3">About this item</h3>
-                        <ul class="space-y-3">
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
-                                <span><span class="font-medium">Vital Boost is a premium</span>, nutrient-dense superfood formula designed to support longevity, vitality, and overall wellness.</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
-                                <span><span class="font-medium">Inspired by over 30 years of clinical research and patient care, this daily supplement delivers a powerful blend of vitamins, minerals, antioxidants, and plant-based nutrients.</span></span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
-                                <span><span class="font-medium">Increase daily energy levels</span></span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
-                                <span><span class="font-medium">Support immune system health</span></span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
-                                <span><span class="font-medium">Promote cellular protection</span></span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
-                                <span><span class="font-medium">Enhance overall vitality and well-being</span></span>
-                            </li>
-                        </ul> -->
+                <h2 class="text-xl font-bold mb-4">About this item</h2>
+                <div class="w-full">
+                    <div class="mb-4">
+                        <p class="text-gray-700 leading-relaxed">
+                            {{ $product->description }}
+                        </p>
                     </div>
+                    
+                    @if($product->features)
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold mb-4">Key Features</h3>
+                        <div class="space-y-3">
+                            @if(is_array($product->features))
+                                @foreach($product->features as $feature)
+                                <div class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700">{{ $feature }}</span>
+                                </div>
+                                @endforeach
+                            @else
+                                <div class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                    <span class="text-gray-700">{{ $product->features }}</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+                    
+                    <!-- Product Specifications -->
+                    @if($product->specifications)
+                    <div class="mt-8">
+                        <h3 class="text-lg font-semibold mb-4">Specifications</h3>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            @if(is_array($product->specifications))
+                                @foreach($product->specifications as $key => $value)
+                                <div class="flex justify-between py-2 border-b border-gray-200 last:border-0">
+                                    <span class="font-medium text-gray-600">{{ $key }}:</span>
+                                    <span class="text-gray-800">{{ $value }}</span>
+                                </div>
+                                @endforeach
+                            @else
+                                <p class="text-gray-700">{{ $product->specifications }}</p>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+                </div>
+            </div>
                     
                     <!-- <div>
                         <h3 class="text-lg font-semibold mb-3">Key Features</h3>
@@ -803,6 +819,78 @@
                     alert(`Redirecting to "${productName}" product page...`);
                 });
             });
+        });
+        
+        // Quantity selection functions
+        function increaseQuantity() {
+            const input = document.getElementById('quantity');
+            const max = parseInt(input.getAttribute('max'));
+            const current = parseInt(input.value);
+            if (current < max) {
+                input.value = current + 1;
+            }
+        }
+        
+        function decreaseQuantity() {
+            const input = document.getElementById('quantity');
+            const min = parseInt(input.getAttribute('min'));
+            const current = parseInt(input.value);
+            if (current > min) {
+                input.value = current - 1;
+            }
+        }
+        
+        // Override addToCart to use selected quantity
+        function addToCart(productId) {
+            const quantity = parseInt(document.getElementById('quantity').value);
+            
+            $('#add_to_cart_button_' + productId).html('Adding...');
+            $('#add_to_cart_button_' + productId).attr('disabled', true);
+            
+            $.ajax({
+                method: "POST",
+                url: baseurl + "/addtocart",
+                data: {quantity: quantity, product_id: productId},
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (data) {
+                    if (data.status == true) {
+                        toastr.success(data.message);
+                        $('#cart_count').html(data.cartCount);
+                        $('#add_to_cart_button_' + productId).html(data.message);
+                        $('#add_to_cart_button_' + productId).attr('disabled', false);
+                    } else {
+                        toastr.error(data.message);
+                        $('#add_to_cart_button_' + productId).html('Add to Cart');
+                        $('#add_to_cart_button_' + productId).attr('disabled', false);
+                    }
+                },
+                error: function() {
+                    toastr.error('Error adding product to cart');
+                    $('#add_to_cart_button_' + productId).html('Add to Cart');
+                    $('#add_to_cart_button_' + productId).attr('disabled', false);
+                }
+            });
+        }
+        
+        // Auto update viewing count
+        function updateViewingCount() {
+            const viewingElement = document.querySelector('[data-viewing-count]');
+            if (!viewingElement) return;
+            
+            let currentCount = parseInt(viewingElement.getAttribute('data-current-count'));
+            const change = Math.random() > 0.5 ? 1 : -1;
+            const newCount = Math.max(1, currentCount + change);
+            
+            viewingElement.setAttribute('data-current-count', newCount);
+            viewingElement.textContent = `${newCount} people are viewing this right now`;
+        }
+        
+        // Initialize viewing count updates
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start automatic count updates every 3-7 seconds
+            setInterval(updateViewingCount, Math.random() * 4000 + 3000);
         });
     </script>
  @endsection

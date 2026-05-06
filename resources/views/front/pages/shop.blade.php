@@ -59,20 +59,26 @@
                                     </div>
                                 </div>
 
-                                <!-- Price Filter -->
-                                <div>
-                                    <div class="space-y-4">
-                                        <div class="flex items-center justify-center gap-2">
-                                            <input type="number" id="minPrice" placeholder="Min $" min="0" class="w-full flex-1 px-2 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
-                                            <span class="text-gray-500 space-x-2">to</span>
-                                            <input type="number" id="maxPrice" placeholder="Max $" min="0" class="w-full flex-1 px-2 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                                <!-- Collaborator Filter (Hidden by default) -->
+                                <div id="collaboratorFilterContainer" class="hidden">
+                                    <div class="relative">
+                                        <select id="collaboratorFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none bg-white">
+                                            <option value="">Select Collaborator</option>
+                                            <!-- Collaborators will be populated by JavaScript -->
+                                        </select>
+                                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users">
+                                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                                <circle cx="9" cy="7" r="4"/>
+                                                <path d="m22 21-3.5-3.5a2.5 2.5 0 0 0-3.5 0L12 21"/>
+                                            </svg>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="lg:ml-4">
-                                    <button id="applyPriceFilter" class="w-full  px-4 py-2 bg-primary text-white rounded-lg  transition">
-                                        Apply Filter
+                                    <button id="resetFilters" class="w-full px-4 py-2 bg-primary text-white rounded-lg transition">
+                                        Reset Filter
                                     </button>
                                 </div>
                             </div>
@@ -158,25 +164,27 @@ const cart = @json($cartVal);
 document.addEventListener('DOMContentLoaded', function() {
     // Laravel products → JS
     const products = @json($products);
+    const collaborators = @json($collaborators);
 
     // Log products to console for debugging
     //console.log('Products:', products);
+    //console.log('Collaborators:', collaborators);
 
     // DOM elements
     const searchInput = document.getElementById('searchInput');
     const clearSearchBtn = document.getElementById('clearSearch');
     const clearAllFiltersBtn = document.getElementById('clearAllFilters');
     const resetAllFromEmptyBtn = document.getElementById('resetAllFromEmpty');
-    const applyPriceFilterBtn = document.getElementById('applyPriceFilter');
+    const resetFiltersBtn = document.getElementById('resetFilters');
     const productsGrid = document.getElementById('productsGrid');
     const resultsCount = document.getElementById('resultsCount');
     const activeFilters = document.getElementById('activeFilters');
     const noResults = document.getElementById('noResults');
    
     // Filter elements
-    const minPriceInput = document.getElementById('minPrice');
-    const maxPriceInput = document.getElementById('maxPrice');
     const categoryFilter = document.getElementById('categoryFilter');
+    const collaboratorFilterContainer = document.getElementById('collaboratorFilterContainer');
+    const collaboratorFilter = document.getElementById('collaboratorFilter');
     // const vendorFilter = document.getElementById('vendorFilter');
     const ratingRadios = document.querySelectorAll('input[name="rating"]');
    
@@ -184,8 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let filters = {
         search: '',
         category: '',
-        minPrice: null,
-        maxPrice: null,
+        collaborator: '',
         minRating: null,
         vendor: ''
     };
@@ -204,8 +211,17 @@ document.addEventListener('DOMContentLoaded', function() {
         uniqueCategories.forEach(category => {
             const option = document.createElement('option');
             option.value = category;
-            option.textContent = category;
+            option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
             categoryFilter.appendChild(option);
+        });
+
+        // Populate collaborator dropdown
+        collaboratorFilter.innerHTML = '<option value="">Select Collaborator</option>';
+        collaborators.forEach(collaborator => {
+            const option = document.createElement('option');
+            option.value = collaborator.id;
+            option.textContent = `${collaborator.first_name} ${collaborator.last_name}`;
+            collaboratorFilter.appendChild(option);
         });
 
         // Populate vendor dropdown
@@ -221,6 +237,25 @@ document.addEventListener('DOMContentLoaded', function() {
         categoryFilter.addEventListener('change', () => {
             //console.log('Category changed to:', categoryFilter.value);
             filters.category = categoryFilter.value;
+            
+            // Show/hide collaborator dropdown based on category selection
+            if (categoryFilter.value === 'collaborator') {
+                collaboratorFilterContainer.classList.remove('hidden');
+            } else {
+                collaboratorFilterContainer.classList.add('hidden');
+                collaboratorFilter.value = '';
+                filters.collaborator = '';
+            }
+            
+            filterProducts();
+            updateClearButton();
+            updateActiveFilters();
+        });
+
+        // Collaborator filter event listener
+        collaboratorFilter.addEventListener('change', () => {
+            //console.log('Collaborator changed to:', collaboratorFilter.value);
+            filters.collaborator = collaboratorFilter.value;
             filterProducts();
             updateClearButton();
             updateActiveFilters();
@@ -269,23 +304,10 @@ document.addEventListener('DOMContentLoaded', function() {
         updateActiveFilters();
     });
    
-    // Apply price filter
-    applyPriceFilterBtn.addEventListener('click', () => {
-        const minPrice = minPriceInput.value ? parseFloat(minPriceInput.value) : null;
-        const maxPrice = maxPriceInput.value ? parseFloat(maxPriceInput.value) : null;
-        //console.log('Price filter applied:', minPrice, maxPrice);
-
-        // Validate price range
-        if (minPrice !== null && maxPrice !== null && minPrice > maxPrice) {
-            alert('Minimum price cannot be greater than maximum price');
-            return;
-        }
-
-        filters.minPrice = minPrice;
-        filters.maxPrice = maxPrice;
-        filterProducts();
-        updateClearButton();
-        updateActiveFilters();
+    // Reset filters button
+    resetFiltersBtn.addEventListener('click', () => {
+        // Refresh the page to clear all filter states
+        window.location.href = window.location.pathname;
     });
    
     // Clear all filters
@@ -297,17 +319,16 @@ document.addEventListener('DOMContentLoaded', function() {
         filters = {
             search: '',
             category: '',
-            minPrice: null,
-            maxPrice: null,
+            collaborator: '',
             minRating: null,
             vendor: ''
         };
         // Reset UI
         searchInput.value = '';
         clearSearchBtn.classList.add('hidden');
-        minPriceInput.value = '';
-        maxPriceInput.value = '';
         categoryFilter.value = '';
+        collaboratorFilter.value = '';
+        collaboratorFilterContainer.classList.add('hidden');
         // vendorFilter.value = '';
         document.querySelector('#rating-any').checked = true;
         // Hide no results message
@@ -321,8 +342,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateClearButton() {
         const hasFilters = filters.search ||
                             filters.category ||
-                            filters.minPrice !== null ||
-                            filters.maxPrice !== null ||
+                            filters.collaborator ||
                             filters.minRating !== null ||
                             filters.vendor;
 
@@ -358,12 +378,9 @@ document.addEventListener('DOMContentLoaded', function() {
             filtered = filtered.filter(p => p.category === filters.category);
         }
 
-        // Apply price filter
-        if (filters.minPrice !== null) {
-            filtered = filtered.filter(p => parseFloat(p.price) >= filters.minPrice);
-        }
-        if (filters.maxPrice !== null) {
-            filtered = filtered.filter(p => parseFloat(p.price) <= filters.maxPrice);
+        // Apply collaborator filter
+        if (filters.collaborator) {
+            filtered = filtered.filter(p => p.user_id == filters.collaborator);
         }
 
         // Apply rating filter
@@ -449,14 +466,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Category chip
         if (filters.category) {
-            chips.push(createFilterChip(`Category: ${filters.category}`, 'clearCategory'));
+            chips.push(createFilterChip(`Category: ${filters.category.charAt(0).toUpperCase() + filters.category.slice(1)}`, 'clearCategory'));
         }
 
-        // Price chip
-        if (filters.minPrice !== null || filters.maxPrice !== null) {
-            const min = filters.minPrice !== null ? `$${filters.minPrice}` : 'Min';
-            const max = filters.maxPrice !== null ? `$${filters.maxPrice}` : 'Max';
-            chips.push(createFilterChip(`Price: ${min} - ${max}`, 'clearPriceFilter'));
+        // Collaborator chip
+        if (filters.collaborator) {
+            const selectedCollaborator = collaborators.find(c => c.id == filters.collaborator);
+            const collaboratorName = selectedCollaborator ? `${selectedCollaborator.first_name} ${selectedCollaborator.last_name}` : 'Collaborator';
+            chips.push(createFilterChip(`Collaborator: ${collaboratorName}`, 'clearCollaborator'));
         }
 
         // Rating chip
@@ -481,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     if (action === 'clearSearchInput') clearSearchInput();
                     else if (action === 'clearCategory') clearCategory();
-                    else if (action === 'clearPriceFilter') clearPriceFilter();
+                    else if (action === 'clearCollaborator') clearCollaborator();
                     else if (action === 'clearRatingFilter') clearRatingFilter();
                     else if (action === 'clearVendor') clearVendor();
                 });
@@ -512,21 +529,22 @@ document.addEventListener('DOMContentLoaded', function() {
     function clearCategory() {
         categoryFilter.value = '';
         filters.category = '';
+        collaboratorFilterContainer.classList.add('hidden');
+        collaboratorFilter.value = '';
+        filters.collaborator = '';
         filterProducts();
         updateClearButton();
         updateActiveFilters();
     }
    
-    function clearPriceFilter() {
-        minPriceInput.value = '';
-        maxPriceInput.value = '';
-        filters.minPrice = null;
-        filters.maxPrice = null;
+    function clearCollaborator() {
+        collaboratorFilter.value = '';
+        filters.collaborator = '';
         filterProducts();
         updateClearButton();
         updateActiveFilters();
     }
-
+   
     function clearRatingFilter() {
         document.querySelector('#rating-any').checked = true;
         filters.minRating = null;

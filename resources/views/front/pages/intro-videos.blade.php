@@ -173,6 +173,7 @@
             hours of expert content on health, nutrition, exercise, and longevity."
             padding="p-2 md:p-2 lg:p-20"
             cardClass="hover:border-gray-200"
+            container="max-w-7xl"
             :buttons="[
                 ['route' => 'membership',   'label' => 'Explore Membership Plans', 'variant' => 'outline', 'icon' => 'external-link'],
             ]"

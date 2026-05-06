@@ -16,9 +16,9 @@
         {{-- Contact Information --}}
         <section class="py-5 bg-background ">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="grid md:grid-cols-3 gap-8">
-                        <div class="md:col-span-1 space-y-6 ">
-                            <x-card class="shadow-medium hover:border-muted-foreground/20">
+                    <div class="grid md:grid-cols-3 gap-8 items-stretch">
+                        <div class="md:col-span-1 space-y-6 flex flex-col">
+                            <x-card class="shadow-medium hover:border-muted-foreground/20 flex-1">
                                 <x-card-header>
                                     <x-card-title>Contact Information</x-card-title>
                                 </x-card-header>
@@ -57,7 +57,7 @@
                                     @endif
                                 </x-card-content>
                             </x-card>
-                            <x-card class="ml-0 mr-4 shadow-medium bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/20 hover:border-muted-foreground/20">
+                            <x-card class="shadow-medium bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/20 hover:border-muted-foreground/20 flex-1">
                                 <x-card-content class="p-6">
                                     <h3 class="font-semibold text-foreground mb-2">Interested in Collaborating?</h3>
                                     <p class="text-muted-foreground text-sm mb-4">
@@ -68,16 +68,16 @@
                             </x-card>
                         </div>
 
-                        <div class="md:col-span-2">
-                            <x-card class="shadow-medium hover:border-muted-foreground/20 ">
+                        <div class="md:col-span-2 flex flex-col">
+                            <x-card class="shadow-medium hover:border-muted-foreground/20 flex-1 flex flex-col">
                                 <x-card-header>
                                     <x-card-title class="text-2xl">Ask Anything You Want To Know</x-card-title>
                                     <p class="text-muted-foreground text-[16px]">
                                         Fill out the form below and we'll get back to you within 24 hours
                                     </p>
                                 </x-card-header>
-                                <x-card-content>
-                                    <form method="POST" action="{{ route('contact.store') }}" class="space-y-6">
+                                <x-card-content class="flex-1 flex flex-col">
+                                    <form method="POST" action="{{ route('contact.store') }}" class="space-y-6 flex-1 flex flex-col">
                                         @csrf
                                         {{-- GLOBAL SUCCESS MESSAGE --}}
                                         <!-- @if (session('success'))
@@ -152,9 +152,9 @@
                                                 <p class="text-red-500 text-sm">{{ $message }}</p>
                                             @enderror
                                         </div>
-                                        <div class="space-y-2">
+                                        <div class="space-y-2 flex-1 flex flex-col">
                                             <label class="font-medium" for="description">Message *</label>
-                                            <textarea id="description" name="description" rows="4" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:ring focus:ring-primary/30">{{ old('description') }}</textarea>
+                                            <textarea id="description" name="description" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:ring focus:ring-primary/30 flex-1 resize-none">{{ old('description') }}</textarea>
                                             @error('description')
                                                 <p class="text-red-500 text-sm">{{ $message }}</p>
                                             @enderror
@@ -179,7 +179,7 @@
 
         {{-- FAQ Section k --}}
         <section class="py-20 gradient-subtle">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="rounded-lg border bg-card text-card-foreground shadow-sm shadow-strong">
                     <div class="p-8 text-center">
                         <h2 class="text-3xl font-bold text-foreground mb-4">Looking for Quick Answers?</h2>

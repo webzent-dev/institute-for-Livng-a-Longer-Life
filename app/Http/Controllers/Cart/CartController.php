@@ -82,7 +82,7 @@ class CartController extends Controller
             'cartItems' => $cartItems,
             'groupedItems' => $groupedItems,
             'total' => $total,
-            'cartCount' => count($cart)
+            'cartCount' => array_sum($cart)
         ]);
     }
 
@@ -136,7 +136,7 @@ class CartController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Product added to cart successfully',
-                'cartCount' => count($cart),
+                'cartCount' => array_sum($cart),
                 'cartTotal' => $this->getCartTotal($cart),
                 'message' => $message
             ]);
@@ -184,7 +184,7 @@ class CartController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Cart updated successfully',
-                'cartCount' => count($cart),
+                'cartCount' => array_sum($cart),
                 'cartTotal' => $this->getCartTotal($cart)
             ]);
         }
@@ -220,7 +220,7 @@ class CartController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Product removed from cart',
-                'cartCount' => count($cart),
+                'cartCount' => array_sum($cart),
                 'cartTotal' => $this->getCartTotal($cart)
             ]);
         }

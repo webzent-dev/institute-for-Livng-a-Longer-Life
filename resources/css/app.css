@@ -648,6 +648,12 @@
   .equal-height {
     @apply h-full;
     }
+
+  /* Contact Form Height Match */
+  .contact-form-match-height {
+    display: flex;
+    flex-direction: column;
+  }
   }
 
   /* Fix map tiles trying to overlap other UI elements */
