@@ -36,7 +36,7 @@
                 <a href="{{ url('/contact') }}" class="px-4 py-2 text-sm font-medium rounded-md {{ request()->is('contact') ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground' : 'hover:bg-accent hover:text-accent-foreground' }}">Contact Us</a>
                 <a href="{{ url('/testimonials') }}" class="px-4 py-2 text-sm font-medium rounded-md  {{ request()->is('testimonials') ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground' : 'hover:bg-accent hover:text-accent-foreground' }}">Testimonials</a>
                 @php ($cartVal = Session::get('cart', []))
-                @php ($cartCount = !empty($cartVal)?count($cartVal):0)
+                @php ($cartCount = !empty($cartVal)?array_sum($cartVal):0)
                 <a href="{{ url('/cart') }}" class="relative px-3 py-2 text-[14px] {{ request()->is('cart') ? 'bg-secondary hover:bg-secondary/80 text-secondary-foreground' : 'hover:bg-accent hover:text-accent-foreground' }} rounded-md">
                     <i data-lucide="shopping-cart" class="h-5 w-5"></i>
                     {{-- <span class="absolute -top-1 -right-1 bg-gradient-to-r from-green-500 to-orange-400 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" id="cart_count">{{ $cartCount }}</span> --}}
