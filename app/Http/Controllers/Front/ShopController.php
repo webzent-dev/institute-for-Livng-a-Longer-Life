@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\User;
 
 class ShopController extends Controller
 {
@@ -14,7 +15,14 @@ class ShopController extends Controller
         ->whereIn('category',['collaborator','institute'])
         ->whereIn('product_type',['supplement','guide','book'])
         ->where('status', 'active')->get();
-        return view('front.pages.shop', compact('products'));
+        
+        // Get active collaborators for dropdown
+        $collaborators = User::where('role', 'collaborator')
+                            ->where('status', 'active')
+                            ->select('id', 'first_name', 'last_name')
+                            ->get();
+        
+        return view('front.pages.shop', compact('products', 'collaborators'));
     }
 
     public function filter(Request $request)

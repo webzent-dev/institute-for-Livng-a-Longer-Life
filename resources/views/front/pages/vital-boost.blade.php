@@ -220,7 +220,7 @@
 
         {{-- Dosage & Usage --}}
         <section class="py-20 bg-background">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="container-base max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="rounded-lg border bg-card text-card-foreground shadow-sm shadow-medium">
                     <div class="flex flex-col space-y-1.5 p-6">
                         <h3 class="font-semibold tracking-tight text-3xl text-center">How to Use Vital Boost</h3>
@@ -302,7 +302,7 @@
         </section>
 
         <section class="py-20 gradient-subtle">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="container-base max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <div class="rounded-lg border bg-card text-card-foreground shadow-sm shadow-strong">
                     <div class="p-8 lg:p-12">
                         <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-6">Start Your Journey to Vitality</h2>
