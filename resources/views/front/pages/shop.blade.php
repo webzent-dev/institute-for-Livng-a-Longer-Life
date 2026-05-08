@@ -39,7 +39,6 @@
                                     <div class="relative">
                                         <input type="text" id="searchInput" placeholder="Search by name, category, or description..." class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none text-base"/><i data-lucide="search" class="h-5 w-5 absolute text-semibold left-4 text-xl top-1/2 transform -translate-y-1/2"></i>
                                         <button id="clearSearch" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 text-lg hidden">
-                                            <i class="fas fa-times-circle"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -52,9 +51,7 @@
                                             <!-- Categories will be populated by JavaScript -->
                                         </select>
                                         <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-funnel-icon lucide-funnel">
-                                                <path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"/>
-                                            </svg>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -67,11 +64,7 @@
                                             <!-- Collaborators will be populated by JavaScript -->
                                         </select>
                                         <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users">
-                                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                                <circle cx="9" cy="7" r="4"/>
-                                                <path d="m22 21-3.5-3.5a2.5 2.5 0 0 0-3.5 0L12 21"/>
-                                            </svg>
+                                            
                                         </div>
                                     </div>
                                 </div>

@@ -12,21 +12,28 @@ function deleteFromList(id='',text='')
 
 //Change Status status
 function changeStatus(id,text){
+    var status_element;
+    var url;
+    
     if(text == 'user'){
-        var status_value = $('#'+text+'_status_'+id).text();
-        var url = baseurl+'/users/changeStatus';
+        status_element = $('#user_status_'+id);
+        var current_status = status_element.text().trim();
+        url = baseurl+'/users/changeStatus';
         text = 'user';
     }else if(text == 'zoom_sessions'){
-        var status_value = $('#zoom_session_'+id).text();
-        var url = baseurl+'/zoom-sessions/changeStatus';
+        status_element = $('#zoom_session_'+id);
+        var current_status = status_element.text().trim();
+        url = baseurl+'/zoom-sessions/changeStatus';
         text = 'zoom_session';
     }
 
-    if(status_value.trim() == 'Active'){
-        status_value = 'inactive';
-    }else{
-        status_value = 'active';    
-    }
+    // Add cursor pointer and hover effect
+    status_element.css('cursor', 'pointer');
+    
+    // Show loading state
+    status_element.addClass('opacity-50 cursor-not-allowed');
+    
+    var new_status_value = current_status.toLowerCase() === 'active' ? 'inactive' : 'active';
 
     $.ajax(
         {
@@ -37,27 +44,53 @@ function changeStatus(id,text){
             },
             cache: false,
             async: true,
-            data: {id:id,status_value:status_value},
+            data: {id:id,status_value:new_status_value},
             success: function (response) {
-                if(response!='') {
-                    if(response.status==true) {
-                        toastr.success(response.message);
-                        if(response.user_status == 'Active'){
-                            $('#'+text+'_status_'+id).attr('class','rounded-full self-center px-3 py-1 text-xs font-semibold text-primary-foreground bg-primary text-green-700');
-                        }else{
-                            $('#'+text+'_status_'+id).attr('class','rounded-full self-center px-3 py-1 text-xs font-semibold text-primary-foreground bg-red-100 text-red-700');
-                        }
-                        $('#'+text+'_status_'+id).text(response.user_status);
+                console.log('Success response:', response); // Debug log
+                // Remove loading state and restore cursor
+                status_element.removeClass('opacity-50 cursor-not-allowed');
+                status_element.css('cursor', 'pointer');
+                
+                if(response && (response.status == true || response.status === 'true')) {
+                    toastr.success(response.message || 'Status updated successfully');
+                    
+                    // Update UI immediately
+                    if(response.user_status && response.user_status.toLowerCase() === 'active'){
+                        status_element.removeClass('bg-red-100 text-red-700');
+                        status_element.addClass('bg-primary text-green-700');
                     }else{
-                        if(response.errortrue==true){
-                            for(var error in response.message){
-                                toastr.error(response.message[error]);
-                            }
-                        }else{
-                            toastr.error(response.message);
+                        status_element.removeClass('bg-primary text-green-700');
+                        status_element.addClass('bg-red-100 text-red-700');
+                    }
+                    
+                    // Update text
+                    status_element.text(response.user_status);
+                    
+                }else{
+                    console.log('Error in response:', response); // Debug log
+                    if(response && response.errortrue==true){
+                        for(var error in response.message){
+                            toastr.error(response.message[error]);
                         }
+                    }else{
+                        toastr.error(response.message || 'Status update failed');
                     }
                 }
+            },
+            error: function(xhr, status, error) {
+                console.log('AJAX Error:', {xhr: xhr, status: status, error: error}); // Debug log
+                // Remove loading state and restore cursor
+                status_element.removeClass('opacity-50 cursor-not-allowed');
+                status_element.css('cursor', 'pointer');
+                
+                // Show specific error message
+                var errorMessage = 'An error occurred while updating status.';
+                if(xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                } else if(xhr.statusText) {
+                    errorMessage = xhr.statusText;
+                }
+                toastr.error(errorMessage + ' Please try again.');
             }
         }
     ); 
