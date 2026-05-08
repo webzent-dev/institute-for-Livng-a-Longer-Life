@@ -1,23 +1,17 @@
 @extends('front.layouts.app')
 @section('title', 'Collaborator Login')
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-12 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-        {{-- Header --}}
-        <div class="text-center">
-            <div class="mx-auto h-12 w-12 sm:h-16 sm:w-16 bg-green-600 rounded-full flex items-center justify-center">
-                <i data-lucide="lock-keyhole" class="w-10 h-10 sm:w-8 sm:h-8 text-white"></i>
-                {{-- <svg class="h-6 w-6 sm:h-8 sm:w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg> --}}
-            </div>
-            <h2 class="mt-4 sm:mt-6 text-2xl sm:text-3xl font-bold ">Collaborator Login</h2>
-            {{-- <p class="mt-2 text-sm text-gray-600">Sign in to your admin account</p> --}}
-        </div>
- 
+<div class="flex-1 flex items-center justify-center py-12 px-4">
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-md p-4">
+       
         {{-- Form --}}
-        <form method="POST" action="{{ route('collaborator.login') }}" class="mt-8 space-y-6 bg-white py-6 sm:py-8 px-4 sm:px-6 shadow-lg rounded-xl border border-gray-200">
+        <form method="POST" action="{{ route('collaborator.login') }}" class="space-y-4">
             @csrf
+            {{-- Header --}}
+            <div class="flex flex-col space-y-1.5 pb-6">
+                <h3 class="text-2xl font-semibold leading-none tracking-tight text-center">Collaborator Login</h3>
+                <p class="text-sm text-muted-foreground text-center">Sign in to your collaborator account</p>
+            </div>
             {{-- Email Field --}}
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address*</label>

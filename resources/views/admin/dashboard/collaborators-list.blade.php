@@ -52,7 +52,7 @@
                                                     <span class="px-3 py-1 text-xs font-medium bg-blue-50 text-amber-700 rounded-full">Admin</span>
                                                 </td>
                                                 <td class="py-4 px-6">
-                                                    <div class="flex items-center">
+                                                    <div class="flex items-center cursor-pointer">
                                                         <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
                                                         <span class="text-sm text-slate-700">Active</span>
                                                     </div>
@@ -87,7 +87,7 @@
                                                     <span class="px-3 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-full">Editor</span>
                                                 </td>
                                                 <td class="py-4 px-6">
-                                                    <div class="flex items-center">
+                                                    <div class="flex items-center cursor-pointer">
                                                         <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
                                                         <span class="text-sm text-slate-700">Active</span>
                                                     </div>
@@ -122,7 +122,7 @@
                                                     <span class="px-3 py-1 text-xs font-medium bg-amber-50 text-amber-700 rounded-full">Viewer</span>
                                                 </td>
                                                 <td class="py-4 px-6">
-                                                    <div class="flex items-center">
+                                                    <div class="flex items-center cursor-pointer">
                                                         <div class="w-2 h-2 rounded-full bg-slate-400 mr-2"></div>
                                                         <span class="text-sm text-slate-700">Inactive</span>
                                                     </div>

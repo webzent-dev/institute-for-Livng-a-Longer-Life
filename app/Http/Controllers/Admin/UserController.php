@@ -48,7 +48,10 @@ class UserController extends Controller
         //Admins List
         $admins = User::where('role', 'admin')->paginate(10);
 
-        return view('admin.users.index', compact('members', 'collaborators', 'admins'));
+        // Get current user's role
+        $currentUserRole = auth()->user()->role;
+
+        return view('admin.users.index', compact('members', 'collaborators', 'admins', 'currentUserRole'));
     }
 
     /**
@@ -225,7 +228,10 @@ class UserController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect()->back()->with('success', 'User has been updated successfully.');
+        // Get the current tab from the request
+        $currentTab = $request->get('current_tab', 'members');
+        
+        return redirect()->route('admin.users.index', ['tab' => $currentTab])->with('success', 'User has been updated successfully.');
     }
 
 }
