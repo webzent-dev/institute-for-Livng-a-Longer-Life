@@ -35,7 +35,7 @@
                 <!-- Header -->
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-4">
-                        <x-button-use href="{{route('admin.users.index')}}" variant="outline" icon="arrow-left" class=" bg-white h-10 w-10 pl-1 pr-0"/>
+                        <x-button-use href="{{route('admin.users.index')}}?tab={{request()->get('tab', 'members')}}" variant="outline" icon="arrow-left" class=" bg-white h-10 w-10 pl-1 pr-0"/>
                     <div>
                         <h1 class="text-3xl font-bold text-left mb-0">User Details</h1>
                         <p class="text-muted-foreground text-lg">View and manage user information</p>

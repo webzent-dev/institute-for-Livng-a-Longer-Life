@@ -54,8 +54,10 @@
                             <x-form.input label="Last Name" type="text" name="last_name" id="last_name" autocomplete="off" placeholder="Enter last name*" required  />
                             <x-form.input label="Email" type="email" id="email" name="email" autocomplete="off" placeholder="Enter email*" required />
                             <x-form.select label="Role" name="role" placeholder="Select Role*" required
-                                :selected="[old('role', 'user')]"
-                                :options="[
+                                :selected="[old('role', 'admin')]"
+                                :options="$currentUserRole === 'admin' ? [
+                                    ['label' => 'Admin','value' => 'admin', 'selected' => true]
+                                ] : [
                                     ['label' => 'Member','value' => 'user'],
                                     ['label' => 'Collaborator','value' => 'collaborator'],
                                     ['label' => 'Admin','value' => 'admin', 'selected' => true]
@@ -101,7 +103,7 @@
                         </form>
                     </x-ui.modal> -->
 
-                    <div id="editUserModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50">
+                    <div id="editUserModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 flex">
                         <div class="bg-white w-full max-w-3xl rounded-xl shadow-lg sticky top-20">
                             <button type="button" onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl">&times;</button>
                             <div class="p-6 border-b">
@@ -208,8 +210,7 @@
                                                 <td class="px-4 py-3">{{$member->created_at}}</td>
                                                 <td class="justify-items-center">
                                                     <div class="flex gap-2">
-                                                        <x-button-use href="{{ route('users.show', $member->id) }}" label="View" variant="outline" icon="eye" class="pl-0 pr-0 w-24 h-10"/>
-                                                        <button class="h-9 rounded-md px-3 hover:bg-accent text-destructive" onclick="openEditModal({{ $member->id }}, '{{ $member->first_name }}', '{{ $member->last_name }}', '{{ $member->status }}')">
+                                                        <button class="h-9 rounded-md px-3 hover:bg-accent text-destructive" onclick="openEditModal({{ $member->id }}, '{{ $member->first_name }}', '{{ $member->last_name }}', '{{ $member->status }}', 'members')">
                                                             <i data-lucide="pencil" class="w-4 h-4"></i>
                                                         </button>
                                                         <button class="h-9 rounded-md px-3 hover:bg-accent text-destructive" onclick="deleteFromList('{{$member->id}}','user')">
@@ -298,8 +299,7 @@
                                                 <td class="px-4 py-3">{{$collaborator->created_at}}</td>
                                                 <td class="px-4 py-3">
                                                     <div class="flex gap-2">
-                                                        <x-button-use href="{{ route('users.show', $collaborator->id) }}" label="View" variant="outline" icon="eye" class="pl-0 pr-0 w-24 h-10"/>
-                                                        <button class="h-9 rounded-md px-3 hover:bg-accent text-destructive" onclick="openEditModal({{ $collaborator->id }}, '{{ $collaborator->first_name }}', '{{ $collaborator->last_name }}', '{{ $collaborator->status }}')">
+                                                        <button class="h-9 rounded-md px-3 hover:bg-accent text-destructive" onclick="openEditModal({{ $collaborator->id }}, '{{ $collaborator->first_name }}', '{{ $collaborator->last_name }}', '{{ $collaborator->status }}', 'collaborators')">
                                                             <i data-lucide="pencil" class="w-4 h-4"></i>
                                                         </button>
                                                         <button class="h-9 rounded-md px-3 hover:bg-accent text-destructive" onclick="deleteFromList('{{$collaborator->id}}','user')">
@@ -391,8 +391,7 @@
                                                         <!-- <button class="flex gap-2 items-center h-9 rounded-md border-2 border-primary px-3 text-primary hover:bg-primary hover:text-white">
                                                             <i data-lucide="eye" class="w-4 h-4"></i> View
                                                         </button> -->
-                                                        <x-button-use href="{{ route('users.show', $admin->id) }}" label="View" variant="outline" icon="eye" class="pl-0 pr-0 w-24 h-10"/>
-                                                        <button class="h-9 rounded-md px-3 hover:bg-accent text-destructive" onclick="openEditModal({{ $admin->id }}, '{{ $admin->first_name }}', '{{ $admin->last_name }}', '{{ $admin->status }}')">
+                                                        <button class="h-9 rounded-md px-3 hover:bg-accent text-destructive" onclick="openEditModal({{ $admin->id }}, '{{ $admin->first_name }}', '{{ $admin->last_name }}', '{{ $admin->status }}', 'admins')">
                                                             <i data-lucide="pencil" class="w-4 h-4"></i>
                                                         </button>
                                                         <button class="h-9 rounded-md px-3 hover:bg-accent text-destructive" onclick="deleteFromList('{{$admin->id}}','user')">
@@ -446,24 +445,55 @@
     <script>
     const tabs = document.querySelectorAll('[role="tab"]');
     const contents = document.querySelectorAll('.tab-content');
+    
+    // Function to switch to a specific tab
+    function switchToTab(tabName) {
+        tabs.forEach(t => {
+            t.setAttribute('aria-selected', 'false');
+            t.classList.remove('bg-background', 'shadow-sm');
+        });
+        contents.forEach(c => c.classList.add('hidden'));
+        
+        const targetTab = document.querySelector(`[data-tab="${tabName}"]`);
+        if (targetTab) {
+            targetTab.setAttribute('aria-selected', 'true');
+            targetTab.classList.add('bg-background', 'shadow-sm');
+            document.getElementById(tabName).classList.remove('hidden');
+        }
+    }
+    
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            tabs.forEach(t => {
-                t.setAttribute('aria-selected', 'false');
-                t.classList.remove('bg-background', 'shadow-sm');
-            });
-            contents.forEach(c => c.classList.add('hidden'));
-            tab.setAttribute('aria-selected', 'true');
-            tab.classList.add('bg-background', 'shadow-sm');
-            document.getElementById(tab.dataset.tab).classList.remove('hidden');
+            switchToTab(tab.dataset.tab);
         });
     });
+    
+    // Handle URL parameter for tab on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        if (tabParam) {
+            switchToTab(tabParam);
+        }
+    });
 
-    function openEditModal(id, firstName, lastName, status) {
+    function openEditModal(id, firstName, lastName, status, currentTab) {
         document.getElementById('editUserId').value = id;
         document.getElementById('editFirstName').value = firstName;
         document.getElementById('editLastName').value = lastName;
         document.getElementById('editStatus').value = status;
+        
+        // Store current tab in a hidden field
+        let tabField = document.getElementById('currentTabField');
+        if (!tabField) {
+            tabField = document.createElement('input');
+            tabField.type = 'hidden';
+            tabField.name = 'current_tab';
+            tabField.id = 'currentTabField';
+            document.querySelector('#editUserModal form').appendChild(tabField);
+        }
+        tabField.value = currentTab || 'members';
+        
         document.getElementById('editUserModal').classList.remove('hidden');
     }
 
@@ -550,5 +580,10 @@
     </script>
     <script src="{{asset('js/constraint.js')}}"></script>
     <script src="{{asset('js/common.js')}}"></script>
+<style>
+    .rounded-full {
+        cursor: pointer;
+    }
+</style>
 </body>
 </html>

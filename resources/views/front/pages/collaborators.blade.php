@@ -114,7 +114,7 @@
                                 </div>
                                 <div class="flex flex-col sm:flex-row gap-3 justify-center pt-2">
                                     <x-button-use href="{{ url('/collaborator/'.encrypt($c->id)) }}" label="View Profile" variant="primary"  icon="award" size="md"/>
-                                    <x-button-use href="{{ url('/shop') }}" label="Visit Store" variant="outline" icon="store" size="md"/>
+                                    <x-button-use href="{{ url('/collaborator/'.encrypt($c->id)) }}#store" label="Visit Store" variant="outline" icon="store" size="md"/>
                                 </div>
                             </div>
                         </div>

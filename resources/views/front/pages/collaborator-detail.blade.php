@@ -131,7 +131,11 @@
                         <!-- COURSE CARD -->
                         <div class="rounded-lg bg-card border-2 hover:border-primary shadow-soft hover:shadow-medium">
                             <div class="p-6">
-                                <a href="{{$course->video_url}}" target="_blank">
+                                @if(auth()->check())
+                                    <a href="{{$course->video_url}}" target="_blank">
+                                @else
+                                    <a href="javascript:void(0)" onclick="showLoginPrompt()">
+                                @endif
                                     <div class="aspect-video rounded-lg mb-4 relative overflow-hidden
                                         @if(!empty($course->thumbnail) && file_exists(public_path('course_images/' . $course->thumbnail)))
                                             bg-cover bg-center
@@ -156,7 +160,11 @@
                                 </a>
                                 <h3 class="text-2xl font-semibold mb-2">{{$course->title}}</h3>
                                 <p class="text-muted-foreground mb-4">{{$course->description}}</p>
-                                <a href="{{$course->video_url}}" target="_blank"><button class="gradient-primary text-primary-foreground font-semibold h-10 px-4 py-2 w-full rounded-md">Start Course</button></a>
+                                @if(auth()->check())
+                                    <a href="{{$course->video_url}}" target="_blank"><button class="gradient-primary text-primary-foreground font-semibold h-10 px-4 py-2 w-full rounded-md">Start Course</button></a>
+                                @else
+                                    <button onclick="showLoginPrompt()" class="gradient-primary text-primary-foreground font-semibold h-10 px-4 py-2 w-full rounded-md">Start Course</button>
+                                @endif
                             </div>
                         </div>
                         @endforeach
@@ -271,19 +279,93 @@
 <script>
 const tabs = document.querySelectorAll(".tab-btn");
 const contents = document.querySelectorAll(".tab-content");
-tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-        const target = tab.dataset.tab;
-        // remove active class
+
+// Function to activate a specific tab
+function activateTab(tabName) {
+    const targetTab = document.querySelector(`[data-tab="${tabName}"]`);
+    const targetContent = document.getElementById(tabName);
+    
+    if (targetTab && targetContent) {
+        // remove active class from all tabs
         tabs.forEach(t => t.classList.remove("active"));
         // hide all content
         contents.forEach(c => c.classList.add("hidden"));
-        // activate tab
-        tab.classList.add("active");
-        // show content
-        document.getElementById(target).classList.remove("hidden");
+        // activate selected tab
+        targetTab.classList.add("active");
+        // show selected content
+        targetContent.classList.remove("hidden");
+    }
+}
+
+// Check for hash fragment on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if URL has #store hash
+    if (window.location.hash === '#store') {
+        activateTab('store');
+    }
+    
+    // Add click listeners for tabs
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            const target = tab.dataset.tab;
+            activateTab(target);
+        });
     });
 });
 </script>
+<!-- Login Modal -->
+<div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-md w-full p-6 relative">
+        <button onclick="hideLoginPrompt()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 6v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6a3 3 0 013-3h6a3 3 0 013 3z"></path>
+                    <path d="M12 6v12a3 3 0 003 3h6a3 3 0 003-3V6a3 3 0 00-3-3h-6a3 3 0 00-3 3z"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">Login Required</h3>
+            <p class="text-gray-600">Please log in to access this exclusive course content.</p>
+        </div>
+        
+        <div class="space-y-3">
+            <a href="{{ url('/login') }}" class="w-full gradient-primary text-primary-foreground font-semibold h-11 px-6 rounded-md flex items-center justify-center">
+                Sign In
+            </a>
+                    </div>
+        
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-500">
+                Don't have an account? 
+                <a href="{{ url('/membership') }}" class="text-primary hover:underline font-medium">View Membership Plans</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+function showLoginPrompt() {
+    document.getElementById('loginModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function hideLoginPrompt() {
+    document.getElementById('loginModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+// Close modal when clicking outside
+document.getElementById('loginModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideLoginPrompt();
+    }
+});
+</script>
+
 <script src="{{ asset('js/cart.js') }}"></script> 
 @endsection

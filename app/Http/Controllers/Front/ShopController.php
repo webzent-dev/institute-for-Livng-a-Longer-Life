@@ -14,7 +14,14 @@ class ShopController extends Controller
         $products = Product::with('user')
         ->whereIn('category',['collaborator','institute'])
         ->whereIn('product_type',['supplement','guide','book'])
-        ->where('status', 'active')->get();
+        ->where('status', 'active')
+        ->where(function($query) {
+            $query->where('category', 'institute')
+                  ->orWhereHas('user', function($userQuery) {
+                      $userQuery->where('status', 'active');
+                  });
+        })
+        ->get();
         
         // Get active collaborators for dropdown
         $collaborators = User::where('role', 'collaborator')
@@ -35,8 +42,22 @@ class ShopController extends Controller
         ->when($category, function($q) use ($category) {
             $q->where('category', $category);
         })
+        ->where('status', 'active')
+        ->where(function($query) {
+            $query->where('category', 'institute')
+                  ->orWhereHas('user', function($userQuery) {
+                      $userQuery->where('status', 'active');
+                  });
+        })
         ->get();
-        return view('front.pages.shop', compact('products'));
+        
+        // Get active collaborators for dropdown
+        $collaborators = User::where('role', 'collaborator')
+                            ->where('status', 'active')
+                            ->select('id', 'first_name', 'last_name')
+                            ->get();
+        
+        return view('front.pages.shop', compact('products', 'collaborators'));
     }
     
     public function productDetails($slug)

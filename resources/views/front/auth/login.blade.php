@@ -4,8 +4,8 @@
     <main class="flex-1 flex items-center justify-center py-12 px-4">
         <div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-md p-4">
             <div class="flex flex-col space-y-1.5 p-6">
-                <h3 class="text-2xl font-semibold leading-none tracking-tight">Welcome</h3>
-                <p class="text-sm text-muted-foreground">Sign in to your account or create a new one</p>
+                <h3 class="text-2xl font-semibold leading-none tracking-tight text-center">Member Login</h3>
+                <p class="text-sm text-muted-foreground">Sign in to your member account or join our community</p>
             </div>
 
             <!-- Tabs -->

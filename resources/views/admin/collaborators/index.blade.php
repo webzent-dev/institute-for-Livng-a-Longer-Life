@@ -181,7 +181,7 @@
                                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                                                 </svg> -->
-                                                <span id="user_status_{{$collaborator->id}}" class="rounded-full self-center px-3 py-1 text-xs font-semibold text-primary-foreground {{ $collaborator->status === 'active' ? 'bg-primary text-green-700' : 'bg-red-100 text-red-700' }}" data-status="{{ $collaborator->status }}" data-url="{{ route('admin.users.changestatus', $collaborator->id) }}" onclick="changeStatus('{{$collaborator->id}}','user')">
+                                                <span id="user_status_{{$collaborator->id}}" class="rounded-full self-center px-3 py-1 text-xs font-semibold text-primary-foreground {{ $collaborator->status === 'active' ? 'bg-primary text-green-700' : 'bg-red-100 text-red-700' }}" data-status="{{ $collaborator->status }}" data-url="{{ route('admin.users.changestatus', $collaborator->id) }}" onclick="changeStatus('{{$collaborator->id}}','user')" style="cursor: pointer;">
                                                     {{ucfirst($collaborator->status)}}
                                                 </span>
                                             </td>

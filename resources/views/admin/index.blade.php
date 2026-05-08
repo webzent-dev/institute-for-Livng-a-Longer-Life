@@ -1,17 +1,17 @@
 @extends('front.layouts.app')
 @section('title', 'Admin Login')
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-12 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-        <div class="text-center">
-            <div class="mx-auto h-12 w-12 sm:h-16 sm:w-16 bg-green-600 rounded-full flex items-center justify-center">
-                <i data-lucide="lock-keyhole" class="w-10 h-10 sm:w-8 sm:h-8 text-white"></i>
-            </div>
-            <h2 class="mt-4 sm:mt-6 text-2xl sm:text-3xl font-bold ">Admin Login</h2>
-        </div>
+<div class="flex-1 flex items-center justify-center py-12 px-4">
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-md p-4">
+        
 
-        <form method="POST" action="{{ route('admin.login') }}" class="mt-8 space-y-6 bg-white py-6 sm:py-8 px-4 sm:px-6 shadow-lg rounded-xl border border-gray-200">
+        <form method="POST" action="{{ route('admin.login') }}" class="space-y-4">
             @csrf
+            {{-- Header --}}
+            <div class="flex flex-col space-y-1.5 pb-6">
+                <h3 class="text-2xl font-semibold leading-none tracking-tight text-center">Admin Login</h3>
+                <p class="text-sm text-muted-foreground text-center">Sign in to your admin account</p>
+            </div>
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address<span class="text-red-500">*</span></label>
                 <div class="relative">

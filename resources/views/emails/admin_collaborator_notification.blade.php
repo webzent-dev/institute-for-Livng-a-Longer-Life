@@ -4,7 +4,7 @@
         Dear Administrator,
     </p>
     <p style="font-size:16px;color:#555;">
-        We are excited to inform you that a new collaborator has registered with the email: {{ $user-&gt;email }}.
+        We are excited to inform you that a new collaborator has registered with the email: {{ $user->email }}.
     </p>
     <p style="font-size:16px;color:#555;">
         Please log in to the admin panel to review the new collaborator's details and take any necessary actions.
