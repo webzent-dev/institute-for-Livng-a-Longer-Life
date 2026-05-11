@@ -13,7 +13,7 @@ use App\Mail\CollaboratorLoginMail;
 use App\Mail\CollaboratorActiveMail;
 use App\Mail\MemberActiveMail;
 use App\Mail\MemberInActiveMail;
-use App\Mail\CollaboratorInActiveMail;
+use App\Mail\CollaboratorInactiveMail;
 
 class UserController extends Controller
 {
