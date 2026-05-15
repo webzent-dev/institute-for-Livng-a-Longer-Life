@@ -12,7 +12,6 @@ class WebSettingsController extends Controller
     public function updateSettings(Request $request)
     {
         // Validation
-                // dd($request->all());
         $request->validate([
             'logo' => 'nullable|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
             'phone' => 'nullable|string',

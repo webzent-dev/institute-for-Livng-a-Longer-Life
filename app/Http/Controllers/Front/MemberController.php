@@ -21,6 +21,7 @@ use App\Models\Course;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use App\Models\SiteSetting;
+use App\Services\StripeService;
 
 class MemberController extends Controller
 {
@@ -962,17 +963,7 @@ class MemberController extends Controller
 
     public function getStripeSecret()
     {
-        //Get stripe secret key from database
-        $siteSettingDetail = SiteSetting::first();
-        if(!empty($siteSettingDetail->stripe_mode)){
-            if($siteSettingDetail->stripe_mode == 'sandbox'){
-                Stripe::setApiKey($siteSettingDetail->stripe_sandbox_secret);
-            }else{
-                Stripe::setApiKey($siteSettingDetail->stripe_production_secret);
-            }
-        }else{
-            Stripe::setApiKey(config('services.stripe.secret'));
-        }
+        StripeService::configure();
     }
 
 }

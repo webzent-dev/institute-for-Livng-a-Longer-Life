@@ -89,13 +89,21 @@ class AdminProductController extends Controller
             return redirect()->back()->with('error',$validator)->withInput();
         }*/
 
+        $request->validate([
+            'product_name'     => 'required|string|max:255',
+            'product_type'     => 'required|string',
+            'price'            => 'required|numeric|min:0',
+            'stock_quantity'   => 'required|integer|min:0',
+            'product_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ]);
+
         //Add validation for check slug
         $slug = Str::slug($request->product_name);
         $slugCount = Product::where('slug', $slug)->count();
         if($slugCount > 0){
             return redirect()->back()->with('error', 'Product with the same name & slug already exists. Please choose a different name.')->withInput();
         }
-        
+
         //Add validation for check SKU
         $skuCount = Product::where('sku', $request->sku)->count();
         if($skuCount > 0){
@@ -184,17 +192,18 @@ class AdminProductController extends Controller
         $product = Product::findOrFail($id);
 
         $request->validate([
-            'sku' => 'required|string|unique:products,sku,'.$id,
-            'category' => 'required',
-            'product_type' => 'required',
-            'product_name' => 'required',
-            'description' => 'required',
-            'price' => 'required',
-            'stock_quantity' => 'required|integer',
-            'weight' => 'required|numeric|min:0',
-            'length' => 'required|numeric|min:0',
-            'width' => 'required|numeric|min:0',
-            'height' => 'required|numeric|min:0',
+            'sku'              => 'required|string|unique:products,sku,'.$id,
+            'category'         => 'required',
+            'product_type'     => 'required|string',
+            'product_name'     => 'required|string|max:255',
+            'description'      => 'required',
+            'price'            => 'required|numeric|min:0',
+            'stock_quantity'   => 'required|integer|min:0',
+            'weight'           => 'required|numeric|min:0',
+            'length'           => 'required|numeric|min:0',
+            'width'            => 'required|numeric|min:0',
+            'height'           => 'required|numeric|min:0',
+            'product_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         /*if ($request->hasFile('image')) {
@@ -272,7 +281,6 @@ class AdminProductController extends Controller
    public function destroy($id)
     {
         $product = Product::findOrFail($id);
-        //echo '<pre>';print_r($product);exit;
 
         //Delete image from product_images folder
         if ($product->image && file_exists(public_path('product_images/'.$product->image))) {

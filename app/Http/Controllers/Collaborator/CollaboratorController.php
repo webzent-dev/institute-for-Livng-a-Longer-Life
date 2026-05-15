@@ -18,7 +18,9 @@ use App\Models\SubOrderItem;
 use App\Models\CollaboratorBusinessDetails;
 use App\Models\CollaboratorBankDetails;
 use App\Services\ShippingService;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Database\UniqueConstraintViolationException;
 use App\Mail\AdminCollaboratorNotification;
 use App\Mail\OrderStatusNotification;
@@ -184,7 +186,7 @@ class CollaboratorController extends Controller
             $request->profile_image->move(public_path('user_images'), $profileImageName);
         }
 
-        $collaboratorDetail = User::findOrFail($request->user_id);
+        $collaboratorDetail = User::findOrFail(Auth::id());
         $profile_image = !empty($profileImageName) ? $profileImageName : $collaboratorDetail->profile_image;
         $collaboratorDetail->update([
             'first_name' => $request->first_name,
@@ -225,7 +227,6 @@ class CollaboratorController extends Controller
         ]);*/
         
         try{
-            $plainPassword = $request->password;
             if($request->password != $request->password_confirmation){
                 return redirect()->route('become.collaborator.store')->with('error', 'Passwords do not match.');
             }else{
@@ -234,7 +235,7 @@ class CollaboratorController extends Controller
                     'last_name'  => $request->last_name,
                     'email'      => $request->email,
                     'phone'      => $request->phone,
-                    'password'   => Hash::make($request->password),
+                    'password'   => Hash::make(Str::random(32)),
                     'speciality'  => $request->speciality,
                     'professional_credentials' => $request->professional_credentials,
                     'experience' => $request->experience,
@@ -246,8 +247,10 @@ class CollaboratorController extends Controller
                 ]);
 
                 if(!empty($user->email)) {
+                    $resetToken = Password::createToken($user);
+                    $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);
                     Mail::to($user->email)->send(
-                        new CollaboratorLoginMail($user, $plainPassword)
+                        new CollaboratorLoginMail($user, null, $resetUrl)
                     );
                 }
 
@@ -342,14 +345,27 @@ class CollaboratorController extends Controller
             $collaboratorProductIds[] = $product->id;
         }
 
-        $orderDetail = Order::with('user')->where('id', $id)->first();
+        $orderDetail = Order::with('user')
+            ->where('id', $id)
+            ->whereHas('items', function ($q) {
+                $q->whereHas('product', function ($q2) {
+                    $q2->where('user_id', Auth::id());
+                });
+            })
+            ->firstOrFail();
         $orderItems = OrderItem::where('order_id', $orderDetail->id)->get();
         return view('collaborator.orders.show', compact('orderDetail', 'orderItems', 'collaboratorProductIds'));
     }
 
     public function updateOrder(Request $request, string $id)
     {
-        $orderDetail = Order::where('id', $id)->first();
+        $orderDetail = Order::where('id', $id)
+            ->whereHas('items', function ($q) {
+                $q->whereHas('product', function ($q2) {
+                    $q2->where('user_id', Auth::id());
+                });
+            })
+            ->firstOrFail();
         $orderDetail->status = $request->input('status');
         $orderDetail->save();
 

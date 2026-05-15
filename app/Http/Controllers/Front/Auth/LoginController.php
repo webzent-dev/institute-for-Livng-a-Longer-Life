@@ -70,12 +70,14 @@ class LoginController extends Controller
             }   
             
             // Attempt login with user role only
-            if (!Auth::attempt(['email' => $request->email,'password' => $request->password,'role' => 'user'])) 
+            if (!Auth::attempt(['email' => $request->email,'password' => $request->password,'role' => 'user']))
             {
                 return response()->json([
                     'message' => 'Invalid credentials'
                 ], 401);
             }
+
+            $request->session()->regenerate();
 
             return response()->json([
                 'message' => 'Login successful'
@@ -193,7 +195,7 @@ class LoginController extends Controller
         );
         return response()->json($result);
         */
-        return redirect()->route('become.collaborator.store')->with('success', 'Collaborator has been created successfully. Please wait for admin approval.');
+        return redirect()->route('auth')->with('success', 'Registration successful. Please wait for admin approval.');
     }
 
 }
