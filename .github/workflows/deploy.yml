@@ -2,85 +2,111 @@ name: Deploy to Production
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+
   pull_request:
-    branches: [ main ]
-    types: [closed]
+    branches:
+      - main
+    types:
+      - closed
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install npm dependencies
-      run: npm ci
-      
-    - name: Build assets
-      run: npm run build
-      
-    - name: Clean up node_modules
-      run: rm -rf node_modules
-      
-    - name: Get changed files
-      id: changed-files
-      uses: tj-actions/changed-files@v40
-      with:
-        files: |
-          **/*.php
-          **/*.js
-          **/*.css
-          **/*.html
-          **/*.json
-          public/**
-          resources/**
-          app/**
-          config/**
-          database/**
-          routes/**
-          
-    - name: List all changed files
-      run: |
-        echo "=== DEPLOYMENT DEBUG INFO ==="
-        echo "Any changed files: ${{ steps.changed-files.outputs.any_changed }}"
-        echo "All changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
-        echo "Added files: ${{ steps.changed-files.outputs.added_files }}"
-        echo "Modified files: ${{ steps.changed-files.outputs.modified_files }}"
-        echo "Deleted files: ${{ steps.changed-files.outputs.deleted_files }}"
-        echo "=========================="
-        
-    - name: Show deployment info
-      run: |
-        echo "=== DEPLOYMENT INFO ==="
-        echo "Any changed files: ${{ steps.changed-files.outputs.any_changed }}"
-        echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
-        echo "====================="
-        
-    - name: Force full deployment by removing sync state
-      run: |
-        echo "Removing sync state file to force full deployment..."
-        rm -f .ftp-deploy-sync-state.json
-        
-    - name: Deploy all files to server via FTP
-      uses: SamKirkland/FTP-Deploy-Action@4.3.0
-      with:
-        server: ftp.bikewrapt.com
-        username: living@bikewrapt.com
-        password: webzent@123
-        server-dir: /
-        protocol: ftp
-        port: 21
-        local-dir: ./
-                # Only exclude truly unnecessary files for production
-        exclude: .git/**, .git*, .github/**, node_modules/**, storage/logs/**, storage/framework/cache/**, storage/framework/sessions/**, storage/framework/testing/**, storage/framework/views/**, bootstrap/cache/**, vendor/**
-        
+      # Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: npm
+
+      # Install dependencies
+      - name: Install npm dependencies
+        run: npm ci
+
+      # Build frontend assets
+      - name: Build assets
+        run: npm run build
+
+      # Remove node_modules before deployment
+      - name: Clean up node_modules
+        run: rm -rf node_modules
+
+      # Detect changed files
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            **/*.php
+            **/*.js
+            **/*.css
+            **/*.html
+            **/*.json
+            public/**
+            resources/**
+            app/**
+            config/**
+            database/**
+            routes/**
+
+      # Debug output
+      - name: List all changed files
+        run: |
+          echo "=============================="
+          echo "DEPLOYMENT DEBUG INFORMATION"
+          echo "=============================="
+          echo "Any changed files: ${{ steps.changed-files.outputs.any_changed }}"
+          echo "All changed files:"
+          echo "${{ steps.changed-files.outputs.all_changed_files }}"
+          echo ""
+          echo "Added files:"
+          echo "${{ steps.changed-files.outputs.added_files }}"
+          echo ""
+          echo "Modified files:"
+          echo "${{ steps.changed-files.outputs.modified_files }}"
+          echo ""
+          echo "Deleted files:"
+          echo "${{ steps.changed-files.outputs.deleted_files }}"
+          echo "=============================="
+
+      # Force full deployment
+      - name: Force full deployment by removing sync state
+        run: |
+          echo "Removing sync state file..."
+          rm -f .ftp-deploy-sync-state.json
+
+      # Deploy to FTP server
+      - name: Deploy all files to server via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          local-dir: ./
+          server-dir: /
+          exclude: |
+            .git/**
+            .git*
+            .github/**
+            node_modules/**
+            storage/logs/**
+            storage/framework/cache/**
+            storage/framework/sessions/**
+            storage/framework/testing/**
+            storage/framework/views/**
+            bootstrap/cache/**
+            vendor/**
