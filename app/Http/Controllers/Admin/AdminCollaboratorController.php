@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\CollaboratorBusinessDetails;
 use App\Models\CollaboratorBankDetails;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use App\Mail\MemberSignupMail;
 use App\Mail\CollaboratorActiveMail;
 use App\Mail\CollaboratorLoginMail;
@@ -118,7 +120,7 @@ class AdminCollaboratorController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'profile_image' => $profileImageName,
-                'password' => bcrypt('12345678'),
+                'password' => bcrypt(Str::random(32)),
                 'speciality' => $request->speciality,
                 'professional_credentials' => $request->professional_credentials,
                 'experience' => $request->experience,
@@ -130,8 +132,10 @@ class AdminCollaboratorController extends Controller
             ]);
 
             if(!empty($user->email)){
+                $resetToken = Password::createToken($user);
+                $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);
                 Mail::to($user->email)->send(
-                    new CollaboratorLoginMail($user, '12345678')
+                    new CollaboratorLoginMail($user, null, $resetUrl)
                 );
             }
 
@@ -157,8 +161,6 @@ class AdminCollaboratorController extends Controller
         $businessDetails = CollaboratorBusinessDetails::where('user_id', $id)->first();
         //Get bank details
         $bankDetails = CollaboratorBankDetails::where('user_id', $id)->first();
-        //echo '<pre>'; print_r($collaboratorCourses); exit;
-
         return view('admin.collaborators.show', compact('collaboratorDetail', 'collaboratorProducts', 'collaboratorCourses', 'businessDetails', 'bankDetails'));
     }
 
@@ -175,13 +177,11 @@ class AdminCollaboratorController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        exit('updateCollaborator');
         $profileImageName = null;
         if ($request->hasFile('profile_image')) {
             $profileImageName = time() . '.' . $request->profile_image->getClientOriginalExtension();
             $request->profile_image->move(public_path('user_images'), $profileImageName);
         }
-        exit($profileImageName);
 
         $collaboratorDetail = User::findOrFail($id);
         $collaboratorDetail->update([

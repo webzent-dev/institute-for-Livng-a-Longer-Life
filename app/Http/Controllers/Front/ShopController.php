@@ -36,7 +36,8 @@ class ShopController extends Controller
     {
         $search = $request->search;
         $category = $request->category;
-        $products = Product::when($search, function($q) use ($search) {
+        $products = Product::whereIn('category', ['collaborator', 'institute'])
+        ->when($search, function($q) use ($search) {
             $q->where('name', 'like', "%$search%");
         })
         ->when($category, function($q) use ($category) {

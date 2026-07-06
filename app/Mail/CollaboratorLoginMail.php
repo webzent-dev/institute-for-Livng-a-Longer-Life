@@ -12,11 +12,13 @@ class CollaboratorLoginMail extends Mailable
 
     public $user;
     public $password;
+    public $resetUrl;
 
-    public function __construct(User $user, $password)
+    public function __construct(User $user, $password = null, $resetUrl = null)
     {
         $this->user = $user;
         $this->password = $password;
+        $this->resetUrl = $resetUrl;
     }
 
     public function build()

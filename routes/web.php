@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\ZoomSessionController;
 use App\Http\Controllers\Front\CheckoutController;
+use App\Http\Controllers\Front\StripeWebhookController;
 use App\Http\Controllers\Front\MemberController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\ContentManagementController;
@@ -44,7 +45,7 @@ use App\Http\Controllers\Admin\EmailManagementController;
 
 //------------Admin routes start here--------//
 Route::get('/admin', [AdminController::class, 'index']);
-Route::post('/admin/login', [LoginController::class, 'adminLogin'])->name('admin.login');
+Route::post('/admin/login', [LoginController::class, 'adminLogin'])->middleware('throttle:5,1')->name('admin.login');
 Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(function ()
 {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
@@ -141,7 +142,7 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
     Route::resource('/zoom-sessions', ZoomSessionController::class)->only(
         ['create','store','show','edit','destroy']
     );
-    Route::post('/admin/zoom-sessions/{id}/status', [ZoomSessionController::class, 'updateStatus'])->name('admin.zoom-sessions.status');
+    Route::post('/zoom-sessions/{id}/status', [ZoomSessionController::class, 'updateStatus'])->name('admin.zoom-sessions.status');
     //Route::put('zoom-sessions/update', [ZoomSessionController::class, 'updateZoomSession'])->name('admin.zoom-sessions.update');
     Route::put('/zoom-sessions/{id}/update', [ZoomSessionController::class, 'update'])->name('admin.zoom-sessions.update');
     Route::post('save-recording-session', [ZoomSessionController::class, 'saveRecording'])->name('admin.zoom-sessions.save-recording');
@@ -270,7 +271,7 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
 
 //------------Collaborator routes start here--------//
 Route::get('/collaborator', [CollaboratorController::class, 'index']);
-Route::post('/collaborator/login', [CollaboratorController::class, 'collaboratorLogin'])->name('collaborator.login');
+Route::post('/collaborator/login', [CollaboratorController::class, 'collaboratorLogin'])->middleware('throttle:5,1')->name('collaborator.login');
 Route::prefix('collaborator')->middleware([RoleMiddleware::class.':collaborator'])->group(function ()
 {
     Route::get('dashboard', [CollaboratorController::class, 'dashboard'])->name('collaborator.dashboard');
@@ -335,7 +336,7 @@ Route::get('/membership',[IndexController::class, 'membership'] )->name('members
 Route::post('/membership/store', [UserRegister::class, 'store']);
 Route::get('/auth', [LoginController::class, 'showLoginForm'])->name('auth');
 Route::post('/auth', [LoginController::class, 'signUp'])->name('auth.signup');
-Route::post('/login', [LoginController::class, 'login'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:5,1')->name('login');
 Route::get('/contact', [ContactController::class, 'index'] )->name('contact');
 Route::post('contact/store', [ContactController::class, 'store'])->name('contact.store');
 Route::post('/newsletter/subscribe', [ContactController::class, 'subscribe'])->name('newsletter.subscribe');
@@ -362,6 +363,9 @@ Route::post('/addtocart', [CartController::class, 'addToCart'])->name('cart.addt
 Route::post('/cart/update', [CartController::class, 'updateCart'])->name('cart.update');
 Route::post('/cart/remove', [CartController::class, 'removeFromCart'])->name('cart.remove');
 Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
+
+// Stripe webhook — outside auth middleware, CSRF exempted in bootstrap/app.php
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
 
 //checkout routes
 Route::get('/checkout/shipping', [CheckoutController::class, 'shipping'])->name('checkout.shipping');

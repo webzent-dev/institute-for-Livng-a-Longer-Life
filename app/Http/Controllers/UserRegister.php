@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\Membership;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use App\Mail\MemberSignupMail;
 use Stripe\Stripe;
 use Stripe\Charge;
@@ -29,12 +31,14 @@ class UserRegister extends Controller
             'last_name'  => $validated['last_name'],
             'email'      => $validated['email'],
             'phone'      => $validated['phone'],
-            'password'   => Hash::make($validated['password']),
+            'password'   => Hash::make(Str::random(32)),
         ]);
 
         if(!empty($request->email)){
+            $resetToken = Password::createToken($user);
+            $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);
             Mail::to($request->email)->send(
-                new MemberSignupMail($user, $validated['password'])
+                new MemberSignupMail($user, null, $resetUrl)
             );
         }
 

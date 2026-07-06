@@ -18,6 +18,7 @@ use App\Models\Testimonial;
 use App\Models\VideoTestimonial;
 use Auth;
 use App\Models\SiteSetting;
+use App\Services\StripeService;
 
 class IndexController extends Controller
 {
@@ -31,7 +32,7 @@ class IndexController extends Controller
             return [
                 'id' => $item->id,
                 'videoUrl' => $item->video_url,
-                'thumbnail' => env('APP_URL') . 'testimonial_images/'.$item->thumbnail,
+                'thumbnail' => rtrim(config('app.url'), '/') . '/testimonial_images/'.$item->thumbnail,
                 'quote' => $item->quote,
                 'name' => $item->name,
             ];
@@ -231,17 +232,7 @@ class IndexController extends Controller
 
     public function getTransactionDetail($request){
         /**********Get transaction detail start*****************/
-        //Get stripe secret key from database
-        $siteSettingDetail = SiteSetting::first();
-        if(!empty($siteSettingDetail->stripe_mode)){
-            if($siteSettingDetail->stripe_mode == 'sandbox'){
-                Stripe::setApiKey($siteSettingDetail->stripe_sandbox_secret);
-            }else{
-                Stripe::setApiKey($siteSettingDetail->stripe_production_secret);
-            }
-        }else{
-            Stripe::setApiKey(config('services.stripe.secret'));
-        }
+        StripeService::configure();
         $sessionId = $request->get('session_id');
         if(!empty($sessionId)){
             $session = \Stripe\Checkout\Session::retrieve($sessionId);

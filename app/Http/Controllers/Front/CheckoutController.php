@@ -11,10 +11,15 @@ use App\Models\OrderItem;
 use App\Models\SubOrder;
 use App\Models\SubOrderItem;
 use App\Models\UserAddress;
-use App\Services\ShippingService;
 use App\Services\AddressValidationService;
+use App\Services\OrderFulfilmentService;
+use App\Services\ShippingService;
+use App\Services\StripeService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use App\Mail\MemberSignupMail;
 use Stripe\Stripe;
 use Stripe\Charge;
@@ -33,11 +38,13 @@ class CheckoutController extends Controller
 {
     protected $shippingService;
     protected $addressValidationService;
+    protected $fulfilmentService;
 
-    public function __construct(ShippingService $shippingService, AddressValidationService $addressValidationService)
+    public function __construct(ShippingService $shippingService, AddressValidationService $addressValidationService, OrderFulfilmentService $fulfilmentService)
     {
         $this->shippingService = $shippingService;
         $this->addressValidationService = $addressValidationService;
+        $this->fulfilmentService = $fulfilmentService;
     }
     
     public function shipping()
@@ -119,14 +126,16 @@ class CheckoutController extends Controller
                         'last_name' => $request->last_name,
                         'email' => $request->email,
                         'phone' => $request->phone,
-                        'password' => bcrypt('12345678'),
+                        'password' => bcrypt(Str::random(32)),
                         'role' => 'user'
                     ];
                     $user = User::create($userData);
 
                     if(!empty($request->email)) {
+                        $resetToken = Password::createToken($user);
+                        $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);
                         Mail::to($request->email)->send(
-                            new MemberSignupMail($user, '12345678')
+                            new MemberSignupMail($user, null, $resetUrl)
                         );
                     }
                     /******Add user end*********/
@@ -469,133 +478,19 @@ class CheckoutController extends Controller
 
     public function success(Request $request)
     {
-        //get order detail
-        $order = Order::limit(1)->orderBy('id','desc')->first();
-        $orderItems = OrderItem::where('order_id', $order->id)->get();
-
-        //Update stock in products table
-        foreach($orderItems as $orderItem){
-            $product = Product::find($orderItem->product_id);
-            if($product){
-                $newStock = $product->stock - $orderItem->quantity;
-                $product->update([
-                    'stock' => $newStock
-                ]);
-            }
-        }
-
-        //Send email to user after successful payment
-        if(!empty($order->email)){
-            Mail::to($order->email)->send(
-                new OrderConfirmationMail($order, $orderItems)
-            );
-        }
-
-        //Send order notification to collaborator if collaborator product exist in orderitems
-        if(count($orderItems) > 0){
-            foreach($orderItems as $orderItem){
-                $product = Product::with('user')->where('id', $orderItem->product_id)->first();
-                //Check user is collaborator or not
-                if($product->user->role == 'collaborator'){
-                    $collaboratorName = $product->user->first_name.' '.$product->user->last_name;
-                    //Get collaboraotr products
-                    $collaboratorProducts = Product::where('user_id', $product->user->id)->get();
-
-                    $collaboratorProductIds = [];
-                    foreach($collaboratorProducts as $collaboratorProduct){
-                        $collaboratorProductIds[] = $collaboratorProduct->id;
-                    }
-
-                    if(!empty($product->user->email)){
-                        Mail::to($product->user->email)->send(
-                            new CollaboratorOrderNotification($order, $orderItems, $collaboratorProductIds, $collaboratorName)
-                        );
-                    }
-                }
-            }
-        }
-
-        //Send notification to admin
-        $adminDetail = User::where('role', 'admin')->first();
-        $adminEmail = $adminDetail ? $adminDetail->email : null;
-        if(!empty($adminEmail)){
-            Mail::to($adminEmail)->send(
-                new AdminOrderNotification($order, $orderItems)
-            );
-        }
-
-        /**********Get transaction detail start*****************/
-        //Stripe::setApiKey(config('services.stripe.secret'));
         $this->getStripeSecret();
         $sessionId = $request->get('session_id');
         $session = \Stripe\Checkout\Session::retrieve($sessionId);
-        $paymentIntent = PaymentIntent::retrieve($session->payment_intent);
-        //Get line items
-        $lineItems = \Stripe\Checkout\Session::allLineItems($sessionId);
-        $description = $lineItems->data[0]->description;
 
-        $data = [
-            'transaction_id' => $paymentIntent->id,
-            'description'    => $description,
-            'payment_method' => $paymentIntent->payment_method_types[0] ?? null,
-            'amount'         => $paymentIntent->amount / 100,
-            'currency'       => $paymentIntent->currency,
-            'status'         => $paymentIntent->status,
-        ];
+        $order = Order::findOrFail($session->metadata->order_id);
 
-        if($paymentIntent->status == 'succeeded'){
-            //Update order table
-            $order->update([
-                'payment_status'=>'completed'
-            ]);
+        if ($order->user_id !== null && Auth::check() && Auth::id() !== $order->user_id) {
+            abort(403);
         }
 
-        //Get card details
-        $paymentMethod = \Stripe\PaymentMethod::retrieve(
-            $paymentIntent->payment_method
-        );
-        $card = $paymentMethod->card;
-        $cardDetails = [
-            'brand' => $card->brand,
-            'last4' => $card->last4,
-            'exp_month' => $card->exp_month,
-            'exp_year' => $card->exp_year
-        ];
+        $orderItems = OrderItem::where('order_id', $order->id)->get();
 
-        //Get invoice details
-        $invoiceId = $session->invoice;
-        $invoice = \Stripe\Invoice::retrieve($invoiceId);
-        $invoiceDetails = [
-            'invoice_id' => $invoice->id,
-            'invoice_number' => $invoice->number,
-            'invoice_pdf' => $invoice->invoice_pdf
-        ];
-
-        //Get receipt details
-        $charge = \Stripe\Charge::retrieve($paymentIntent->latest_charge);
-        $receiptDetails = [
-            'receipt_url' => $charge->receipt_url
-        ];
-
-        //Get transaction detail
-        $paymentHistoryDetail = PaymentHistory::where('transaction_id', $data['transaction_id'])->first();
-        if(empty($paymentHistoryDetail)){
-            PaymentHistory::create([
-                'user_id' => $order->user_id,
-                'transaction_id' => $data['transaction_id'],
-                'description' => $data['description'],
-                'payment_method' => $data['payment_method'],
-                'amount' => $data['amount'],
-                'card_details' => json_encode($cardDetails),
-                'invoice_detail' => json_encode($invoiceDetails),
-                'receipt_detail' => json_encode($receiptDetails),
-                'payment_for' => 'order',
-                'status' => $data['status'],
-                'created_at' => Carbon::now()
-            ]);
-        }
-        /**********Get transaction detail end*****************/
-
+        $this->fulfilmentService->fulfil($order, $session);
 
         session()->forget('cart');
         session()->forget('checkout.shipping');
@@ -606,10 +501,18 @@ class CheckoutController extends Controller
         return view('front.checkout.success',compact('orderItems','order'));
     }
 
-    public function cancel()
+    public function cancel(Request $request)
     {
-        //get order detail
-        $order = Order::limit(1)->orderBy('id','desc')->first();
+        $this->getStripeSecret();
+        $sessionId = $request->get('session_id');
+        $session = \Stripe\Checkout\Session::retrieve($sessionId);
+
+        $order = Order::findOrFail($session->metadata->order_id);
+
+        if ($order->user_id !== null && Auth::check() && Auth::id() !== $order->user_id) {
+            abort(403);
+        }
+
         $orderItems = OrderItem::where('order_id', $order->id)->get();
 
         //Update order table
@@ -672,79 +575,83 @@ class CheckoutController extends Controller
         }
 
         $total = $subtotal + $totalShipping;
-        
-        // Create main order
-        $order = Order::create([
-            'order_number' => 'ORD_'.time(),
-            'user_id'=>auth()->id(),
-            'first_name'=>$shipping['first_name'],
-            'last_name'=>$shipping['last_name'],
-            'email'=>$shipping['email'],
-            'phone'=>$shipping['phone'],
-            'address_line_1'=>$shipping['address_line_1'],
-            'address_line_2'=>$shipping['address_line_2'] ?? null,
-            'city'=>$shipping['city'],
-            'state'=>$shipping['state'],
-            'zip_code'=>$shipping['zip_code'],
-            'country'=>$shipping['country'],
-            'payment_method'=>$payment['method'],
-            'subtotal'=>$subtotal,
-            'shipping_method' => 'split_shipping',
-            'shipping_cost'=>$totalShipping,
-            'tax' => 0,
-            'discount' => 0,
-            'total'=>$total,
-            'status' => 'pending',
-            'payment_status'=>'pending',
-            'shipping_address' => json_encode($shipping),
-            'billing_address' => json_encode($billing),
-            'notes' => $delivery['delivery_instructions'] ?? null
-        ]);
-
-        // Create order items and sub-orders
-        foreach($cart as $productId => $qty){
-            $product = Product::findOrFail($productId);
-            OrderItem::create([
-                'user_id'=>auth()->id(),
-                'order_id'=>$order->id,
-                'product_id'=>$productId,
-                'product_name' => $product->name,
-                'quantity'=>$qty,
-                'price'=>$product->price,
-                'total' => $product->price * $qty
-            ]);
-        }
-
-        // Create sub-orders for each seller
-        $this->createSubOrders($order, $cart, $shippingQuotes, $shipping);
 
         /************Stripe payment start here****************/
-        //Stripe::setApiKey(config('services.stripe.secret'));
-        $this->getStripeSecret();
-        $session = \Stripe\Checkout\Session::create([
-            'payment_method_types' => ['card'],
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'usd',
-                    'product_data' => [
-                        'name' => 'Order #' . $order->order_number,
-                        'description' => 'Order #' . $order->order_number
+        $stripeUrl = DB::transaction(function () use ($cart, $shipping, $delivery, $payment, $billing, $totalShipping, $shippingQuotes, $subtotal, $total) {
+            // Create main order
+            $order = Order::create([
+                'order_number' => 'ORD_'.time(),
+                'user_id'=>auth()->id(),
+                'first_name'=>$shipping['first_name'],
+                'last_name'=>$shipping['last_name'],
+                'email'=>$shipping['email'],
+                'phone'=>$shipping['phone'],
+                'address_line_1'=>$shipping['address_line_1'],
+                'address_line_2'=>$shipping['address_line_2'] ?? null,
+                'city'=>$shipping['city'],
+                'state'=>$shipping['state'],
+                'zip_code'=>$shipping['zip_code'],
+                'country'=>$shipping['country'],
+                'payment_method'=>$payment['method'],
+                'subtotal'=>$subtotal,
+                'shipping_method' => 'split_shipping',
+                'shipping_cost'=>$totalShipping,
+                'tax' => 0,
+                'discount' => 0,
+                'total'=>$total,
+                'status' => 'pending',
+                'payment_status'=>'pending',
+                'shipping_address' => json_encode($shipping),
+                'billing_address' => json_encode($billing),
+                'notes' => $delivery['delivery_instructions'] ?? null
+            ]);
+
+            // Create order items and sub-orders
+            foreach($cart as $productId => $qty){
+                $product = Product::findOrFail($productId);
+                OrderItem::create([
+                    'user_id'=>auth()->id(),
+                    'order_id'=>$order->id,
+                    'product_id'=>$productId,
+                    'product_name' => $product->name,
+                    'quantity'=>$qty,
+                    'price'=>$product->price,
+                    'total' => $product->price * $qty
+                ]);
+            }
+
+            // Create sub-orders for each seller
+            $this->createSubOrders($order, $cart, $shippingQuotes, $shipping);
+
+            //Stripe::setApiKey(config('services.stripe.secret'));
+            $this->getStripeSecret();
+            $session = \Stripe\Checkout\Session::create([
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => 'usd',
+                        'product_data' => [
+                            'name' => 'Order #' . $order->order_number,
+                            'description' => 'Order #' . $order->order_number
+                        ],
+                        'unit_amount' => (int)($total * 100), // Dynamic total in cents
                     ],
-                    'unit_amount' => (int)($total * 100), // Dynamic total in cents
+                    'quantity' => 1,
+                ]],
+                'mode' => 'payment',
+                'invoice_creation' => [
+                    'enabled' => true
                 ],
-                'quantity' => 1,
-            ]],
-            'mode' => 'payment',
-            'invoice_creation' => [
-                'enabled' => true
-            ],
-            'success_url' => route('checkout.payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => route('checkout.payment.cancel'),
-            'metadata' => [
-                'order_id' => $order->id // Useful for webhooks later
-            ]
-        ]);
-        return redirect($session->url, 303);
+                'success_url' => route('checkout.payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => route('checkout.payment.cancel') . '?session_id={CHECKOUT_SESSION_ID}',
+                'metadata' => [
+                    'order_id' => $order->id // Useful for webhooks later
+                ]
+            ]);
+
+            return $session->url;
+        });
+        return redirect($stripeUrl, 303);
         /************Stripe payment end here*****************/
     }
 
@@ -819,17 +726,7 @@ class CheckoutController extends Controller
 
     public function getStripeSecret()
     {
-        //Get stripe secret key from database
-        $siteSettingDetail = SiteSetting::first();
-        if(!empty($siteSettingDetail->stripe_mode)){
-            if($siteSettingDetail->stripe_mode == 'sandbox'){
-                Stripe::setApiKey($siteSettingDetail->stripe_sandbox_secret);
-            }else{
-                Stripe::setApiKey($siteSettingDetail->stripe_production_secret);
-            }
-        }else{
-            Stripe::setApiKey(config('services.stripe.secret'));
-        }
+        StripeService::configure();
     }
-    
+
 }

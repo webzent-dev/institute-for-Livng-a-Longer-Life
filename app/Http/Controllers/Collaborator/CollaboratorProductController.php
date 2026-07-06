@@ -74,21 +74,29 @@ class CollaboratorProductController extends Controller
             return redirect()->back()->with('error',$validator)->withInput();
         }*/
 
+        $request->validate([
+            'product_name'     => 'required|string|max:255',
+            'product_type'     => 'required|string',
+            'price'            => 'required|numeric|min:0',
+            'stock_quantity'   => 'required|integer|min:0',
+            'product_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ]);
+
         //Add validation for check slug
         $slug = Str::slug($request->product_name);
         $slugCount = Product::where('slug', $slug)->count();
-        
+
         //Add validation for check SKU
         $skuCount = Product::where('sku', $request->sku)->count();
-        
+
         if($slugCount > 0){
             return redirect()->back()->with('error', 'Product with the same name & slug already exists. Please choose a different name.')->withInput();
         }
-        
+
         if($skuCount > 0){
             return redirect()->back()->with('error', 'Product with the same SKU already exists. Please choose a different SKU.')->withInput();
         }
-        
+
         if($slugCount == 0 && $skuCount == 0){
             $product = Product::create([
                 'user_id' => Auth::id(),
@@ -142,7 +150,7 @@ class CollaboratorProductController extends Controller
 
     public function edit($id)
     {
-        $productDetail = Product::findOrFail($id);
+        $productDetail = Product::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
         //Product images
         $productImages = ProductImage::where('product_id', $id)->get();
@@ -152,7 +160,7 @@ class CollaboratorProductController extends Controller
 
     public function show($id)
     {
-        $productDetail = Product::findOrFail($id);
+        $productDetail = Product::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
         //Product images
         $productImages = ProductImage::where('product_id', $id)->get();
@@ -162,7 +170,7 @@ class CollaboratorProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
         /*
         $request->validate([
@@ -188,10 +196,18 @@ class CollaboratorProductController extends Controller
             $product->image = $imageName;
         }*/
 
+        $request->validate([
+            'product_name'     => 'required|string|max:255',
+            'product_type'     => 'required|string',
+            'price'            => 'required|numeric|min:0',
+            'stock_quantity'   => 'required|integer|min:0',
+            'product_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ]);
+
         //Add validation for check slug
         $slug = Str::slug($request->product_name);
         $slugCount = Product::where('slug', $slug)->where('id', '!=', $id)->count();
-        
+
         //Add validation for check SKU
         $skuCount = Product::where('sku', $request->sku)->where('id', '!=', $id)->count();
         
@@ -252,7 +268,7 @@ class CollaboratorProductController extends Controller
 
    public function destroy($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
         //echo '<pre>';print_r($product);exit;
 
         //Delete image from product_images folder
@@ -270,7 +286,7 @@ class CollaboratorProductController extends Controller
             'status' => 'required|in:active,inactive'
         ]);
 
-        $product = Product::findOrFail($id);
+        $product = Product::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
         $product->status = $request->status;
         $product->save();
 
@@ -280,6 +296,9 @@ class CollaboratorProductController extends Controller
     public function removeImage(Request $request)
     {
         $image = ProductImage::findOrFail($request->image_id);
+        if ($image->product->user_id !== Auth::id()) {
+            abort(404);
+        }
         if ($image->image && file_exists(public_path('product_images/'.$image->image))) {
             unlink(public_path('product_images/'.$image->image));
         }
