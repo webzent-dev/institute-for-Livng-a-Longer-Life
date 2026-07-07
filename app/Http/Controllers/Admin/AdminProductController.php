@@ -42,53 +42,6 @@ class AdminProductController extends Controller
 
     public function store(Request $request)
     {
-        /*
-        $request->validate([
-            'category' => 'nullable|string',
-            'product_type' => 'required|string|max:255',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric',
-            //'discounted_price' => 'nullable|numeric',
-            //'original_price' => 'nullable|numeric',
-            //'rating' => 'nullable|string',
-            //'reviews' => 'nullable|string',
-            'stock_quantity' => 'required|integer',
-            'product_images.*' => 'required|image|mimes:jpg,jpeg,png|max:5120', // 5MB each
-        ]);
-        */
-
-        /*$imageName = null;
-        if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('product_images'), $imageName);
-        }*/
-
-        /*$validator = Validator::make(
-            [
-                'category'  => $request->category,
-                'product_type'  => $request->product_type,
-                'name'  => $request->name,
-                'description'  => $request->description,
-                'price'  => $request->price,
-                'stock_quantity'  => $request->stock_quantity,
-                'product_images.*'  => $request->product_images
-            ], 
-            [
-                'category' => 'required',
-                'product_type' => 'required',
-                'name' => 'required|string',
-                'description' => 'required|string',
-                'price' => 'required|numeric',
-                'stock_quantity' => 'required|integer',
-                'product_images.*' => 'required|image|mimes:jpg,jpeg,png|max:5120', // 5MB each
-            ]
-        );
-
-        if ($validator->fails()) {
-            return redirect()->back()->with('error',$validator)->withInput();
-        }*/
-
         $request->validate([
             'product_name'     => 'required|string|max:255',
             'product_type'     => 'required|string',
@@ -135,7 +88,7 @@ class AdminProductController extends Controller
                 $i = 1;
                 foreach ($request->file('product_images') as $image) {
                     // Generate unique filename
-                    $imageName = time().'_'.Str::random(10).'.'.$image->getClientOriginalExtension();
+                    $imageName = time().'_'.Str::random(10).'.'.$image->extension();
 
                     // Store image
                     //$image->storeAs('public/product_images', $imageName);
@@ -253,7 +206,7 @@ class AdminProductController extends Controller
                 $i = 1;
                 foreach ($request->file('product_images') as $image) {
                     // Generate unique filename
-                    $imageName = time().'_'.Str::random(10).'.'.$image->getClientOriginalExtension();
+                    $imageName = time().'_'.Str::random(10).'.'.$image->extension();
 
                     // Store image
                     //$image->storeAs('public/product_images', $imageName);
