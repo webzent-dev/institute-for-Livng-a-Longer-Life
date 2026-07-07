@@ -47,27 +47,32 @@
                     {{-- Modal Form --}}
                     <x-ui.modal name="add-testimonial-modal" title="Add New Testimonial" size="md" class="max-w-2xl overflow-y-auto scrollbar-custom ">
                         <h2 class="text-lg font-semibold leading-none tracking-tight mb-2 text-left">Add Testimonial</h2>
-                        <form method="POST" class="space-y-3 overflow-y-auto scrollbar-custom max-h-[60vh] scroll-smooth px-5" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('testimonials.store') }}" class="space-y-3 overflow-y-auto scrollbar-custom max-h-[60vh] scroll-smooth px-5">
                             @csrf
                             <div class="grid grid-cols-2 gap-4 mt-3">
                                 <div class="space-y-2">
                                     <x-form.input label="Name" type="text" name="name" id="name" autocomplete="off" placeholder="Enter Name*" required />
                                 </div>
                                 <div class="space-y-2">
-                                    <x-form.input label="Age" type="number" name="age" id="age" autocomplete="off" placeholder="Enter Age*" required />
+                                    <x-form.input label="Location" type="text" name="location" id="location" autocomplete="off" placeholder="Enter Location" />
                                 </div>
-                                <div class="space-y-2">
-                                    <x-form.input label="Location" type="text" name="location" id="location" autocomplete="off" placeholder="Enter Location*" required />
-                                </div>
-                                <div class="space-y-2">
-                                    <x-form.input label="Rating" type="number" name="rating" id="rating" autocomplete="off" placeholder="Enter Rating*" required />
+                            </div>
+                            <div class="space-y-2" x-data="{ rating: 5, hover: 0 }">
+                                <label class="block text-[14px] font-medium text-foreground text-left">Rating</label>
+                                <div class="flex items-center gap-1">
+                                    <template x-for="star in 5" :key="star">
+                                        <button type="button" @click="rating = star" @mouseenter="hover = star" @mouseleave="hover = 0" class="focus:outline-none">
+                                            <svg class="w-7 h-7 transition-colors" :class="(hover ? star <= hover : star <= rating) ? 'text-yellow-400' : 'text-gray-300'" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M12 2l2.9 6.26L21.6 9l-4.8 4.68L18 21l-6-3.27L6 21l1.2-7.32L2.4 9l6.7-.74L12 2z"/>
+                                            </svg>
+                                        </button>
+                                    </template>
+                                    <input type="hidden" name="rating" :value="rating">
+                                    <span class="ml-2 text-sm text-muted-foreground" x-text="rating + ' / 5'"></span>
                                 </div>
                             </div>
                             <div class="space-y-2">
-                                <x-form.input label="Quote" type="text" name="quote" id="quote" autocomplete="off" placeholder="Enter Quote*" required />
-                            </div>
-                            <div class="space-y-2">
-                                <x-form.input label="Result" type="text" name="result" id="result" autocomplete="off" placeholder="Enter Result*" required />
+                                <x-form.input label="Quote" type="text" name="quote" id="quote" autocomplete="off" placeholder="Enter Quote" />
                             </div>
                             <x-button-use label="Add Testimonial" type="submit" variant="primary" class="w-full"/>
                         </form>
@@ -104,7 +109,6 @@
                                             <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Location</th>
                                             <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Rating</th>
                                             <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Quote</th>
-                                            <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Result</th>
                                             <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
                                             <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
                                         </tr>
@@ -121,7 +125,6 @@
                                             <td class="p-4 align-middle">{{ $testimonial->location ?? '-'}}</td>
                                             <td class="p-4 align-middle">{{$testimonial->rating ?? '-'}}</td>
                                             <td class="p-4 align-middle">{{$testimonial->quote ?? '-'}}</td>
-                                            <td class="p-4 align-middle">{{$testimonial->result ?? '-'}}</td>
                                             <td class="p-4 align-middle">
                                                 <div 
                                                     class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-primary text-primary-foreground cursor-pointer status-badge {{ $testimonial->is_active == 1 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}"

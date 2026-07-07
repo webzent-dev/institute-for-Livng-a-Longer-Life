@@ -34,15 +34,6 @@
                                     </p>
                                 </div>
 
-                                {{-- Result --}}
-                                @if($testimonial->result)
-                                <div class="p-3 bg-primary/10 rounded-lg border border-primary/20">
-                                    <p class="text-sm font-semibold text-primary">
-                                        Result: {{ $testimonial->result }}
-                                    </p>
-                                </div>
-                                @endif
-
                                 {{-- Author --}}
                                 <div class="flex items-center space-x-3 pt-4 border-t border-border">
                                     <x-ui.avatar name="{{ $testimonial->name }}"  size="3" />

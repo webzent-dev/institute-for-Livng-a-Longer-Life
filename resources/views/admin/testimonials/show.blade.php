@@ -86,19 +86,24 @@
                             <x-form.input label="Name" type="text" name="name" value="{{ $testimonialDetail->name }}" placeholder="Enter Name*" autocomplete="off" required  />
                         </div>
                         <div class="space-y-2">
-                            <x-form.input label="Age" type="number" name="age" value="{{ $testimonialDetail->age }}" placeholder="Enter Age*" autocomplete="off" required  />
+                            <x-form.input label="Location" type="text" name="location" value="{{ $testimonialDetail->location }}" placeholder="Enter Location" autocomplete="off" />
+                        </div>
+                        <div class="space-y-2" x-data="{ rating: {{ (int) ($testimonialDetail->rating ?? 5) }}, hover: 0 }">
+                            <label class="block text-[14px] font-medium text-foreground text-left">Rating</label>
+                            <div class="flex items-center gap-1">
+                                <template x-for="star in 5" :key="star">
+                                    <button type="button" @click="rating = star" @mouseenter="hover = star" @mouseleave="hover = 0" class="focus:outline-none">
+                                        <svg class="w-7 h-7 transition-colors" :class="(hover ? star <= hover : star <= rating) ? 'text-yellow-400' : 'text-gray-300'" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 2l2.9 6.26L21.6 9l-4.8 4.68L18 21l-6-3.27L6 21l1.2-7.32L2.4 9l6.7-.74L12 2z"/>
+                                        </svg>
+                                    </button>
+                                </template>
+                                <input type="hidden" name="rating" :value="rating">
+                                <span class="ml-2 text-sm text-muted-foreground" x-text="rating + ' / 5'"></span>
+                            </div>
                         </div>
                         <div class="space-y-2">
-                            <x-form.input label="Location" type="text" name="location" value="{{ $testimonialDetail->location }}" placeholder="Enter Location*" autocomplete="off" required  />
-                        </div>
-                        <div class="space-y-2">
-                            <x-form.input label="Rating" type="number" name="rating" value="{{ $testimonialDetail->rating }}" placeholder="Enter Rating*" autocomplete="off" required  />
-                        </div>
-                        <div class="space-y-2">
-                            <x-form.input label="Quote" type="text" name="quote" value="{{ $testimonialDetail->quote }}" placeholder="Enter Quote*" autocomplete="off" required  />
-                        </div>
-                        <div class="space-y-2">
-                            <x-form.input label="Result" type="text" name="result" value="{{ $testimonialDetail->result }}" placeholder="Enter Result*" autocomplete="off" required  />
+                            <x-form.input label="Quote" type="text" name="quote" value="{{ $testimonialDetail->quote }}" placeholder="Enter Quote" autocomplete="off" />
                         </div>
                         <div class="space-y-2 z-0">
                             <x-form.select label="Status*" name="is_active" placeholder="Select Status" required
