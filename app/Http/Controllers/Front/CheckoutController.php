@@ -693,6 +693,7 @@ class CheckoutController extends Controller
                 'destination_address' => $shippingAddress,
                 'carrier' => $quote['selected_rate']['provider'] ?? 'USPS',
                 'service_level' => $quote['selected_rate']['service'] ?? 'Standard',
+                'shippo_rate_id' => $quote['selected_rate']['rate_id'] ?? null,
                 'weight' => $quote['package_details']['weight'] ?? 0,
                 'package_dimensions' => $quote['package_details'],
             ]);

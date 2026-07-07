@@ -98,13 +98,23 @@ class LoginController extends Controller
 
         $credentials = $request->only('email', 'password');
         $adminLogin = Auth::attempt(array_merge($credentials, [
-            'role' => 'admin'
+            'role' => 'admin',
+            'status' => 'active', // <-- only active admins
         ]));
 
         if ($adminLogin) {
             $request->session()->regenerate();
             return redirect()->route('admin.dashboard')->with('success', 'Welcome Admin! Login successful.');
         }
+
+        $user = \App\Models\User::where('email', $request->email)
+            ->where('role', 'admin')
+            ->first();
+
+        if ($user && $user->status !== 'active') {
+            return back()->with('error', 'Your account is inactive. Please contact the system administrator.')->withInput();
+        }
+
         return back()->with('error', 'Invalid credentials or enter valid  credentials.')->withInput();
     }
 

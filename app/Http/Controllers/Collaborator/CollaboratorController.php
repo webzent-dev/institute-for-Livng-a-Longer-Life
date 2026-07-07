@@ -18,6 +18,7 @@ use App\Models\SubOrderItem;
 use App\Models\CollaboratorBusinessDetails;
 use App\Models\CollaboratorBankDetails;
 use App\Services\ShippingService;
+use App\Services\ShippoService;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -332,6 +333,77 @@ class CollaboratorController extends Controller
         }
 
         return redirect()->back()->with('success', 'Sub-order status has been updated successfully.');
+    }
+
+    /**
+     * Generate a Shippo shipping label for the sub-order.
+     */
+    public function generateShippingLabel(Request $request, string $id)
+    {
+        $subOrder = SubOrder::where('id', $id)
+            ->where('seller_id', Auth::id())
+            ->firstOrFail();
+
+        // Don't regenerate if label already exists
+        if ($subOrder->label_url) {
+            return redirect()->back()->with('error',
+                'Label already generated. Download it below.');
+        }
+
+        // Must have a Shippo rate ID
+        if (!$subOrder->shippo_rate_id) {
+            return redirect()->back()->with('error',
+                'No shipping rate available. Please contact support.');
+        }
+
+        try {
+            $shippoService = app(ShippoService::class);
+            $transaction = $shippoService->purchaseLabel($subOrder->shippo_rate_id);
+
+            if (isset($transaction['status']) && $transaction['status'] === 'SUCCESS') {
+                $subOrder->update([
+                    'shippo_transaction_id' => $transaction['object_id'] ?? null,
+                    'label_url' => $transaction['label_url'] ?? null,
+                    'label_pdf_url' => $transaction['label_url'] ?? null,
+                    'tracking_number' => $transaction['tracking_number'] ?? $subOrder->tracking_number,
+                    'carrier' => $transaction['rate']['provider'] ?? $subOrder->carrier,
+                    'label_created_at' => now(),
+                ]);
+
+                return redirect()->back()->with('success',
+                    'Shipping label generated successfully!');
+            }
+
+            // Shippo returned an error
+            $errorMsg = '';
+            if (isset($transaction['messages'])) {
+                $errorMsg = collect($transaction['messages'])->pluck('text')->implode(', ');
+            }
+            return redirect()->back()->with('error',
+                'Label generation failed: ' . ($errorMsg ?: 'Unknown error'));
+
+        } catch (\Exception $e) {
+            \Log::error('Label generation failed: ' . $e->getMessage());
+            return redirect()->back()->with('error',
+                'Label generation failed. Please try again.');
+        }
+    }
+
+    /**
+     * Redirect to the label PDF for download.
+     */
+    public function downloadLabel(string $id)
+    {
+        $subOrder = SubOrder::where('id', $id)
+            ->where('seller_id', Auth::id())
+            ->firstOrFail();
+
+        if (!$subOrder->label_pdf_url) {
+            return redirect()->back()->with('error',
+                'No label available for download.');
+        }
+
+        return redirect($subOrder->label_pdf_url);
     }
 
     public function orderDetails($id)

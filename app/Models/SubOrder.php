@@ -29,6 +29,11 @@ class SubOrder extends Model
         'weight',
         'package_dimensions',
         'notes',
+        'shippo_rate_id',
+        'shippo_transaction_id',
+        'label_url',
+        'label_pdf_url',
+        'label_created_at',
     ];
 
     protected $casts = [
@@ -41,6 +46,7 @@ class SubOrder extends Model
         'tax' => 'decimal:2',
         'total' => 'decimal:2',
         'weight' => 'decimal:2',
+        'label_created_at' => 'datetime',
     ];
 
     public function order()
