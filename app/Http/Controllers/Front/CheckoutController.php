@@ -468,7 +468,18 @@ class CheckoutController extends Controller
         }
 
         $cartItems = $this->getCartTotal();
-        return view('front.checkout.review', compact('cartItems'));
+
+        // Member discount preview (institute products only)
+        $instituteSubtotal = 0;
+        foreach($cart as $productId => $qty){
+            $product = Product::find($productId);
+            if($product && $product->category !== 'collaborator'){
+                $instituteSubtotal += $product->price * $qty;
+            }
+        }
+        $memberDiscount = $this->calculateMemberDiscount($instituteSubtotal);
+
+        return view('front.checkout.review', compact('cartItems', 'memberDiscount'));
     }
 
     public function thankyou()
@@ -550,6 +561,33 @@ class CheckoutController extends Controller
         return $cartItems;
     }
 
+    /**
+     * Calculate the logged-in member's discount on institute (non-collaborator) products.
+     * Standard 5%, Premium 10%, Lifetime 20% — only while the membership is active.
+     */
+    private function calculateMemberDiscount(float $instituteSubtotal): float
+    {
+        if (!Auth::check() || $instituteSubtotal <= 0) {
+            return 0;
+        }
+
+        $user = Auth::user();
+        $discountPercent = match(strtolower($user->plan_name ?? '')) {
+            'standard' => 5,
+            'premium' => 10,
+            'lifetime' => 20,
+            default => 0,
+        };
+
+        if ($discountPercent > 0
+            && !empty($user->plan_expiry)
+            && \Carbon\Carbon::parse($user->plan_expiry)->isFuture()) {
+            return round($instituteSubtotal * ($discountPercent / 100), 2);
+        }
+
+        return 0;
+    }
+
     public function placeOrder(Request $request)
     {
         //Add check if cart is empty then redirect to cart page
@@ -569,15 +607,24 @@ class CheckoutController extends Controller
         
         // Calculate order totals
         $subtotal = 0;
+        $instituteSubtotal = 0;
         foreach($cart as $productId => $qty){
             $product = Product::findOrFail($productId);
-            $subtotal += $product->price * $qty;
+            $lineTotal = $product->price * $qty;
+            $subtotal += $lineTotal;
+            // Institute products are everything that is not a collaborator product
+            if($product->category !== 'collaborator'){
+                $instituteSubtotal += $lineTotal;
+            }
         }
 
-        $total = $subtotal + $totalShipping;
+        // Apply membership tier discount on institute products only
+        $discount = $this->calculateMemberDiscount($instituteSubtotal);
+
+        $total = $subtotal + $totalShipping - $discount;
 
         /************Stripe payment start here****************/
-        $stripeUrl = DB::transaction(function () use ($cart, $shipping, $delivery, $payment, $billing, $totalShipping, $shippingQuotes, $subtotal, $total) {
+        $stripeUrl = DB::transaction(function () use ($cart, $shipping, $delivery, $payment, $billing, $totalShipping, $shippingQuotes, $subtotal, $discount, $total) {
             // Create main order
             $order = Order::create([
                 'order_number' => 'ORD_'.time(),
@@ -597,7 +644,7 @@ class CheckoutController extends Controller
                 'shipping_method' => 'split_shipping',
                 'shipping_cost'=>$totalShipping,
                 'tax' => 0,
-                'discount' => 0,
+                'discount' => $discount,
                 'total'=>$total,
                 'status' => 'pending',
                 'payment_status'=>'pending',

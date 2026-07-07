@@ -32,6 +32,20 @@
             <span class="font-medium capitalize">{{ ucfirst($order->payment_status) }}</span>
           </div>
           <div class="flex justify-between">
+            <span class="text-gray-600">Subtotal:</span>
+            <span class="font-medium">${{ number_format($order->subtotal ?? 0, 2) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Shipping:</span>
+            <span class="font-medium">${{ number_format($order->shipping_cost ?? 0, 2) }}</span>
+          </div>
+          @if(($order->discount ?? 0) > 0)
+          <div class="flex justify-between">
+            <span class="text-gray-600">Member Discount:</span>
+            <span class="font-medium text-green-600">-${{ number_format($order->discount, 2) }}</span>
+          </div>
+          @endif
+          <div class="flex justify-between border-t border-gray-200 pt-3">
             <span class="text-gray-600">Total:</span>
             <span class="font-medium">${{ number_format($order->total, 2) }}</span>
           </div>
