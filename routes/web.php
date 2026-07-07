@@ -374,8 +374,8 @@ Route::get('/checkout/delivery', [CheckoutController::class, 'delivery'])->name(
 Route::post('/checkout/delivery', [CheckoutController::class, 'deliveryStore'])->name('checkout.delivery.store');
 Route::get('/checkout/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
 Route::post('/checkout/payment', [CheckoutController::class, 'paymentStore'])->name('checkout.payment.store');
-Route::get('/chekcout/review', [CheckoutController::class, 'review'])->name('checkout.review');
-Route::post('/chekcout/order', [CheckoutController::class, 'placeOrder'])->name('checkout.place-order');
+Route::get('/checkout/review', [CheckoutController::class, 'review'])->name('checkout.review');
+Route::post('/checkout/order', [CheckoutController::class, 'placeOrder'])->name('checkout.place-order');
 Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.payment.success');
 Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.payment.cancel');
 

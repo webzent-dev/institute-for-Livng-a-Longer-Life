@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use App\Mail\MemberSignupMail;
 use App\Models\PaymentHistory;
 use Illuminate\Database\QueryException;
@@ -81,7 +83,7 @@ class UserController extends Controller
             'email' => $request->email,
             'role' => $request->role,
             'status' => $request->status,
-            'password' => bcrypt('12345678'), // Set a default password or generate one
+            'password' => bcrypt(Str::random(32)),
         ]);
 
         if($request->role == 'collaborator') {
@@ -92,8 +94,10 @@ class UserController extends Controller
             }
         } else {
             if(!empty($request->email)) {
+                $resetToken = Password::createToken($user);
+                $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);
                 Mail::to($request->email)->send(
-                    new MemberSignupMail($user, '12345678')
+                    new MemberSignupMail($user, $resetUrl)
                 );
             }
         }

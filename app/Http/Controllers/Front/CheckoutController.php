@@ -135,7 +135,7 @@ class CheckoutController extends Controller
                         $resetToken = Password::createToken($user);
                         $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);
                         Mail::to($request->email)->send(
-                            new MemberSignupMail($user, null, $resetUrl)
+                            new MemberSignupMail($user, $resetUrl)
                         );
                     }
                     /******Add user end*********/

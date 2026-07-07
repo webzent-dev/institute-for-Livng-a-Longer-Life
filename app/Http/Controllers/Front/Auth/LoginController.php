@@ -146,7 +146,7 @@ class LoginController extends Controller
             'first_name' => !empty($request->first_name)?$request->first_name:'',
             'last_name' => !empty($request->last_name)?$request->last_name:'',
             'email' => !empty($request->email)?$request->email:'',
-            'password' => !empty($request->password)?bcrypt($request->password) : '',
+            'password' => bcrypt(\Illuminate\Support\Str::random(32)),
             'confirm_password' => !empty($request->confirm_password)?$request->confirm_password:'',
             'phone' => !empty($request->phone)?$request->phone:'',
             'role' => 'user',
@@ -183,8 +183,10 @@ class LoginController extends Controller
 
         $user = User::create($singupData);
         if(!empty($singupData['email'])){
+            $resetToken = \Illuminate\Support\Facades\Password::createToken($user);
+            $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);
             Mail::to($singupData['email'])->send(
-                new MemberSignupMail($user, $request->password)
+                new MemberSignupMail($user, $resetUrl)
             );
         }
 
