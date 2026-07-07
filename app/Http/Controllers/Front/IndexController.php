@@ -298,6 +298,12 @@ class IndexController extends Controller
                         'status' => 'active'
                     ]);
                 }
+
+                // Assign a unique membership number on first membership purchase
+                if (empty($user->membership_number)) {
+                    $user->membership_number = User::generateMembershipNumber();
+                    $user->save();
+                }
             }
     
             //Get card details

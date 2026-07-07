@@ -227,6 +227,47 @@
         </div>
     </div>
 
+    <!-- Standard Process Store -->
+    @if(auth()->user()->membership_number)
+        @php
+            $discountMap = [
+                'standard' => '5%',
+                'premium' => '10%',
+                'lifetime' => '20%',
+            ];
+            $tier = strtolower(auth()->user()->plan_name ?? '');
+            $discount = $discountMap[$tier] ?? '0%';
+            $storeUrl = config('services.standard_process.store_url');
+        @endphp
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm mt-4 p-6">
+            <div class="flex gap-2 mb-4">
+                <i data-lucide="shopping-bag" class="h-5 w-5 text-primary mt-1"></i>
+                <h2 class="text-2xl font-semibold text-left">Standard Process Store</h2>
+            </div>
+            <p class="text-sm text-muted-foreground mb-2">
+                Your exclusive discount code for the Standard Process store:
+            </p>
+            <div class="bg-gray-100 rounded-lg p-4 text-center mb-4">
+                <span class="text-2xl font-mono font-bold tracking-wider">
+                    {{ auth()->user()->membership_number }}
+                </span>
+            </div>
+            <p class="text-sm text-muted-foreground mb-4">
+                Your {{ ucfirst($tier) ?: 'membership' }} membership gives you
+                <strong>{{ $discount }} off</strong> all Standard Process products.
+            </p>
+            @if(!empty($storeUrl))
+                <a href="{{ rtrim($storeUrl, '/') }}/discount/{{ auth()->user()->membership_number }}?redirect=/collections/all"
+                   target="_blank"
+                   class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm h-10 px-6 py-2">
+                    Shop Standard Process
+                </a>
+            @else
+                <p class="text-xs text-muted-foreground">Store link coming soon.</p>
+            @endif
+        </div>
+    @endif
+
     <!-- Getting Started -->
     <div class="rounded-lg border bg-card text-card-foreground shadow-sm mt-4 ">
         <div class="flex flex-col space-y-1.5 p-6 text-left">

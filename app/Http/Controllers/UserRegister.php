@@ -31,6 +31,10 @@ class UserRegister extends Controller
             'password'   => Hash::make(Str::random(32)),
         ]);
 
+        $user->update([
+            'membership_number' => User::generateMembershipNumber(),
+        ]);
+
         if(!empty($request->email)){
             $resetToken = Password::createToken($user);
             $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);

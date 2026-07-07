@@ -49,4 +49,12 @@ return [
         'mode'           => env('STRIPE_MODE', 'live'),
     ],
 
+    'shopify_app' => [
+        'api_key' => env('SHOPIFY_APP_API_KEY'),
+    ],
+
+    'standard_process' => [
+        'store_url' => env('STANDARD_PROCESS_STORE_URL'),
+    ],
+
 ];
