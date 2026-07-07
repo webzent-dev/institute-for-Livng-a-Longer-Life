@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use App\Mail\MemberSignupMail;
 use App\Models\User;
 
@@ -118,38 +119,6 @@ class LoginController extends Controller
         return back()->with('error', 'Invalid credentials or enter valid  credentials.')->withInput();
     }
 
-
-    /*public function collaboratorLogin(Request $request)
-    {
-        $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
-
-        $credentials = $request->only('email', 'password');
-        $collaboratorLogin = Auth::attempt(array_merge($credentials, [
-            'role' => 'collaborator',
-            'status' => 'active', // <-- only active collaborators
-        ]));
-
-        if ($collaboratorLogin) {
-            $request->session()->regenerate();
-            return redirect()->route('collaborator.dashboard')
-            ->with('success', 'Welcome Collaborator! Login successful.');
-        }
-
-        $user = \App\Models\User::where('email', $request->email)
-        ->where('role', 'collaborator')
-        ->first();
-
-        if ($user && $user->status !== 'active') {
-            return back()->with('error', 'Your account is inactive. Please wait for admin to activate it.')->withInput();
-        }
-
-        // If credentials are completely wrong
-        return back()->with('error', 'Invalid credentials.')->withInput();
-    }*/
-
     public function signUp(Request $request)
     {
         $singupData = [
@@ -163,20 +132,20 @@ class LoginController extends Controller
             'status' => 'inactive',
         ];
 
+        // Password is generated server-side (Str::random) and set by the member via the
+        // reset link, so the submitted password is not validated or used here.
         $validator = Validator::make(
             [
                 'first_name'      =>  $singupData['first_name'],
                 'last_name'  =>  $singupData['last_name'],
                 'email'   =>  $singupData['email'],
-                'password' => $singupData['password'],
                 'phone'  =>  $singupData['phone'],
                 'role'  =>  $singupData['role'],
             ],
             [
                 'first_name'  =>  'required|string',
                 'last_name'  =>  'required|string',
-                'email'  =>  'required|email',
-                'password'  =>  'required|string|min:8|confirmed',
+                'email'  =>  'required|email|unique:users,email',
                 'phone'  =>  'required',
                 'role'  =>  'required',
             ]

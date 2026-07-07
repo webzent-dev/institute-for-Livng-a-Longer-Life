@@ -49,7 +49,7 @@
                                     <div>
                                         <p class="font-semibold text-foreground">{{ $testimonial->name }}</p>
                                         <p class="text-sm text-muted-foreground">
-                                            Age {{ $testimonial->age }} • {{ $testimonial->location }}
+                                            {{ $testimonial->location }}
                                         </p>
                                     </div>
                                 </div>

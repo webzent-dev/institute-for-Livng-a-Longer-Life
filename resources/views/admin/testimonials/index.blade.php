@@ -101,7 +101,6 @@
                                     <thead class="[&_tr]:border-b">
                                         <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                                             <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Name</th>
-                                            <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Age</th>
                                             <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Location</th>
                                             <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Rating</th>
                                             <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Quote</th>
@@ -119,7 +118,6 @@
                                             @endif
                                         <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                                             <td class="p-4 align-middle">{{$testimonial->name ?? '-'}}</td>
-                                            <td class="p-4 align-middle font-medium">{{$testimonial->age ?? '-'}}</td>
                                             <td class="p-4 align-middle">{{ $testimonial->location ?? '-'}}</td>
                                             <td class="p-4 align-middle">{{$testimonial->rating ?? '-'}}</td>
                                             <td class="p-4 align-middle">{{$testimonial->quote ?? '-'}}</td>
