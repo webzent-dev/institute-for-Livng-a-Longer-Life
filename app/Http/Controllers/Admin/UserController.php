@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use App\Services\ShopifyAppService;
 use App\Mail\MemberSignupMail;
 use App\Models\PaymentHistory;
 use Illuminate\Database\QueryException;
@@ -182,6 +183,8 @@ class UserController extends Controller
                             new MemberActiveMail($userDetail)
                         );
                     }
+                    // Reactivate and sync the member's Shopify discount code
+                    app(ShopifyAppService::class)->syncActiveMember($userDetail);
                 }
             } else if($status_value == 'inactive') {
                 if($userDetail->role == 'collaborator') {
@@ -196,6 +199,8 @@ class UserController extends Controller
                             new MemberInactiveMail($userDetail)
                         );
                     }
+                    // Revoke the member's Shopify discount code
+                    app(ShopifyAppService::class)->revokeForMember($userDetail);
                 }
             }
 

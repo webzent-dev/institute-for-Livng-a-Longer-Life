@@ -174,6 +174,52 @@
                                         </table>
                                     </div>
                                 </div>
+
+                                <!-- Related Sub-Orders (Split Shipping) -->
+                                @if(isset($subOrders) && $subOrders->count() > 0)
+                                <div class="bg-white rounded-xl shadow border">
+                                    <div class="p-6 border-b">
+                                        <h3 class="text-xl font-semibold">Sub-Orders &amp; Shipping Labels</h3>
+                                        <p class="text-sm text-gray-500">Manage shipping and generate labels for your part of this order</p>
+                                    </div>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-sm">
+                                            <thead class="bg-gray-100 text-left">
+                                                <tr>
+                                                    <th class="p-4">Sub-Order Number</th>
+                                                    <th class="p-4">Status</th>
+                                                    <th class="p-4">Label</th>
+                                                    <th class="p-4">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($subOrders as $subOrder)
+                                                    <tr class="border-t">
+                                                        <td class="p-4">{{ $subOrder->sub_order_number }}</td>
+                                                        <td class="p-4">
+                                                            <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent text-white @if($subOrder->status == 'delivered') bg-green-500 @elseif($subOrder->status == 'cancelled') bg-red-500 @elseif($subOrder->status == 'shipped') bg-blue-500 @else bg-orange-500 @endif">
+                                                                {{ ucfirst($subOrder->status) }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="p-4">
+                                                            @if($subOrder->label_url)
+                                                                <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-green-500 text-white">Label Ready</span>
+                                                            @elseif($subOrder->status == 'shipped')
+                                                                <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-blue-500 text-white">Shipped</span>
+                                                            @else
+                                                                <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-yellow-500 text-white">No Label</span>
+                                                            @endif
+                                                        </td>
+                                                        <td class="p-4">
+                                                            <x-button-use href="{{ route('collaborator.sub-order-details', $subOrder->id) }}" label="View / Manage" variant="outline" icon="eye" class="pl-0 pr-0 w-36 h-9"/>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                @endif
                             </div>
 
                             <!-- RIGHT SECTION (ORDER SUMMARY) -->

@@ -51,6 +51,8 @@ return [
 
     'shopify_app' => [
         'api_key' => env('SHOPIFY_APP_API_KEY'),
+        'base_url' => env('SHOPIFY_APP_URL'),
+        'webhook_secret' => env('SHOPIFY_APP_WEBHOOK_SECRET'),
     ],
 
     'standard_process' => [

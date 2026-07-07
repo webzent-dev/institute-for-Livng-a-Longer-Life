@@ -429,7 +429,14 @@ class CollaboratorController extends Controller
             })
             ->firstOrFail();
         $orderItems = OrderItem::where('order_id', $orderDetail->id)->get();
-        return view('collaborator.orders.show', compact('orderDetail', 'orderItems', 'collaboratorProductIds'));
+
+        // Sub-orders for this order that belong to the current collaborator (for label management)
+        $subOrders = SubOrder::where('order_id', $orderDetail->id)
+            ->where('seller_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('collaborator.orders.show', compact('orderDetail', 'orderItems', 'collaboratorProductIds', 'subOrders'));
     }
 
     public function updateOrder(Request $request, string $id)

@@ -304,6 +304,9 @@ class IndexController extends Controller
                     $user->membership_number = User::generateMembershipNumber();
                     $user->save();
                 }
+
+                // Sync the member's Shopify discount code (new purchase / renewal / tier change)
+                app(\App\Services\ShopifyAppService::class)->syncActiveMember($user);
             }
     
             //Get card details
