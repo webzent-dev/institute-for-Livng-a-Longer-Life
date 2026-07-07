@@ -161,8 +161,8 @@ class CollaboratorController extends Controller
                 'experience'  => $request->experience,
                 'organization'  => $request->organization,
                 'collaborator_message'  => $request->collaborator_message,
-                //'profile_image'  => $request->profile_image,
-            ], 
+                'profile_image'  => $request->file('profile_image'),
+            ],
             [
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
@@ -172,7 +172,9 @@ class CollaboratorController extends Controller
                 'experience' => 'required|string|max:255',
                 'organization' => 'required|string|max:255',
                 'collaborator_message' => 'required',
-                //'profile_image' => 'file|mimes:jpg,jpeg,png|max:2048',
+                // Server-side, content-based validation: image/mimes inspect the actual
+                // file contents (not the client-supplied extension) to verify the MIME type.
+                'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             ]
         );
 
@@ -183,7 +185,8 @@ class CollaboratorController extends Controller
 
         $profileImageName = null;
         if ($request->hasFile('profile_image') && !empty($request->profile_image)) {
-            $profileImageName = time() . '.' . $request->profile_image->getClientOriginalExtension();
+            // Derive the extension from the sniffed content, not the client-supplied name.
+            $profileImageName = time() . '.' . $request->profile_image->extension();
             $request->profile_image->move(public_path('user_images'), $profileImageName);
         }
 
