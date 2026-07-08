@@ -566,135 +566,25 @@ class MemberController extends Controller
         if (!$user || !$user->plan_expiry || $user->plan_expiry < now()) {
             abort(403, 'Active membership required to download this content.');
         }
-        
-        // Create HTML content for PDF
-        $html = '<!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <title>' . htmlspecialchars($product->name) . '</title>
-            <style>
-                body { 
-                    font-family: "DejaVu Sans", Arial, sans-serif; 
-                    margin: 40px; 
-                    line-height: 1.6; 
-                    font-size: 12pt;
-                }
-                .header { 
-                    text-align: center; 
-                    border-bottom: 2px solid #333; 
-                    padding-bottom: 20px; 
-                    margin-bottom: 30px; 
-                }
-                .product-info { 
-                    margin-bottom: 30px; 
-                }
-                .description { 
-                    background: #f5f5f5; 
-                    padding: 20px; 
-                    border: 1px solid #ddd; 
-                    margin: 20px 0; 
-                    page-break-inside: avoid;
-                }
-                .author-info { 
-                    background: #e8f4f8; 
-                    padding: 15px; 
-                    border: 1px solid #cce8f3; 
-                    margin: 20px 0; 
-                }
-                .footer { 
-                    margin-top: 50px; 
-                    border-top: 1px solid #ccc; 
-                    padding-top: 20px; 
-                    font-size: 10pt; 
-                    color: #666; 
-                }
-                .product-image { 
-                    text-align: center; 
-                    margin: 20px 0; 
-                    page-break-inside: avoid;
-                }
-                .product-image img { 
-                    max-width: 250px; 
-                    height: auto; 
-                    border: 1px solid #ddd;
-                }
-                h1 { 
-                    color: #333; 
-                    font-size: 18pt;
-                    margin-bottom: 10px;
-                }
-                h2 { 
-                    color: #555; 
-                    border-bottom: 1px solid #ddd; 
-                    padding-bottom: 5px; 
-                    font-size: 14pt;
-                    margin-top: 20px;
-                }
-                p { 
-                    margin-bottom: 10px; 
-                    text-align: justify;
-                }
-                strong { 
-                    font-weight: bold; 
-                }
-                em { 
-                    font-style: italic; 
-                }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>' . htmlspecialchars($product->name) . '</h1>
-                <p><em>' . ucfirst(htmlspecialchars($product->product_type)) . '</em></p>
-            </div>
-            
-            <div class="product-info">
-                <h2>Product Information</h2>
-                <p><strong>Category:</strong> ' . ucfirst(str_replace('_', ' ', htmlspecialchars($product->category))) . '</p>
-                <p><strong>Price:</strong> $' . htmlspecialchars($product->price) . '</p>';
-                
-                if ($product->originalPrice) {
-                    $html .= '<p><strong>Original Price:</strong> $' . htmlspecialchars($product->originalPrice) . '</p>';
-                }
-                
-                $html .= '<p><strong>Rating:</strong> ' . htmlspecialchars($product->rating) . ' stars</p>
-                <p><strong>Reviews:</strong> ' . htmlspecialchars($product->reviews) . '</p>
-            </div>';
-                
-                // Add product image if exists
-                if ($product->image) {
-                    $imagePath = public_path('product_images/' . $product->image);
-                    if (file_exists($imagePath)) {
-                        $imageData = base64_encode(file_get_contents($imagePath));
-                        $imageSrc = 'data:image/' . pathinfo($imagePath, PATHINFO_EXTENSION) . ';base64,' . $imageData;
-                        $html .= '<div class="product-image">
-                            <h2>Product Image</h2>
-                            <img src="' . $imageSrc . '" alt="' . htmlspecialchars($product->name) . '" />
-                        </div>';
-                    }
-                }
-                
-                $html .= '<div class="description">
-                    <h2>Description</h2>
-                    <div>' . str_replace("\n", "<br>", htmlspecialchars($product->description)) . '</div>
-                </div>';
-                
-                if ($product->user) {
-                    $html .= '<div class="author-info">
-                        <h2>Author Information</h2>
-                        <p><strong>Author:</strong> ' . htmlspecialchars($product->user->first_name) . ' ' . htmlspecialchars($product->user->last_name) . '</p>
-                    </div>';
-                }
-                
-                $html .= '<div class="footer">
-                <p><strong>Generated on:</strong> ' . date('Y-m-d H:i:s') . '</p>
-                <p><strong>Downloaded by:</strong> ' . htmlspecialchars(auth()->user()->first_name) . ' ' . htmlspecialchars(auth()->user()->last_name) . '</p>
-                <p><em>This is a member-exclusive document from Institute for Living a Longer Life</em></p>
-            </div>
-        </body>
-        </html>';
-        
+
+        // Build the product image as a base64 data URI (if it exists on disk)
+        $imageSrc = null;
+        if ($product->image) {
+            $imagePath = public_path('product_images/' . $product->image);
+            if (file_exists($imagePath)) {
+                $imageData = base64_encode(file_get_contents($imagePath));
+                $imageSrc = 'data:image/' . pathinfo($imagePath, PATHINFO_EXTENSION) . ';base64,' . $imageData;
+            }
+        }
+
+        // Render the PDF HTML from a dedicated Blade view
+        $html = view('front.pdf.member-download', [
+            'product'     => $product,
+            'user'        => $user,
+            'imageSrc'    => $imageSrc,
+            'generatedAt' => date('Y-m-d H:i:s'),
+        ])->render();
+
         // Initialize DOMPDF with proper configuration
         $options = new Options();
         $options->set('defaultFont', 'Arial');
@@ -770,7 +660,7 @@ class MemberController extends Controller
             }
 
             // If no receipt URL found, create a PDF receipt
-            $this->createPdfReceipt($payment);
+            return $this->createPdfReceipt($payment);
 
         } catch (\Exception $e) {
             // Log error and return error message
@@ -781,111 +671,18 @@ class MemberController extends Controller
 
     private function createPdfReceipt($payment)
     {
-        // Create HTML content for PDF receipt
         $cardDetails = json_decode($payment->card_details);
         $user = auth()->user();
 
-        $html = '<!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <title>Payment Receipt</title>
-            <style>
-                body { 
-                    font-family: "DejaVu Sans", Arial, sans-serif; 
-                    margin: 40px; 
-                    line-height: 1.6; 
-                    font-size: 12pt;
-                }
-                .header { 
-                    text-align: center; 
-                    border-bottom: 2px solid #333; 
-                    padding-bottom: 20px; 
-                    margin-bottom: 30px; 
-                }
-                .receipt-info { 
-                    margin-bottom: 30px; 
-                }
-                .payment-details { 
-                    background: #f5f5f5; 
-                    padding: 20px; 
-                    border: 1px solid #ddd; 
-                    margin: 20px 0; 
-                }
-                .footer { 
-                    margin-top: 50px; 
-                    border-top: 1px solid #ccc; 
-                    padding-top: 20px; 
-                    font-size: 10pt; 
-                    color: #666; 
-                }
-                h1 { 
-                    color: #333; 
-                    font-size: 18pt;
-                    margin-bottom: 10px;
-                }
-                h2 { 
-                    color: #555; 
-                    border-bottom: 1px solid #ddd; 
-                    padding-bottom: 5px; 
-                    font-size: 14pt;
-                    margin-top: 20px;
-                }
-                p { 
-                    margin-bottom: 10px; 
-                }
-                strong { 
-                    font-weight: bold; 
-                }
-                .success-badge {
-                    background: #28a745;
-                    color: white;
-                    padding: 4px 8px;
-                    border-radius: 4px;
-                    font-size: 10pt;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>Payment Receipt</h1>
-                <p><strong>Institute for Living a Longer Life</strong></p>
-            </div>
-            
-            <div class="receipt-info">
-                <h2>Receipt Information</h2>
-                <p><strong>Receipt Number:</strong> ' . htmlspecialchars($payment->transaction_id) . '</p>
-                <p><strong>Date:</strong> ' . \Carbon\Carbon::parse($payment->created_at)->format('M j, Y \a\t g:i A') . '</p>
-                <p><strong>Status:</strong> <span class="success-badge">' . ucfirst($payment->status) . '</span></p>
-            </div>
-                
-            <div class="payment-details">
-                <h2>Payment Details</h2>
-                <p><strong>Description:</strong> ' . htmlspecialchars($payment->description ?? 'Membership Payment') . '</p>
-                <p><strong>Amount:</strong> $' . htmlspecialchars($payment->amount) . '</p>
-                <p><strong>Payment Method:</strong> ' . htmlspecialchars($cardDetails->brand ?? 'Card') . ' •••• ' . htmlspecialchars($cardDetails->last4 ?? '****') . '</p>
-                <p><strong>Payment For:</strong> ' . htmlspecialchars($payment->payment_for ?? 'Membership') . '</p>
-            </div>
-                
-            <div class="payment-details">
-                <h2>Billing Information</h2>
-                <p><strong>Name:</strong> ' . htmlspecialchars($user->first_name . ' ' . $user->last_name) . '</p>
-                <p><strong>Email:</strong> ' . htmlspecialchars($user->email) . '</p>';
-                
-                if ($user->phone) {
-                    $html .= '<p><strong>Phone:</strong> ' . htmlspecialchars($user->phone) . '</p>';
-                }
-                
-                $html .= '</div>
-                
-            <div class="footer">
-                <p><strong>Generated on:</strong> ' . date('Y-m-d H:i:s') . '</p>
-                <p><em>This is an official receipt from Institute for Living a Longer Life</em></p>
-                <p><em>Thank you for your payment!</em></p>
-            </div>
-        </body>
-        </html>';
-        
+        // Render the receipt HTML from a dedicated Blade view
+        $html = view('front.pdf.receipt', [
+            'payment'     => $payment,
+            'user'        => $user,
+            'cardDetails' => $cardDetails,
+            'receiptDate' => \Carbon\Carbon::parse($payment->created_at)->format('M j, Y \a\t g:i A'),
+            'generatedAt' => date('Y-m-d H:i:s'),
+        ])->render();
+
         // Initialize DOMPDF with proper configuration
         $options = new Options();
         $options->set('defaultFont', 'Arial');
