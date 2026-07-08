@@ -22,6 +22,11 @@ function addToCart(product_id){
                 $('#add_to_cart_button_' + product_id).attr('disabled', false);
             }
             //$("html, body").animate({ scrollTop: 0 }, "slow");
+        },
+        error: function () {
+            toastr.error('Error adding product to cart');
+            $('#add_to_cart_button_' + product_id).html('Add to Cart');
+            $('#add_to_cart_button_' + product_id).attr('disabled', false);
         }
     });
 }

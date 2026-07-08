@@ -169,29 +169,48 @@ function cartState() {
         })),
         updateQuantity(id, qty) {
             if (qty < 1) return;
+
+            const self = this;
+            const current = this.items.find(item => item.id === id);
+            if (!current) return;
+            const previousQty = current.quantity;
+
+            // Optimistically reflect the new quantity in the UI
             this.items = this.items.map(item => {
-                if (item.id === id) item.quantity = qty; 
+                if (item.id === id) item.quantity = qty;
                 return item;
             });
 
-            if(qty>0){
-                $.ajax({
-                    url: baseurl+'/cart/update',
-                    type: 'POST',
-                    data: {product_id: id, quantity: qty},
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (data) { 
-                        if (data.status == true) { 
-                            toastr.success(data.message); 
-                            $('#cart_count').html(data.cartCount); 
-                        } else { 
-                            toastr.error(data.message); 
-                        } 
-                    } 
+            // Roll the quantity back to what it was before the (rejected) change
+            const revertQuantity = function () {
+                self.items = self.items.map(item => {
+                    if (item.id === id) item.quantity = previousQty;
+                    return item;
                 });
-            }
+            };
+
+            $.ajax({
+                url: baseurl+'/cart/update',
+                type: 'POST',
+                data: {product_id: id, quantity: qty},
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (data) {
+                    if (data.status == true) {
+                        toastr.success(data.message);
+                        $('#cart_count').html(data.cartCount);
+                    } else {
+                        // Validation failed (e.g. stock limit) — undo the UI change
+                        toastr.error(data.message);
+                        revertQuantity();
+                    }
+                },
+                error: function () {
+                    toastr.error('Unable to update quantity. Please try again.');
+                    revertQuantity();
+                }
+            });
         },
         removeFromCart(id) {
             this.items = this.items.filter(item => item.id !== id);

@@ -301,6 +301,9 @@ function membershipForm(id) {
             } else {
                 alert(err.message || 'Something went wrong');
             }
+            // Restore the button so the user can correct and resubmit
+            $('#register').prop('disabled', false);
+            $('#register').text('Register');
         });
     }
     // close() {

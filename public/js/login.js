@@ -73,6 +73,8 @@ function login() {
  
             } catch (e) {
                 this.generalError = "Server error. Please try again.";
+                $("#loginBtn").attr('disabled', false);
+                $("#loginBtn").text("Sign In");
             }
         }
     }
