@@ -175,22 +175,17 @@ class IndexController extends Controller
         ];
 
         // With setup_future_usage, we need to ensure the payment method is properly attached
-        \Log::info('Payment method saved for future use: ' . $paymentIntent->payment_method);
-        
         // Ensure the payment method is attached to the customer
         if ($session->customer && $paymentIntent->payment_method) {
             try {
                 $paymentMethod = \Stripe\PaymentMethod::retrieve($paymentIntent->payment_method);
-                
+
                 // Check if payment method is already attached to this customer
                 if ($paymentMethod->customer !== $session->customer) {
                     // Attach the payment method to the customer
                     $paymentMethod->attach(['customer' => $session->customer]);
-                    \Log::info('Payment method attached to customer: ' . $paymentIntent->payment_method . ' -> ' . $session->customer);
-                } else {
-                    \Log::info('Payment method already attached to customer: ' . $paymentIntent->payment_method);
                 }
-                
+
             } catch (\Exception $e) {
                 \Log::warning('Could not attach payment method: ' . $e->getMessage());
             }
@@ -322,22 +317,17 @@ class IndexController extends Controller
             ];
     
             // With setup_future_usage, we need to ensure the payment method is properly attached
-            \Log::info('Payment method saved for future use: ' . $paymentIntent->payment_method);
-            
             // Ensure the payment method is attached to the customer
             if ($session->customer && $paymentIntent->payment_method) {
                 try {
                     $paymentMethod = \Stripe\PaymentMethod::retrieve($paymentIntent->payment_method);
-                    
+
                     // Check if payment method is already attached to this customer
                     if ($paymentMethod->customer !== $session->customer) {
                         // Attach the payment method to the customer
                         $paymentMethod->attach(['customer' => $session->customer]);
-                        \Log::info('Payment method attached to customer: ' . $paymentIntent->payment_method . ' -> ' . $session->customer);
-                    } else {
-                        \Log::info('Payment method already attached to customer: ' . $paymentIntent->payment_method);
                     }
-                    
+
                 } catch (\Exception $e) {
                     \Log::warning('Could not attach payment method: ' . $e->getMessage());
                 }

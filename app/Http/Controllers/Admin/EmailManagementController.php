@@ -446,7 +446,6 @@ class EmailManagementController extends Controller
         
         // Log the received value for debugging
         \Log::info('getAllUser received recipient_type: ' . $recipientType);
-        \Log::info('All request data: ' . json_encode($request->all()));
 
         // Convert "members" to "member" for database query
       
@@ -458,7 +457,6 @@ class EmailManagementController extends Controller
         
         // Log what users were fetched
         \Log::info('Fetched users count: ' . $users->count());
-        \Log::info('Users data: ' . json_encode($users->toArray()));
         
         // Return a response with all data
         return response()->json([

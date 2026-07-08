@@ -130,9 +130,6 @@ class MemberController extends Controller
             
             $user = auth()->user();
             
-            // Debug: Check if user has stripe_customer_id
-            \Log::info('Getting payment methods for user: ' . $user->id . ', stripe_customer_id: ' . $user->stripe_customer_id);
-            
             // If user doesn't have stripe_customer_id, try to find existing customer
             if (!$user->stripe_customer_id) {
                 // Try to find customer by email
@@ -140,7 +137,6 @@ class MemberController extends Controller
                 if ($customers->data) {
                     $user->stripe_customer_id = $customers->data[0]->id;
                     $user->save();
-                    \Log::info('Found existing customer by email: ' . $user->stripe_customer_id);
                 }
             }
             
@@ -152,9 +148,7 @@ class MemberController extends Controller
                 'customer' => $customer->id,
                 'type' => 'card',
             ]);
-            
-            \Log::info('Found ' . count($paymentMethods->data) . ' payment methods for customer: ' . $customer->id);
-            
+
             // If no payment methods found, try to recover from recent payments
             if (count($paymentMethods->data) === 0) {
                 \Log::info('No payment methods found, trying to recover from recent payments...');
@@ -168,8 +162,6 @@ class MemberController extends Controller
                 foreach ($recentPayments as $payment) {
                     $cardDetails = json_decode($payment->card_details, true);
                     if ($cardDetails && isset($cardDetails['last4'])) {
-                        \Log::info('Found recent payment with card: ' . $cardDetails['brand'] . ' ****' . $cardDetails['last4']);
-                        
                         // Create a new payment method from the payment intent
                         if (isset($payment->transaction_id)) {
                             try {
@@ -188,7 +180,6 @@ class MemberController extends Controller
                                         'customer' => $customer->id,
                                     ]);
                                     
-                                    \Log::info('Created new payment method for customer: ' . $newPaymentMethod->id);
                                     break;
                                 }
                             } catch (\Exception $e) {
@@ -217,7 +208,6 @@ class MemberController extends Controller
                                 'is_default' => true,
                                 'is_display_only' => true // Flag for UI
                             ];
-                            \Log::info('Created display entry for card: ' . $cardDetails['brand'] . ' ****' . $cardDetails['last4']);
                             break; // Only show the most recent one
                         }
                     }

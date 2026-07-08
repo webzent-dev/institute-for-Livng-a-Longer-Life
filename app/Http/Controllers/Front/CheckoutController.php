@@ -284,7 +284,6 @@ class CheckoutController extends Controller
                 'country' => $shipping['country'],
             ];
             
-            \Log::info('DeliveryStore - Calculating shipping for destination: ' . json_encode($destinationAddress));
             \Log::info('DeliveryStore - Cart items: ' . json_encode($cart));
             
             $shippingRates = $this->shippingService->calculateSplitShippingRates($cart, $destinationAddress);
@@ -431,7 +430,6 @@ class CheckoutController extends Controller
                 'country' => $shipping['country'],
             ];
             
-            \Log::info('Calculating shipping for destination: ' . json_encode($destinationAddress));
             \Log::info('Cart items: ' . json_encode($cart));
             
             $shippingRates = $this->shippingService->calculateSplitShippingRates($cart, $destinationAddress);
