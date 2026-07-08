@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use App\Mail\MemberSignupMail;
-use Stripe\Stripe;
-use Stripe\Charge;
-use App\Models\SiteSetting;
 use App\Mail\AdminMemberNotification;
 
 class UserRegister extends Controller
@@ -34,11 +31,15 @@ class UserRegister extends Controller
             'password'   => Hash::make(Str::random(32)),
         ]);
 
+        $user->update([
+            'membership_number' => User::generateMembershipNumber(),
+        ]);
+
         if(!empty($request->email)){
             $resetToken = Password::createToken($user);
             $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);
             Mail::to($request->email)->send(
-                new MemberSignupMail($user, null, $resetUrl)
+                new MemberSignupMail($user, $resetUrl)
             );
         }
 
@@ -57,18 +58,8 @@ class UserRegister extends Controller
         session(['planDetail'=>$planDetail]);
         session(['user_id'=>$user->id]);
 
-        //Get stripe secret key from database
-        $siteSettingDetail = SiteSetting::first();
-        if(!empty($siteSettingDetail->stripe_mode)){
-            if($siteSettingDetail->stripe_mode == 'sandbox'){
-                Stripe::setApiKey($siteSettingDetail->stripe_sandbox_secret);
-            }else{
-                Stripe::setApiKey($siteSettingDetail->stripe_production_secret);
-            }
-        }else{
-            Stripe::setApiKey(config('services.stripe.secret'));
-        }
-        
+        \App\Services\StripeService::configure();
+
         $session = \Stripe\Checkout\Session::create([
             'payment_method_types' => ['card'],
             'line_items' => [[

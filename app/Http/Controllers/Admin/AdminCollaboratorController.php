@@ -10,7 +10,6 @@ use App\Models\CollaboratorBankDetails;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
-use App\Mail\MemberSignupMail;
 use App\Mail\CollaboratorActiveMail;
 use App\Mail\CollaboratorLoginMail;
 use Validator;

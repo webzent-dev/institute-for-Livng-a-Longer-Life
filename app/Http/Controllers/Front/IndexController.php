@@ -175,22 +175,17 @@ class IndexController extends Controller
         ];
 
         // With setup_future_usage, we need to ensure the payment method is properly attached
-        \Log::info('Payment method saved for future use: ' . $paymentIntent->payment_method);
-        
         // Ensure the payment method is attached to the customer
         if ($session->customer && $paymentIntent->payment_method) {
             try {
                 $paymentMethod = \Stripe\PaymentMethod::retrieve($paymentIntent->payment_method);
-                
+
                 // Check if payment method is already attached to this customer
                 if ($paymentMethod->customer !== $session->customer) {
                     // Attach the payment method to the customer
                     $paymentMethod->attach(['customer' => $session->customer]);
-                    \Log::info('Payment method attached to customer: ' . $paymentIntent->payment_method . ' -> ' . $session->customer);
-                } else {
-                    \Log::info('Payment method already attached to customer: ' . $paymentIntent->payment_method);
                 }
-                
+
             } catch (\Exception $e) {
                 \Log::warning('Could not attach payment method: ' . $e->getMessage());
             }
@@ -298,6 +293,15 @@ class IndexController extends Controller
                         'status' => 'active'
                     ]);
                 }
+
+                // Assign a unique membership number on first membership purchase
+                if (empty($user->membership_number)) {
+                    $user->membership_number = User::generateMembershipNumber();
+                    $user->save();
+                }
+
+                // Sync the member's Shopify discount code (new purchase / renewal / tier change)
+                app(\App\Services\ShopifyAppService::class)->syncActiveMember($user);
             }
     
             //Get card details
@@ -313,22 +317,17 @@ class IndexController extends Controller
             ];
     
             // With setup_future_usage, we need to ensure the payment method is properly attached
-            \Log::info('Payment method saved for future use: ' . $paymentIntent->payment_method);
-            
             // Ensure the payment method is attached to the customer
             if ($session->customer && $paymentIntent->payment_method) {
                 try {
                     $paymentMethod = \Stripe\PaymentMethod::retrieve($paymentIntent->payment_method);
-                    
+
                     // Check if payment method is already attached to this customer
                     if ($paymentMethod->customer !== $session->customer) {
                         // Attach the payment method to the customer
                         $paymentMethod->attach(['customer' => $session->customer]);
-                        \Log::info('Payment method attached to customer: ' . $paymentIntent->payment_method . ' -> ' . $session->customer);
-                    } else {
-                        \Log::info('Payment method already attached to customer: ' . $paymentIntent->payment_method);
                     }
-                    
+
                 } catch (\Exception $e) {
                     \Log::warning('Could not attach payment method: ' . $e->getMessage());
                 }

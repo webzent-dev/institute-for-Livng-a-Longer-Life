@@ -298,6 +298,8 @@ class ShippoService
             'async' => false,
         ]);
 
+        \Log::info('Purchase label response:', $response->json());
+
         return $response->json();
     }
 

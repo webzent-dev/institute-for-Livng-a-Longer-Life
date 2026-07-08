@@ -234,6 +234,12 @@
                             <span class="text-gray-600">Tax</span>
                             <span class="font-medium">$0.00</span>
                         </div>
+                        @if(($memberDiscount ?? 0) > 0)
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Member Discount ({{ ucfirst(strtolower(auth()->user()->plan_name ?? '')) }})</span>
+                            <span class="font-medium text-green-600">-${{ number_format($memberDiscount, 2) }}</span>
+                        </div>
+                        @endif
                     </div>
                     <div class="border-t border-gray-200 pt-4 mt-4">
                         <div class="flex justify-between text-lg font-bold">
@@ -262,6 +268,7 @@ document.getElementById('terms').addEventListener('change', function() {
 
 function cartState() {
     let cartItems = @json($cartItems);
+    let serverMemberDiscount = {{ $memberDiscount ?? 0 }};
     return {
         items: cartItems.map(item => ({
             ...item,
@@ -327,11 +334,11 @@ function cartState() {
             return this.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
         },
         memberDiscount() {
-            return this.subtotal() * 0.2;
+            return serverMemberDiscount;
         },
         total() {
             let shipping = parseFloat($('#shipping_cost').val()) || 0;
-            return this.subtotal() + shipping;
+            return this.subtotal() + shipping - this.memberDiscount();
         },
         proceedToCheckout() {
             window.location.href = baseurl+'/checkout/shipping';

@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use App\Services\ShopifyAppService;
 use App\Mail\MemberSignupMail;
 use App\Models\PaymentHistory;
 use Illuminate\Database\QueryException;
@@ -81,7 +84,7 @@ class UserController extends Controller
             'email' => $request->email,
             'role' => $request->role,
             'status' => $request->status,
-            'password' => bcrypt('12345678'), // Set a default password or generate one
+            'password' => bcrypt(Str::random(32)),
         ]);
 
         if($request->role == 'collaborator') {
@@ -92,8 +95,10 @@ class UserController extends Controller
             }
         } else {
             if(!empty($request->email)) {
+                $resetToken = Password::createToken($user);
+                $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);
                 Mail::to($request->email)->send(
-                    new MemberSignupMail($user, '12345678')
+                    new MemberSignupMail($user, $resetUrl)
                 );
             }
         }
@@ -178,6 +183,8 @@ class UserController extends Controller
                             new MemberActiveMail($userDetail)
                         );
                     }
+                    // Reactivate and sync the member's Shopify discount code
+                    app(ShopifyAppService::class)->syncActiveMember($userDetail);
                 }
             } else if($status_value == 'inactive') {
                 if($userDetail->role == 'collaborator') {
@@ -192,6 +199,8 @@ class UserController extends Controller
                             new MemberInactiveMail($userDetail)
                         );
                     }
+                    // Revoke the member's Shopify discount code
+                    app(ShopifyAppService::class)->revokeForMember($userDetail);
                 }
             }
 

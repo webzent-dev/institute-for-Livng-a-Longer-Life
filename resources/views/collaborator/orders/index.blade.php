@@ -40,6 +40,82 @@
                     <p class="text-muted-foreground text-lg">View and manage your product orders</p>
                 </div>
 
+                <!----- Sub-Orders (Split Shipping) Start Here ----->
+                <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+                    <div class="flex flex-col space-y-1.5 p-6">
+                        <h3 class="text-2xl font-semibold leading-none tracking-tight">Sub-Orders</h3>
+                        <p class="text-sm text-muted-foreground">Orders routed to you through split shipping</p>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <div class="relative w-full overflow-auto">
+                            <table class="w-full caption-bottom text-sm">
+                                <thead class="[&_tr]:border-b">
+                                    <tr class="border-b transition-colors data-[state=selected]:bg-muted hover:bg-muted/50">
+                                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Sub-Order Number</th>
+                                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Customer</th>
+                                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Total</th>
+                                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
+                                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Label</th>
+                                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Order Date</th>
+                                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="[&_tr:last-child]:border-0">
+                                    @forelse($subOrders as $subOrder)
+                                    <tr class="border-b transition-colors data-[state=selected]:bg-muted hover:bg-muted/50">
+                                        <td class="p-4 align-middle">{{ $subOrder->sub_order_number }}</td>
+                                        <td class="p-4 align-middle">
+                                            <div>
+                                                <p class="font-medium">{{ optional($subOrder->order)->first_name }} {{ optional($subOrder->order)->last_name }}</p>
+                                                <p class="text-sm text-muted-foreground">{{ optional($subOrder->order)->email }}</p>
+                                            </div>
+                                        </td>
+                                        <td class="p-4 align-middle">${{ number_format($subOrder->total, 2) }}</td>
+                                        <td class="p-4 align-middle">
+                                            <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent text-primary-foreground @if($subOrder->status == 'delivered') bg-green-500 @elseif($subOrder->status == 'cancelled') bg-red-500 @elseif($subOrder->status == 'shipped') bg-blue-500 @else bg-orange-500 @endif">
+                                                {{ ucfirst($subOrder->status) }}
+                                            </div>
+                                        </td>
+                                        <td class="p-4 align-middle">
+                                            @if($subOrder->label_url)
+                                                <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-green-500 text-white">Label Ready</div>
+                                            @elseif($subOrder->status == 'shipped')
+                                                <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-blue-500 text-white">Shipped</div>
+                                            @else
+                                                <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-yellow-500 text-white">No Label</div>
+                                            @endif
+                                        </td>
+                                        <td class="p-4 align-middle">{{ $subOrder->created_at }}</td>
+                                        <td class="p-4 justify-items-center">
+                                            <x-button-use href="{{ route('collaborator.sub-order-details', $subOrder->id) }}" label="View / Manage" variant="outline" icon="eye" class="pl-0 pr-0 w-36 h-10"/>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr class="border-b transition-colors data-[state=selected]:bg-muted hover:bg-muted/50">
+                                        <td colspan="7" class="p-4 align-middle text-center text-muted-foreground">No sub-orders yet</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                        @if($subOrders->hasPages())
+                            <div class="px-6 py-4 border-t border-gray-100">
+                                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                                    <div class="text-sm text-gray-500">
+                                        Showing <span class="font-semibold text-gray-700">{{ $subOrders->firstItem() }}</span>
+                                        to <span class="font-semibold text-gray-700">{{ $subOrders->lastItem() }}</span>
+                                        of <span class="font-semibold text-gray-700">{{ $subOrders->total() }}</span> sub-orders
+                                    </div>
+                                    <div class="custom-pagination">
+                                        {{ $subOrders->links('pagination::tailwind') }}
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <!----- Sub-Orders (Split Shipping) End Here ----->
+
                 <!----- Orders Start Here ----->
                 <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
                     @if($orders->count() > 0)

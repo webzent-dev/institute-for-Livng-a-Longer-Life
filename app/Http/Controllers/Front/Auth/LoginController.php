@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use App\Mail\MemberSignupMail;
 use App\Models\User;
 
@@ -98,47 +99,25 @@ class LoginController extends Controller
 
         $credentials = $request->only('email', 'password');
         $adminLogin = Auth::attempt(array_merge($credentials, [
-            'role' => 'admin'
+            'role' => 'admin',
+            'status' => 'active', // <-- only active admins
         ]));
 
         if ($adminLogin) {
             $request->session()->regenerate();
             return redirect()->route('admin.dashboard')->with('success', 'Welcome Admin! Login successful.');
         }
-        return back()->with('error', 'Invalid credentials or enter valid  credentials.')->withInput();
-    }
-
-
-    /*public function collaboratorLogin(Request $request)
-    {
-        $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
-
-        $credentials = $request->only('email', 'password');
-        $collaboratorLogin = Auth::attempt(array_merge($credentials, [
-            'role' => 'collaborator',
-            'status' => 'active', // <-- only active collaborators
-        ]));
-
-        if ($collaboratorLogin) {
-            $request->session()->regenerate();
-            return redirect()->route('collaborator.dashboard')
-            ->with('success', 'Welcome Collaborator! Login successful.');
-        }
 
         $user = \App\Models\User::where('email', $request->email)
-        ->where('role', 'collaborator')
-        ->first();
+            ->where('role', 'admin')
+            ->first();
 
         if ($user && $user->status !== 'active') {
-            return back()->with('error', 'Your account is inactive. Please wait for admin to activate it.')->withInput();
+            return back()->with('error', 'Your account is inactive. Please contact the system administrator.')->withInput();
         }
 
-        // If credentials are completely wrong
-        return back()->with('error', 'Invalid credentials.')->withInput();
-    }*/
+        return back()->with('error', 'Invalid credentials or enter valid  credentials.')->withInput();
+    }
 
     public function signUp(Request $request)
     {
@@ -146,27 +125,27 @@ class LoginController extends Controller
             'first_name' => !empty($request->first_name)?$request->first_name:'',
             'last_name' => !empty($request->last_name)?$request->last_name:'',
             'email' => !empty($request->email)?$request->email:'',
-            'password' => !empty($request->password)?bcrypt($request->password) : '',
+            'password' => bcrypt(\Illuminate\Support\Str::random(32)),
             'confirm_password' => !empty($request->confirm_password)?$request->confirm_password:'',
             'phone' => !empty($request->phone)?$request->phone:'',
             'role' => 'user',
             'status' => 'inactive',
         ];
 
+        // Password is generated server-side (Str::random) and set by the member via the
+        // reset link, so the submitted password is not validated or used here.
         $validator = Validator::make(
             [
                 'first_name'      =>  $singupData['first_name'],
                 'last_name'  =>  $singupData['last_name'],
                 'email'   =>  $singupData['email'],
-                'password' => $singupData['password'],
                 'phone'  =>  $singupData['phone'],
                 'role'  =>  $singupData['role'],
             ],
             [
                 'first_name'  =>  'required|string',
                 'last_name'  =>  'required|string',
-                'email'  =>  'required|email',
-                'password'  =>  'required|string|min:8|confirmed',
+                'email'  =>  'required|email|unique:users,email',
                 'phone'  =>  'required',
                 'role'  =>  'required',
             ]
@@ -183,8 +162,10 @@ class LoginController extends Controller
 
         $user = User::create($singupData);
         if(!empty($singupData['email'])){
+            $resetToken = \Illuminate\Support\Facades\Password::createToken($user);
+            $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);
             Mail::to($singupData['email'])->send(
-                new MemberSignupMail($user, $request->password)
+                new MemberSignupMail($user, $resetUrl)
             );
         }
 

@@ -33,20 +33,16 @@ class AdminTestimonialController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'age' => 'required|integer',
-            'location' => 'required|string|max:255',
-            'rating' => 'required|integer',
-            'quote' => 'required',
-            'result' => 'required'
+            'location' => 'nullable|string|max:255',
+            'rating' => 'nullable|integer|min:1|max:5',
+            'quote' => 'nullable|string',
         ]);
 
         $testimonial = Testimonial::create([
             'name' => $request->name,
-            'age' => $request->age,
             'location' => $request->location,
-            'rating' => $request->rating,
-            'quote' => $request->quote,
-            'result' => $request->result,
+            'rating' => $request->rating ?? 5,
+            'quote' => $request->quote ?? '',
             'is_active' => 1
         ]);
 
@@ -79,20 +75,16 @@ class AdminTestimonialController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'age' => 'required|integer',
-            'location' => 'required|string|max:255',
-            'rating' => 'required|integer',
-            'quote' => 'required',
-            'result' => 'required'
+            'location' => 'nullable|string|max:255',
+            'rating' => 'nullable|integer|min:1|max:5',
+            'quote' => 'nullable|string',
         ]);
 
         $testimonialDetail->update([
             'name' => $request->name,
-            'age' => $request->age,
             'location' => $request->location,
-            'rating' => $request->rating,
-            'quote' => $request->quote,
-            'result' => $request->result,
+            'rating' => $request->rating ?? 5,
+            'quote' => $request->quote ?? '',
             'is_active' => $request->is_active
         ]);
 

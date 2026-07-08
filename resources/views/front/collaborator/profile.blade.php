@@ -1403,9 +1403,6 @@
                                 <div class="${getTypeColor(item.type)} type-indicator">
                                     <i class="${getTypeIcon(item.type)} mr-1"></i> Testimonial
                                 </div>
-                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                                    <div class="text-white font-medium">${item.age} years old</div>
-                                </div>
                             </div>
                         </div>
                         <div class="p-6 ${currentView === 'list' ? 'md:w-2/3 lg:w-3/4' : ''}">

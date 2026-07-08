@@ -320,6 +320,11 @@ Route::prefix('collaborator')->middleware([RoleMiddleware::class.':collaborator'
     //------------Course management end here--------//
 
     Route::get('/orders', [CollaboratorController::class, 'orders'])->name('collaborator.orders');
+    // Sub-order (split shipping) routes — declared before /orders/{id} to keep them explicit
+    Route::get('/orders/sub/{id}', [CollaboratorController::class, 'subOrderDetails'])->name('collaborator.sub-order-details');
+    Route::put('/orders/sub/{id}/update', [CollaboratorController::class, 'updateSubOrder'])->name('collaborator.sub-orders.update');
+    Route::post('/orders/sub/{id}/generate-label', [CollaboratorController::class, 'generateShippingLabel'])->name('collaborator.generate-label');
+    Route::get('/orders/sub/{id}/download-label', [CollaboratorController::class, 'downloadLabel'])->name('collaborator.download-label');
     Route::get('/orders/{id}', [CollaboratorController::class, 'orderDetails'])->name('collaborator.order-details');
     Route::put('/orders/{id}/update', [CollaboratorController::class, 'updateOrder'])->name('collaborator.orders.update');
 });
@@ -374,8 +379,8 @@ Route::get('/checkout/delivery', [CheckoutController::class, 'delivery'])->name(
 Route::post('/checkout/delivery', [CheckoutController::class, 'deliveryStore'])->name('checkout.delivery.store');
 Route::get('/checkout/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
 Route::post('/checkout/payment', [CheckoutController::class, 'paymentStore'])->name('checkout.payment.store');
-Route::get('/chekcout/review', [CheckoutController::class, 'review'])->name('checkout.review');
-Route::post('/chekcout/order', [CheckoutController::class, 'placeOrder'])->name('checkout.place-order');
+Route::get('/checkout/review', [CheckoutController::class, 'review'])->name('checkout.review');
+Route::post('/checkout/order', [CheckoutController::class, 'placeOrder'])->name('checkout.place-order');
 Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.payment.success');
 Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.payment.cancel');
 

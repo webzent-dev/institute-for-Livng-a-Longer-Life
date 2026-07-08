@@ -11,13 +11,11 @@ class MemberSignupMail extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
-    public $password;
     public $resetUrl;
 
-    public function __construct(User $user, $password = null, $resetUrl = null)
+    public function __construct(User $user, $resetUrl = null)
     {
         $this->user = $user;
-        $this->password = $password;
         $this->resetUrl = $resetUrl;
     }
 
