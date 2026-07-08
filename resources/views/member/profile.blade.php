@@ -264,6 +264,8 @@ function profileForm() {
             })
             .catch(error => {
                 console.error('Error:', error);
+                $('#save_changes').attr('disabled', false);
+                $('#save_changes').text('Save Changes');
             });
         },
         showToast(title, message) {

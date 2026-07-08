@@ -93,12 +93,15 @@ function membershipForm() {
                 }
 
                 // ✅ Success
-                $('#signup').prop('disabled', false);
-                $('#signup').text('Sign Up');
                 toastr.success(data.message || "Successfully submitted");
                 this.resetForm();
             } catch (error) {
                 console.error(error);
+                toastr.error("Something went wrong. Please try again.");
+            } finally {
+                // Always restore the button, whatever the outcome
+                $('#signup').prop('disabled', false);
+                $('#signup').text('Sign Up');
             }
         },
         resetForm() {
