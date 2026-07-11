@@ -328,6 +328,10 @@ class CollaboratorController extends Controller
         $subOrder->notes = $request->input('notes');
         $subOrder->save();
 
+        // Update the main order status based on sub-order status
+        $subOrder->order->status = $request->input('status');
+        $subOrder->order->save();
+
         // Send email notification to user about order status update
         if (!empty($subOrder->order->email)) {
             Mail::to($subOrder->order->email)->send(
