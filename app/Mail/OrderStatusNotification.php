@@ -14,12 +14,14 @@ class OrderStatusNotification extends Mailable
 {
     use Queueable, SerializesModels;
     public $order;
+    public $subOrder;
 
     /**
      * Create a new message instance.
      */
     public function __construct(Order $order) {
         $this->order = $order;
+        $this->subOrder = $order->subOrders()->first(); // Get the first sub-order associated with the order
     }
 
     public function build()

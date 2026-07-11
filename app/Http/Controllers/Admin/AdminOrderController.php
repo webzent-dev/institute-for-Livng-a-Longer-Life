@@ -145,7 +145,9 @@ class AdminOrderController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $orderDetail = Order::where('id', $id)->first();
+        $orderDetail = Order::with('subOrders')
+        ->where('id', $id)
+        ->first();
         $orderDetail->status = $request->input('status');
         $orderDetail->save();
 
