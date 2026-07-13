@@ -6,8 +6,6 @@ use App\Models\User;
 use App\Models\Membership;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 use App\Mail\MemberSignupMail;
 use App\Mail\AdminMemberNotification;
 
@@ -20,7 +18,7 @@ class UserRegister extends Controller
             'last_name'  => 'required|string|max:255',
             'email'      => 'required|email|unique:users,email',
             'phone'      => 'required|numeric|unique:users,phone',
-            'password'   => 'required',
+            'password'   => 'required|string|min:8|confirmed',
         ]);
 
         $user = User::create([
@@ -28,18 +26,18 @@ class UserRegister extends Controller
             'last_name'  => $validated['last_name'],
             'email'      => $validated['email'],
             'phone'      => $validated['phone'],
-            'password'   => Hash::make(Str::random(32)),
+            'password'   => Hash::make($validated['password']),
         ]);
 
         $user->update([
             'membership_number' => User::generateMembershipNumber(),
         ]);
 
+        // The member chose their own password on the signup form, so no reset link is
+        // sent — the welcome mail tells them to sign in with those credentials.
         if(!empty($request->email)){
-            $resetToken = Password::createToken($user);
-            $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);
             Mail::to($request->email)->send(
-                new MemberSignupMail($user, $resetUrl)
+                new MemberSignupMail($user)
             );
         }
 

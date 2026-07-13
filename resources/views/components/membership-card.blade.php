@@ -237,6 +237,8 @@ function membershipForm(id) {
 
             if (!this.form.password.trim())
                 this.errors.password = "Password is required";
+            else if (this.form.password.length < 8)
+                this.errors.password = "Password must be at least 8 characters";
             // else if (!passwordRegex.test(this.form.password))
             //     this.errors.password = "Min 8 chars with upper, lower, number & special char";
 
