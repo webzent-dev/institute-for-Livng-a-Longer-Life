@@ -39,7 +39,9 @@ return [
         'account_id'    => env('ZOOM_ACCOUNT_ID'),
         'client_id'     => env('ZOOM_CLIENT_ID'),
         'client_secret' => env('ZOOM_CLIENT_SECRET'),
-        'base_url'      => env('ZOOM_BASE_URL'),
+        // ZoomService builds paths as "{base_url}/users/...", so the trailing slash
+        // in ZOOM_API_URL must be trimmed or every request gets a doubled slash.
+        'base_url'      => rtrim(env('ZOOM_API_URL', 'https://api.zoom.us/v2'), '/'),
     ],
 
     'stripe' => [

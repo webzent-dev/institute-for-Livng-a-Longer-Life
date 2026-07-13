@@ -71,10 +71,16 @@
                                         @endif
                                     </h3>
                                     <div class="space-y-3">
-                                        @if(isset($sellerRates['rates']))
+                                        @if(!empty($sellerRates['rates']))
+                                            @php
+                                                // Pre-select the same rate the backend defaults this seller to, so the
+                                                // summary and the order total agree before the buyer touches anything.
+                                                $defaultRateKey = $sellerRates['default_rate_key'] ?? array_key_first($sellerRates['rates']);
+                                                $handlingFee = $sellerRates['handling_fee'] ?? 0;
+                                            @endphp
                                             @foreach($sellerRates['rates'] as $rateKey => $rate)
-                                                <label class="flex items-start p-4 border-2 rounded-lg cursor-pointer transition @if($loop->first && $loop->parent->first) border-primary bg-primary/5 @else border-gray-300 @endif hover:border-primary active:bg-primary/5">
-                                                    <input type="radio" name="delivery_method_{{ $sellerId }}" value="{{ $rateKey }}_{{ $sellerId }}" @if($loop->first && $loop->parent->first) checked @endif class="mt-1 mr-3 delivery-method-radio" data-seller-id="{{ $sellerId }}" data-rate-key="{{ $rateKey }}" data-amount="{{ $rate['amount'] }}">
+                                                <label class="flex items-start p-4 border-2 rounded-lg cursor-pointer transition @if($rateKey === $defaultRateKey) border-primary bg-primary/5 @else border-gray-300 @endif hover:border-primary active:bg-primary/5">
+                                                    <input type="radio" name="delivery_method_{{ $sellerId }}" value="{{ $rateKey }}_{{ $sellerId }}" @if($rateKey === $defaultRateKey) checked @endif class="mt-1 mr-3 delivery-method-radio" data-seller-id="{{ $sellerId }}" data-rate-key="{{ $rateKey }}" data-amount="{{ $rate['amount'] }}" data-handling-fee="{{ $handlingFee }}">
                                                     <div class="flex-1">
                                                         <div class="flex justify-between items-start">
                                                             <div>
@@ -236,20 +242,21 @@ function updateSummary(method){
     let subtotal = getSubtotal();
     document.getElementById('subtotal-cost').textContent = '$' + subtotal.toFixed(2);
     
-    // Calculate shipping cost based on multi-seller selection
+    // Calculate shipping cost based on multi-seller selection:
+    // each selected rate, plus that seller's handling fee once.
     let shipping = 0;
-    
-    // Get all selected shipping methods for each seller
+    const chargedSellers = new Set();
+
     document.querySelectorAll('.delivery-method-radio:checked').forEach(radio => {
-        const amount = parseFloat(radio.dataset.amount);
-        shipping += amount;
+        shipping += parseFloat(radio.dataset.amount) || 0;
+
+        const sellerId = radio.dataset.sellerId;
+        if (!chargedSellers.has(sellerId)) {
+            chargedSellers.add(sellerId);
+            shipping += parseFloat(radio.dataset.handlingFee) || 0;
+        }
     });
-    
-    // Add handling fees (assuming $2 per seller)
-    const sellerCount = document.querySelectorAll('.delivery-method-radio:checked').length;
-    const handlingFees = sellerCount * 2;
-    shipping += handlingFees;
-    
+
     document.getElementById('shipping-cost').textContent = '$' + shipping.toFixed(2);
     let total = subtotal + shipping;
     document.getElementById('total-cost').textContent = '$' + total.toFixed(2);

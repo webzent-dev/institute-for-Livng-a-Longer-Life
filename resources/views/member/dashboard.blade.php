@@ -98,17 +98,27 @@
 
                                 $start = \Carbon\Carbon::parse($session->date . ' ' . $session->time);
                                 $end = $start->copy()->addMinutes((int) $session->duration);
-                            
+
                                 $googleStart = $start->format('Ymd\THis');
                                 $googleEnd = $end->format('Ymd\THis');
-                            
+
+                                $response = json_decode($session->meeting_response);
+                                $joinUrl = $response->join_url ?? null;
+
                                 $title = urlencode($session->session_title);
-                                $details = urlencode(strip_tags($session->description));
+
+                                // The join link has to be carried into the calendar entry itself,
+                                // otherwise the invite lands with no way to get into the meeting.
+                                $detailsText = strip_tags($session->description);
+                                if ($joinUrl) {
+                                    $detailsText .= "\n\nJoin Zoom Meeting:\n" . $joinUrl;
+                                }
+                                $details = urlencode($detailsText);
+                                $location = urlencode($joinUrl ?? '');
                             @endphp
 
                             @if($sessionDateTime->gte($todayDateTime))
                                 @php
-                                    $response = json_decode($session->meeting_response);
                                     $hostDetail = DB::table('users')->where('id', $session->host)->first();
                                 @endphp
                                 <div class="rounded-lg border-2 bg-card shadow-sm hover:border-primary transition-all">
@@ -141,13 +151,21 @@
                                                 </div> -->
                                             </div>
                                             <div class="flex flex-col gap-3 min-w-[140px]">
-                                                <a href="{{$response->join_url}}" target="_blank">
-                                                    <button class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full shadow-sm">
+                                                @if($joinUrl)
+                                                    <a href="{{ $joinUrl }}" target="_blank">
+                                                        <button class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full shadow-sm">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"></path><rect x="2" y="6" width="14" height="12" rx="2"></rect></svg>
+                                                            Join Session
+                                                        </button>
+                                                    </a>
+                                                @else
+                                                    <button type="button" disabled title="The meeting link is not available yet. Please contact support."
+                                                        class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground h-10 px-4 py-2 w-full shadow-sm">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"></path><rect x="2" y="6" width="14" height="12" rx="2"></rect></svg>
-                                                        Join Session
+                                                        Link Unavailable
                                                     </button>
-                                                </a>
-                                                <a href="https://www.google.com/calendar/render?action=TEMPLATE&text={{ $title }}&dates={{ $googleStart }}/{{ $googleEnd }}&details={{ $details }}&sf=true&output=xml" target="_blank">
+                                                @endif
+                                                <a href="https://www.google.com/calendar/render?action=TEMPLATE&text={{ $title }}&dates={{ $googleStart }}/{{ $googleEnd }}&details={{ $details }}&location={{ $location }}&sf=true&output=xml" target="_blank">
                                                     <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none
                                                     focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground h-9 rounded-md px-3 w-full">
                                                         Add to Calendar
@@ -208,12 +226,23 @@
                                         </div>-->
                                     </div>
                                     <div class="flex flex-col gap-3 min-w-[140px]">
-                                        <a href="{{$response->join_url}}" target="_blank">
-                                            <button class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full shadow-sm">
+                                        {{-- The recording link the admin saved for this session — not the
+                                             parent meeting's join_url, which only re-opens the ended meeting. --}}
+                                        @php $recordingUrl = $session->recorded_link ?: null; @endphp
+                                        @if($recordingUrl)
+                                            <a href="{{ $recordingUrl }}" target="_blank">
+                                                <button class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full shadow-sm">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"></path><rect x="2" y="6" width="14" height="12" rx="2"></rect></svg>
+                                                    Watch Recording
+                                                </button>
+                                            </a>
+                                        @else
+                                            <button type="button" disabled title="The recording is not available yet."
+                                                class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground h-10 px-4 py-2 w-full shadow-sm">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"></path><rect x="2" y="6" width="14" height="12" rx="2"></rect></svg>
-                                                Watch Recording
+                                                Recording Unavailable
                                             </button>
-                                        </a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

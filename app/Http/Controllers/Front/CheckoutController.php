@@ -284,61 +284,46 @@ class CheckoutController extends Controller
                 'country' => $shipping['country'],
             ];
             
-            \Log::info('DeliveryStore - Cart items: ' . json_encode($cart));
-            
-            $shippingRates = $this->shippingService->calculateSplitShippingRates($cart, $destinationAddress);
-            
-            \Log::info('DeliveryStore - Shipping rates calculated: ' . json_encode($shippingRates));
-            
+            $shippingRates = $this->getQuotedShippingRates($cart, $destinationAddress);
+
             // Process selected delivery methods for each seller
             $totalShippingCost = 0;
             $selectedMethods = [];
-            
-            \Log::info('DeliveryStore - Processing delivery methods for ' . count($shippingRates) . ' sellers');
-            
+
             foreach ($shippingRates as $sellerId => $quote) {
-                $deliveryMethodKey = 'delivery_method_' . $sellerId;
-                $selectedMethod = $request->input($deliveryMethodKey);
-                
-                \Log::info('DeliveryStore - Looking for ' . $deliveryMethodKey . ', found: ' . $selectedMethod);
-                
-                if ($selectedMethod) {
-                    // Parse the selected method (format: "service_sellerId")
-                    $parts = explode('_', $selectedMethod);
-                    $service = $parts[0];
-                    
-                    \Log::info('DeliveryStore - Parsed service: ' . $service . ' for seller: ' . $sellerId);
-                    
-                    // Find the rate for this service
-                    if (isset($quote['rates'][$service])) {
-                        $rateAmount = $quote['rates'][$service]['amount'];
-                        $handlingFee = $quote['handling_fee'] ?? 0;
-                        
-                        $selectedMethods[$sellerId] = [
-                            'service' => $service,
-                            'rate' => $quote['rates'][$service],
-                            'handling_fee' => $handlingFee
-                        ];
-                        $totalShippingCost += $rateAmount + $handlingFee;
-                        
-                        \Log::info('DeliveryStore - Added rate: ' . $rateAmount . ' + handling: ' . $handlingFee . ' = ' . ($rateAmount + $handlingFee));
-                    } else {
-                        \Log::warning('DeliveryStore - Rate not found for service: ' . $service . ' in seller: ' . $sellerId);
-                    }
-                } else {
-                    \Log::warning('DeliveryStore - No delivery method selected for seller: ' . $sellerId);
+                // Radio value format: "{rateKey}_{sellerId}"
+                $selectedMethod = $request->input('delivery_method_' . $sellerId);
+                $rateKey = $selectedMethod ? Str::beforeLast($selectedMethod, '_') : null;
+
+                if ($selectedMethod && !isset($quote['rates'][$rateKey])) {
+                    \Log::warning('DeliveryStore - Rate not found for service: ' . $rateKey . ' in seller: ' . $sellerId);
                 }
+
+                // Fold the buyer's choice into the quote itself, so every downstream
+                // consumer (order total, sub-orders, label purchase) sees the same rate.
+                $quote = $this->shippingService->applySelectedRate($quote, $rateKey);
+                $shippingRates[$sellerId] = $quote;
+
+                if (empty($quote['selected_rate'])) {
+                    \Log::warning('DeliveryStore - No shipping rate available for seller: ' . $sellerId);
+                    continue;
+                }
+
+                $selectedMethods[$sellerId] = [
+                    'service' => $quote['selected_rate_key'],
+                    'rate' => $quote['selected_rate'],
+                    'handling_fee' => $quote['handling_fee'],
+                ];
+                $totalShippingCost += $this->shippingService->sellerShippingCharge($quote);
             }
-            
-            \Log::info('DeliveryStore - Final total shipping cost: ' . $totalShippingCost);
-            
+
             Session::put('checkout.delivery', [
                 'methods' => $selectedMethods,
                 'total_charge' => $totalShippingCost,
                 'delivery_instructions' => $request->delivery_instructions ?? null,
                 'shipping_rates' => $shippingRates
             ]);
-            
+
         } catch (\Exception $e) {
             // Fallback to default if calculation fails
             Session::put('checkout.delivery', [
@@ -351,6 +336,34 @@ class CheckoutController extends Controller
         }
         
         return redirect()->route('checkout.payment');
+    }
+
+    /**
+     * Identifies the cart + destination a set of quotes was produced for, so cached
+     * quotes are never reused after the buyer edits their cart or address.
+     */
+    private function quoteSignature(array $cart, array $destinationAddress): string
+    {
+        ksort($cart);
+
+        return md5(json_encode([$cart, $destinationAddress]));
+    }
+
+    /**
+     * Return the quotes the buyer was shown on the delivery page. Only re-quotes the
+     * carrier when the cached quotes are missing or no longer match the cart/address,
+     * so the buyer is charged the prices that were on screen.
+     */
+    private function getQuotedShippingRates(array $cart, array $destinationAddress): array
+    {
+        $cached = Session::get('checkout.shipping_quotes');
+        $signature = $this->quoteSignature($cart, $destinationAddress);
+
+        if (is_array($cached) && ($cached['signature'] ?? null) === $signature && !empty($cached['quotes'])) {
+            return $cached['quotes'];
+        }
+
+        return $this->shippingService->calculateSplitShippingRates($cart, $destinationAddress);
     }
 
     public function payment()
@@ -430,26 +443,22 @@ class CheckoutController extends Controller
                 'country' => $shipping['country'],
             ];
             
-            \Log::info('Cart items: ' . json_encode($cart));
-            
             $shippingRates = $this->shippingService->calculateSplitShippingRates($cart, $destinationAddress);
-            
-            // Calculate total shipping cost properly
-            $totalShippingCost = 0;
-            foreach ($shippingRates as $sellerId => $quote) {
-                $selectedRate = $quote['selected_rate'] ?? null;
-                if ($selectedRate) {
-                    $totalShippingCost += $selectedRate['amount'] + ($quote['handling_fee'] ?? 0);
-                }
-            }
-            
-            \Log::info('Shipping rates calculated: ' . json_encode($shippingRates));
-            \Log::info('Total shipping cost: ' . $totalShippingCost);
-            
+
+            $totalShippingCost = $this->shippingService->calculateTotalShippingCost($shippingRates);
+
+            // Keep the exact quotes the buyer is shown, so deliveryStore() charges
+            // the prices on screen instead of re-quoting them against the carrier.
+            Session::put('checkout.shipping_quotes', [
+                'signature' => $this->quoteSignature($cart, $destinationAddress),
+                'quotes' => $shippingRates,
+            ]);
+
         } catch (\Exception $e) {
             // Fallback to default rates if calculation fails
             $shippingRates = [];
             $totalShippingCost = 0;
+            Session::forget('checkout.shipping_quotes');
             \Log::error('Shipping calculation failed: ' . $e->getMessage());
             \Log::error('Stack trace: ' . $e->getTraceAsString());
         }
@@ -503,6 +512,7 @@ class CheckoutController extends Controller
 
         session()->forget('cart');
         session()->forget('checkout.shipping');
+        session()->forget('checkout.shipping_quotes');
         session()->forget('checkout.delivery');
         session()->forget('checkout.payment');
         session()->forget('checkout.billing');
@@ -709,8 +719,17 @@ class CheckoutController extends Controller
         $groupedItems = $this->shippingService->groupCartBySeller($cart);
 
         foreach ($groupedItems as $sellerId => $items) {
-            $quote = $shippingQuotes[$sellerId] ?? null;
-            if (!$quote) continue;
+            // A seller without a quote still gets a sub-order (with no shipping charged),
+            // otherwise their items are paid for but never reach their panel.
+            $quote = $shippingQuotes[$sellerId] ?? [];
+            if (empty($quote)) {
+                \Log::warning('CreateSubOrders - No shipping quote for seller ' . $sellerId . ' on order ' . $order->order_number);
+            }
+
+            // The buyer's chosen delivery method, as folded into the quote by deliveryStore()
+            $selectedRate = $quote['selected_rate'] ?? null;
+            $shippingAmount = (float) ($selectedRate['amount'] ?? 0);
+            $handlingFee = $selectedRate ? (float) ($quote['handling_fee'] ?? 0) : 0;
 
             // Calculate sub-order totals
             $subtotal = 0;
@@ -718,8 +737,7 @@ class CheckoutController extends Controller
                 $subtotal += $item['product']->price * $item['quantity'];
             }
 
-            $shippingCost = ($quote['selected_rate']['amount'] ?? 0) + $quote['handling_fee'];
-            $total = $subtotal + $shippingCost;
+            $total = $subtotal + $shippingAmount + $handlingFee;
 
             // Create sub-order
             $subOrder = SubOrder::create([
@@ -727,20 +745,20 @@ class CheckoutController extends Controller
                 'seller_id' => $sellerId,
                 'sub_order_number' => 'SUB_' . $order->order_number . '_' . $sellerId . '_' . time(),
                 'subtotal' => $subtotal,
-                'shipping_method' => $quote['selected_rate']['service'] ?? 'standard',
-                'shipping_cost' => $quote['selected_rate']['amount'] ?? 0,
-                'handling_fee' => $quote['handling_fee'],
+                'shipping_method' => $selectedRate['service'] ?? 'standard',
+                'shipping_cost' => $shippingAmount,
+                'handling_fee' => $handlingFee,
                 'tax' => 0,
                 'total' => $total,
                 'status' => 'pending',
                 'payment_status' => 'pending',
-                'origin_address' => $quote['origin_address'],
+                'origin_address' => $quote['origin_address'] ?? null,
                 'destination_address' => $shippingAddress,
-                'carrier' => $quote['selected_rate']['provider'] ?? 'USPS',
-                'service_level' => $quote['selected_rate']['service'] ?? 'Standard',
-                'shippo_rate_id' => $quote['selected_rate']['rate_id'] ?? null,
+                'carrier' => $selectedRate['provider'] ?? 'USPS',
+                'service_level' => $selectedRate['service'] ?? 'Standard',
+                'shippo_rate_id' => $selectedRate['rate_id'] ?? null,
                 'weight' => $quote['package_details']['weight'] ?? 0,
-                'package_dimensions' => $quote['package_details'],
+                'package_dimensions' => $quote['package_details'] ?? null,
             ]);
 
             // Create sub-order items

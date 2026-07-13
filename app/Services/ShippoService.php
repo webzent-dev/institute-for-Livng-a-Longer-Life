@@ -21,23 +21,12 @@ class ShippoService
      */
     public function getRates(array $origin, array $destination, array $packageDetails): array
     {
-        Log::info('ShippoService::getRates called with:', [
-            'origin' => $origin,
-            'destination' => $destination,
-            'package_details' => $packageDetails
-        ]);
-
+        
         try {
             // Use real Shippo API only
-            Log::info('Creating shipment...');
             $shipment = $this->createShipment($origin, $destination, $packageDetails);
-            Log::info('Shipment created:', $shipment);
-            
-            Log::info('Extracting rates from shipment...');
-            $rates = $this->extractRatesFromShipment($shipment);
-            Log::info('Rates extracted:', $rates);
-            
-            return $rates;
+
+            return $this->extractRatesFromShipment($shipment);
 
         } catch (\Exception $e) {
             // Return empty array if API fails
@@ -83,17 +72,12 @@ class ShippoService
             'mass_unit' => 'lb',
         ];
 
-        Log::info('Creating parcel with data:', $parcelData);
-
         $response = Http::withHeaders([
             'Authorization' => 'ShippoToken ' . $this->apiKey,
             'Content-Type' => 'application/json',
         ])->post($this->baseUrl . 'parcels/', $parcelData);
 
-        $result = $response->json();
-        Log::info('Parcel created response:', $result);
-        
-        return $result;
+        return $response->json();
     }
 
     /**
@@ -134,8 +118,6 @@ class ShippoService
             'mass_unit' => 'lb',
         ];
         
-        Log::info('Creating shipment with parcel data:', $shippoParcel);
-
         $shipmentData = [
             'address_from' => $shippoAddressFrom,
             'address_to' => $shippoAddressTo,
@@ -143,24 +125,17 @@ class ShippoService
             'async' => false,
         ];
 
-        Log::info('Shippo API request data:', $shipmentData);
-
         $response = Http::withHeaders([
             'Authorization' => 'ShippoToken ' . $this->apiKey,
             'Content-Type' => 'application/json',
         ])->post($this->baseUrl . 'shipments/', $shipmentData);
 
         $result = $response->json();
-        Log::info('Full Shippo API response:', $result);
-        
-        // Log available rates details
-        if (isset($result['rates']) && is_array($result['rates'])) {
-            Log::info('Number of rates returned: ' . count($result['rates']));
-            foreach ($result['rates'] as $index => $rate) {
-                Log::info("Rate {$index}: {$rate['provider']} - {$rate['servicelevel']['name']} - {$rate['amount']} {$rate['currency']}");
-            }
-        } else {
-            Log::warning('No rates found in Shippo response');
+
+        if (empty($result['rates'])) {
+            Log::warning('No rates found in Shippo response', [
+                'messages' => $result['messages'] ?? null,
+            ]);
         }
 
         return $result;
@@ -298,9 +273,17 @@ class ShippoService
             'async' => false,
         ]);
 
-        \Log::info('Purchase label response:', $response->json());
+        $result = $response->json();
 
-        return $response->json();
+        if (($result['status'] ?? null) !== 'SUCCESS') {
+            Log::error('Shippo label purchase failed', [
+                'rate_id' => $rateId,
+                'status' => $result['status'] ?? null,
+                'messages' => $result['messages'] ?? null,
+            ]);
+        }
+
+        return $result;
     }
 
     /**
