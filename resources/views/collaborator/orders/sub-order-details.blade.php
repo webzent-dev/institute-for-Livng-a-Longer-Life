@@ -221,7 +221,12 @@
                                         <hr>
                                         <div class="flex justify-between">
                                             <span>Shipping Method</span>
-                                            <span class="font-medium">{{ ucfirst($subOrder->shipping_method ?? 'Standard') }}</span>
+                                            <span class="font-medium">
+                                                @if($subOrder->carrier)
+                                                    {{ $subOrder->carrier }} &ndash;
+                                                @endif
+                                                {{ ucfirst($subOrder->shipping_method ?? 'Standard') }}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>

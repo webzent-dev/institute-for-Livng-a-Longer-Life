@@ -10,6 +10,7 @@ use App\Services\ShippoService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class ShippingService
 {
@@ -53,6 +54,7 @@ class ShippingService
             $packageDetails = $this->calculatePackageDetails($sellerItems);
             // Get shipping rates for this seller
             $rates = $this->getShippingRates($originAddress, $destinationAddress, $packageDetails);
+            $defaultRateKey = $this->resolveDefaultRateKey($rates);
 
             $shippingQuotes[$sellerId] = [
                 'seller_name' => $seller->first_name . ' ' . $seller->last_name,
@@ -61,8 +63,11 @@ class ShippingService
                 'items' => $sellerItems,
                 'package_details' => $packageDetails,
                 'rates' => $rates,
-                'selected_rate' => $rates['standard'] ?? null,
-                'handling_fee' => $this->getSellerHandlingFee($seller),
+                'default_rate_key' => $defaultRateKey,
+                'selected_rate_key' => $defaultRateKey,
+                'selected_rate' => $defaultRateKey ? $rates[$defaultRateKey] : null,
+                // No rate means nothing is shipped for this seller, so nothing is charged.
+                'handling_fee' => $defaultRateKey ? $this->getSellerHandlingFee($seller) : 0,
             ];
         }
 
@@ -211,8 +216,6 @@ class ShippingService
             $product = $item['product'];
             $quantity = $item['quantity'];
 
-            \Log::info('Processing product: ' . $product->name . ', requires_shipping: ' . ($product->requires_shipping ?? 'null'));
-            
             // Check if product requires shipping
             // If requires_shipping is explicitly set to 0/false, treat as digital product
             // Otherwise, treat as physical product that needs shipping
@@ -260,14 +263,6 @@ class ShippingService
             }
         }
 
-        \Log::info('Package details calculated:', [
-            'weight' => $totalWeight,
-            'length' => $maxLength,
-            'width' => $maxWidth,
-            'height' => $maxHeight,
-            'requires_shipping' => $requiresShipping
-        ]);
-
         return [
             'weight' => $totalWeight,
             'length' => $maxLength,
@@ -282,14 +277,8 @@ class ShippingService
      */
     private function getShippingRates(array $origin, array $destination, array $packageDetails): array
     {
-        \Log::info('getShippingRates called with:', [
-            'origin' => $origin,
-            'destination' => $destination,
-            'package_details' => $packageDetails
-        ]);
 
         if (!$packageDetails['requires_shipping']) {
-            \Log::info('Product does not require shipping, returning zero rate');
             return [
                 'standard' => [
                     'amount' => 0,
@@ -302,10 +291,8 @@ class ShippingService
 
         // Use real Shippo API call only
         try {
-            \Log::info('Calling ShippoService->getRates()');
             $rates = $this->shippoService->getRates($origin, $destination, $packageDetails);
-            \Log::info('ShippoService returned rates:', $rates);
-            
+           
             return $rates;
         } catch (\Exception $e) {
             // Log error but don't fallback to mock rates
@@ -355,19 +342,76 @@ class ShippingService
     }
 
     /**
+     * Pick the rate a seller is quoted on by default: standard when the carrier
+     * offers it, otherwise the cheapest rate available.
+     */
+    public function resolveDefaultRateKey(array $rates): ?string
+    {
+        if (empty($rates)) {
+            return null;
+        }
+
+        if (isset($rates['standard'])) {
+            return 'standard';
+        }
+
+        $cheapestKey = null;
+        foreach ($rates as $key => $rate) {
+            if ($cheapestKey === null || (float) $rate['amount'] < (float) $rates[$cheapestKey]['amount']) {
+                $cheapestKey = $key;
+            }
+        }
+
+        return $cheapestKey;
+    }
+
+    /**
+     * Apply the buyer's chosen delivery method to a seller's quote. An unknown or
+     * missing key falls back to the seller's default rate so a seller is never
+     * left without a shipping charge.
+     */
+    public function applySelectedRate(array $quote, ?string $rateKey): array
+    {
+        $rates = $quote['rates'] ?? [];
+
+        if (!$rateKey || !isset($rates[$rateKey])) {
+            $rateKey = $quote['default_rate_key'] ?? $this->resolveDefaultRateKey($rates);
+        }
+
+        $quote['selected_rate_key'] = $rateKey;
+        $quote['selected_rate'] = $rateKey ? $rates[$rateKey] : null;
+
+        if (!$quote['selected_rate']) {
+            $quote['handling_fee'] = 0;
+        }
+
+        return $quote;
+    }
+
+    /**
+     * What a single seller's quote adds to the buyer's shipping charge.
+     * Checkout totals and sub-order totals must both go through this.
+     */
+    public function sellerShippingCharge(array $quote): float
+    {
+        if (empty($quote['selected_rate'])) {
+            return 0;
+        }
+
+        return (float) $quote['selected_rate']['amount'] + (float) ($quote['handling_fee'] ?? 0);
+    }
+
+    /**
      * Calculate total shipping cost for all sellers
      */
     public function calculateTotalShippingCost(array $shippingQuotes): float
     {
         $total = 0;
-        
-        foreach ($shippingQuotes as $sellerId => $quote) {
-            $selectedRate = $quote['selected_rate'];
-            if ($selectedRate) {
-                $total += $selectedRate['amount'] + $quote['handling_fee'];
-            }
+
+        foreach ($shippingQuotes as $quote) {
+            $total += $this->sellerShippingCharge($quote);
         }
-        
+
         return $total;
     }
 
