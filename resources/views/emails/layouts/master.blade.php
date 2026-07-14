@@ -20,6 +20,17 @@
         'X'         => $web->twitter_url   ?? null,
     ]);
 
+    // The primary office, used for the postal address and phone number in the footer.
+    $location = \App\Models\Location::where('status', 'active')->first();
+
+    $addressLines = $location ? array_filter([
+        $location->address,
+        trim(implode(', ', array_filter([$location->city, trim(($location->state ?? '') . ' ' . ($location->zip ?? ''))]))),
+        $location->country,
+    ]) : [];
+
+    $phone = $location->phone ?? null;
+
     // Brand colours, matching the site's emerald primary.
     $brand     = '#10b981';
     $brandDark = '#065f46';
@@ -55,9 +66,9 @@
                             <a href="{{ config('app.url') }}" style="text-decoration:none;">
                                 <img src="{{ $logoUrl }}" alt="{{ $siteName }}" width="150" style="display:block; width:150px; max-width:150px; height:auto; margin:0 auto 12px auto; border:0; outline:none;">
                             </a>
-                            <div style="color:#d1fae5; font-size:13px; letter-spacing:0.06em; text-transform:uppercase;">
+                            {{-- <div style="color:#d1fae5; font-size:13px; letter-spacing:0.06em; text-transform:uppercase;">
                                 {{ $tagline }}
-                            </div>
+                            </div> --}}
                         </td>
                     </tr>
 
@@ -84,47 +95,95 @@
                         </td>
                     </tr>
 
+                    {{-- ── Help strip ─────────────────────────────────────── --}}
+                    <tr>
+                        <td style="background-color:#f0fdf4; border-top:1px solid #d1fae5; border-bottom:1px solid #d1fae5; padding:18px 32px; text-align:center;">
+                            <div style="font-size:15px; font-weight:600; color:{{ $brandDark }}; margin-bottom:4px;">
+                                Need a hand?
+                            </div>
+                            <div style="font-size:13px; color:#047857; line-height:1.6;">
+                                Our team is here to help.
+                                @if($contactEmail)
+                                    Email <a href="mailto:{{ $contactEmail }}" style="color:{{ $brandDark }}; font-weight:600; text-decoration:underline;">{{ $contactEmail }}</a>
+                                @endif
+                                @if($phone)
+                                    or call <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" style="color:{{ $brandDark }}; font-weight:600; text-decoration:none;">{{ $phone }}</a>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+
                     {{-- ── Footer ─────────────────────────────────────────── --}}
                     <tr>
-                        <td style="background-color:#f9fafb; border-top:1px solid {{ $line }}; padding:24px 32px; text-align:center; color:{{ $muted }}; font-size:12px; line-height:1.7;">
+                        <td style="background-color:{{ $brandDark }}; padding:32px; text-align:center; color:#a7f3d0; font-size:12px; line-height:1.7;">
 
-                            <div style="font-size:14px; font-weight:600; color:{{ $ink }}; margin-bottom:6px;">
+                            <div style="font-size:16px; font-weight:600; color:#ffffff; letter-spacing:0.02em;">
                                 {{ $siteName }}
                             </div>
 
-                            @if($footerText)
-                                <div style="margin-bottom:10px;">{{ $footerText }}</div>
-                            @endif
-
-                            <div style="margin-bottom:10px;">
-                                <a href="{{ url('/') }}" style="color:{{ $brandDark }}; text-decoration:none;">Home</a>
-                                &nbsp;•&nbsp;
-                                <a href="{{ url('/faq') }}" style="color:{{ $brandDark }}; text-decoration:none;">FAQ</a>
-                                &nbsp;•&nbsp;
-                                <a href="{{ url('/help-center') }}" style="color:{{ $brandDark }}; text-decoration:none;">Help Centre</a>
-                                &nbsp;•&nbsp;
-                                <a href="{{ url('/contact') }}" style="color:{{ $brandDark }}; text-decoration:none;">Contact</a>
+                            <div style="font-size:12px; color:#6ee7b7; text-transform:uppercase; letter-spacing:0.08em; margin-top:4px;">
+                                {{ $tagline }}
                             </div>
 
-                            @if(count($socials))
-                                <div style="margin-bottom:10px;">
-                                    @foreach($socials as $name => $url)
-                                        <a href="{{ $url }}" style="color:{{ $muted }}; text-decoration:none; margin:0 6px;">{{ $name }}</a>
+                            {{-- Quick links --}}
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:20px auto 0 auto;">
+                                <tr>
+                                    @foreach([
+                                        'Home'        => url('/'),
+                                        'Membership'  => url('/membership'),
+                                        'Store'       => url('/shop'),
+                                        'Help Centre' => url('/help-center'),
+                                        'Contact'     => url('/contact'),
+                                    ] as $linkLabel => $linkUrl)
+                                        <td style="padding:0 10px;">
+                                            <a href="{{ $linkUrl }}" style="color:#ffffff; text-decoration:none; font-size:13px; font-weight:500;">{{ $linkLabel }}</a>
+                                        </td>
                                     @endforeach
+                                </tr>
+                            </table>
+
+                            {{-- Social pills --}}
+                            @if(count($socials))
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:20px auto 0 auto;">
+                                    <tr>
+                                        @foreach($socials as $name => $url)
+                                            <td style="padding:0 5px;">
+                                                <a href="{{ $url }}"
+                                                   style="display:inline-block; padding:7px 14px; border:1px solid #047857; border-radius:999px; background-color:#064e3b; color:#a7f3d0; text-decoration:none; font-size:12px; font-weight:500;">
+                                                    {{ $name }}
+                                                </a>
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                </table>
+                            @endif
+
+                            {{-- Divider --}}
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0 16px 0;">
+                                <tr><td style="height:1px; background-color:#047857; font-size:0; line-height:0;">&nbsp;</td></tr>
+                            </table>
+
+                            @if(count($addressLines))
+                                <div style="color:#6ee7b7; margin-bottom:8px;">
+                                    {!! implode(' &nbsp;•&nbsp; ', array_map('e', $addressLines)) !!}
                                 </div>
                             @endif
 
-                            @if($contactEmail)
-                                <div style="margin-bottom:10px;">
-                                    Questions? Write to us at
-                                    <a href="mailto:{{ $contactEmail }}" style="color:{{ $brandDark }}; text-decoration:none;">{{ $contactEmail }}</a>
-                                </div>
-                            @endif
+                            <div style="color:#6ee7b7;">
+                                &copy; {{ date('Y') }} {{ $siteName }}. All rights reserved.
+                            </div>
 
-                            <div style="color:#9ca3af;">
-                                &copy; {{ date('Y') }} {{ $siteName }}. All rights reserved.<br>
+                            <div style="color:#34d399; margin-top:6px; font-size:11px;">
                                 This is an automated message — please do not reply directly to it.
                             </div>
+
+                            {{-- Site-wide disclaimer (Web Settings → footer text). Kept as small print at the
+                                 very bottom, since it is long-form legal copy rather than a tagline. --}}
+                            @if($footerText)
+                                <div style="margin-top:16px; padding-top:14px; border-top:1px solid #047857; color:#34d399; font-size:10px; line-height:1.6; text-align:left;">
+                                    {{ $footerText }}
+                                </div>
+                            @endif
                         </td>
                     </tr>
 
