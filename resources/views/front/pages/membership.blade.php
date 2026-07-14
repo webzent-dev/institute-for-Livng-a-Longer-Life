@@ -101,7 +101,7 @@
         <!--<section class="py-20 bg-background">-->
         <section class="py-10 bg-background">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
                     @foreach($memberships as $plan)
                     @php
                         $isPopular = ($plan->popular == 'yes') ? true : false;
@@ -115,8 +115,12 @@
                         $membership_features = explode(",", $plan->membership_features);
                         $membership_benefits = explode(",", $plan->membership_benefits);
                     @endphp
-                    <div class="relative" x-data="{ selectedPlan: { name: '', price: '', period: '' } }">
-                        <div class="flex flex-col {{ $isPopular ? 'border-primary border-4 shadow-strong md:scale-105 bg-card' : 'border-2 shadow-medium bg-card' }} rounded-2xl  ">
+                    {{-- h-full on both so every card fills its grid cell and all cards end up the same height,
+                         whatever the number of features/benefits. --}}
+                    <div class="relative h-full" x-data="{ selectedPlan: { name: '', price: '', period: '' } }">
+                        {{-- No scale-105 on the popular card: scaling made it overhang the others. It is
+                             still highlighted by the thicker border, stronger shadow and the badge. --}}
+                        <div class="flex flex-col h-full {{ $isPopular ? 'border-primary border-4 shadow-strong bg-card' : 'border-2 shadow-medium bg-card' }} rounded-2xl  ">
                         @if($isPopular)
                         <div class="relative">
                             <div class="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
