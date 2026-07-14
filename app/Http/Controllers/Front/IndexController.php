@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Membership;
 use App\Models\ContentManagement;
 use App\Models\IntroVideos;
+use App\Models\PageContent;
 use Stripe\Stripe;
 use Stripe\Charge;
 use Stripe\PaymentIntent;
@@ -27,7 +28,12 @@ class IndexController extends Controller
     {
         $product = Product::where('product_type','vital_boost')->where('status', 'active')->latest()->first();
         $memberships = Membership::where('status', 'active')->get();
-        $homePageContent = ContentManagement::where('page_name', 'home_page')->first();
+
+        // Keyed by section_key (hero, simple_path, journey, membership, inside, community,
+        // newsletter, cta). The view falls back to its built-in copy for any section that is
+        // missing or deactivated.
+        $sections = PageContent::sections('home');
+
         $videoTestimonials = VideoTestimonial::where('is_active', 1) ->orderBy('sort_order')->get() ->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -37,13 +43,18 @@ class IndexController extends Controller
                 'name' => $item->name,
             ];
         });
-        return view('front.pages.home', compact('product','memberships', 'homePageContent', 'videoTestimonials'));
+        return view('front.pages.home', compact('product','memberships', 'sections', 'videoTestimonials'));
     }
 
     public function introVideos()
     {
         $introVideos = IntroVideos::where('status', 'active')->get();
-        return view('front.pages.intro-videos', compact('introVideos'));
+
+        // Keyed by section_key (hero, cta). The view falls back to its built-in copy
+        // for any section that is missing or deactivated.
+        $sections = PageContent::sections('intro_videos');
+
+        return view('front.pages.intro-videos', compact('introVideos', 'sections'));
     }
 
     public function membership()

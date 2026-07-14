@@ -1,33 +1,120 @@
 @extends('front.layouts.app')
 @section('content')
+@php
+    // CMS sections (App\Models\VitalBoostContent), keyed by section_key. Every value below
+    // falls back to the original hard-coded copy, so the page still renders if a section
+    // has not been seeded or an admin deactivates one.
+    $sections = $sections ?? collect();
+    $hero     = $sections['hero']     ?? null;
+    $benefits = $sections['benefits'] ?? null;
+    $booster  = $sections['booster']  ?? null;
+    $usage    = $sections['usage']    ?? null;
+    $cta      = $sections['cta']      ?? null;
+
+    $heroMeta    = $hero->meta    ?? [];
+    $boosterMeta = $booster->meta ?? [];
+    $usageMeta   = $usage->meta   ?? [];
+    $ctaMeta     = $cta->meta     ?? [];
+
+    $benefitCards = $benefits->items ?? [];
+    if (empty($benefitCards)) {
+        $benefitCards = [
+            ['icon' => 'heart',       'title' => 'Rich in Vitamins and Minerals',    'description' => 'Boosts healthy functioning of the heart and helps in maintaining optimum blood flow in your body.'],
+            ['icon' => 'brain',       'title' => 'Health All Around',                'description' => 'Experience an increase in your energy levels daily. Metabolism, digestion, and immunity will work well for you.'],
+            ['icon' => 'shield',      'title' => 'Science Behind It',                'description' => 'Developed by experts to cater to the hectic lifestyles of today\'s generation and provide complete nutrition to your body.'],
+            ['icon' => 'trending-up', 'title' => 'Economical and Efficient Wellness','description' => 'Get one solution that saves you money as well as provides you with all the essential nutrients in one single capsule.'],
+            ['icon' => 'zap',         'title' => 'Tailored to Your Lifestyles',      'description' => 'Developed specifically to help your body combat all the stressors of today\'s technological world.'],
+            ['icon' => 'users',       'title' => 'Experience Life to the Fullest',   'description' => 'Experience a boost in your energy levels, as well as experience wellness throughout your life.'],
+        ];
+    }
+
+    $facts = $booster->items['facts'] ?? [];
+    if (empty($facts)) {
+        $facts = [
+            'The number of sperm cells is going down, and cancer cases are going up.',
+            'Our lifespan is getting longer, and the quality of our lives has greatly diminished.',
+            'There are more individuals suffering from chronic pain, exhaustion, and compromised immune systems than ever before.',
+        ];
+    }
+    // Card accents cycle so the FACT list stays styled however many an admin adds.
+    $factStyles = [
+        ['from-red-50 to-red-100 border-red-500', 'bg-red-500'],
+        ['from-orange-50 to-orange-100 border-orange-500', 'bg-orange-500'],
+        ['from-yellow-50 to-yellow-100 border-yellow-500', 'bg-yellow-500'],
+    ];
+
+    $ingredients = $booster->items['ingredients'] ?? [];
+    if (empty($ingredients)) {
+        $ingredients = [
+            'Vitamin C 1000 mg', 'Vit B1 (Thymine) 3.15mg', 'Vit B2 (riboflavin) 3.06mg',
+            'Vit B3 (niacinamide) 20mg', 'Vit B5 (Calcium pantothenate) 10mg', 'Vit B6 (pyridoxine 10mg)',
+            'Vit B12 (hydroxyl cobalamin 5 mcg)', 'Biotin 315mcg', 'Folic acid 800mcg',
+            'Vit A (entire carotene complex) 3,334 IU', 'Vit E (d-alpha tocopherol succinate) 100iu',
+            'Lipoic Acid 2mg', 'Coenzyme Q10 50mg', 'Selenium (Se-Methyselenocysteine) 9.8mcg',
+            'Zinc (methionate and succinate) 36 mg', 'Iodine (potassium iodide) 100mcg', 'Copper 1mg',
+            'Chromium (picolinate) 96mcg', 'Potassium (bicarbonate) 250mg', 'Molybdenum 80mcg',
+            'Manganese (gluconate) 4mg', 'Magnesium (citrate, Aspartate, glycinate, ascorbate) 192mg',
+            'L-Lysine 250mg', 'L-cysteine 250mg', 'L-methionine 250mg', 'Taurine 250mg', 'Choline complex',
+        ];
+    }
+
+    $usageStats = $usage->items['stats'] ?? [];
+    if (empty($usageStats)) {
+        $usageStats = [
+            ['value' => '1',   'label' => 'Packet',       'sub' => 'daily'],
+            ['value' => 'Mix', 'label' => 'Into a Drink', 'sub' => 'smoothie or juice'],
+            ['value' => '30',  'label' => 'Day Supply',   'sub' => 'per box'],
+        ];
+    }
+
+    $usageSteps = $usage->items['steps'] ?? [];
+    if (empty($usageSteps)) {
+        $usageSteps = [
+            'Add one package to your morning smoothie or juice and stir.',
+            'In the powdered form, absorption is much easier compared to tablets or capsules.',
+            'It is made from pure and concentrated nutrients without any fillers or binders.',
+            'Consistent daily intake gives maximum benefits.',
+        ];
+    }
+
+    $powderPoints = $usage->items['powder_points'] ?? [];
+    if (empty($powderPoints)) {
+        $powderPoints = [
+            'Better absorbed by your body than pills.',
+            'Higher concentration of nutrients per serving.',
+            'More cost-effective than juggling multiple pill supplements.',
+            'Supports faster recovery from stress and daily demands.',
+        ];
+    }
+@endphp
 <div class="min-h-screen flex flex-col">
     <main>
         @if(!empty($product))
+        {{-- Hero Section --}}
         <section class="gradient-subtle py-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <div class="space-y-6">
                         <div class="inline-flex items-center space-x-2 bg-primary/10 px-4 py-2 rounded-full">
                             <i data-lucide="zap" class="w-5 h-5 text-primary"></i>
-                            <span class="text-sm font-semibold text-primary">Premium Wellness Formula</span>
+                            <span class="text-sm font-semibold text-primary">{{ $heroMeta['badge_text'] ?? 'Premium Wellness Formula' }}</span>
                         </div>
-                        <h1 class="text-4xl lg:text-6xl font-bold text-foreground text-left">{{ $product->name ?? 'Vital Boost' }}</h1>
-                        <p class="text-2xl text-muted-foreground">The finest supplement for the way we live today</p>
-                        <p class="text-lg text-muted-foreground">{{ $product->description ?? 'Premium wellness formula designed to support your daily health and longevity needs.' }}</p>
+                        <h1 class="text-4xl lg:text-6xl font-bold text-foreground text-left">{{ $hero->heading ?? $product->name ?? 'Vital Boost' }}</h1>
+                        <p class="text-2xl text-muted-foreground">{{ $hero->subheading ?? 'The finest supplement for the way we live today' }}</p>
+                        <p class="text-lg text-muted-foreground">{{ $hero->body ?? $product->description ?? 'Premium wellness formula designed to support your daily health and longevity needs.' }}</p>
+                        @if(!empty($heroMeta['note']) || !$hero)
                         <div class="p-4 bg-secondary/50 rounded-lg border-l-4 border-primary">
                             <p class="text-sm text-muted-foreground italic">
-                                Originally formulated to protect patients from harmful effects of
-                                dental radiation, now protects you from everyday electromagnetic
-                                radiation from computers, cell phones, and other hi-tech devices.
+                                {{ $heroMeta['note'] ?? 'Originally formulated to protect patients from harmful effects of dental radiation, now protects you from everyday electromagnetic radiation from computers, cell phones, and other hi-tech devices.' }}
                             </p>
                         </div>
+                        @endif
                         <div class="flex flex-col sm:flex-row gap-4">
                             @if($product)
-                                <x-button-use href="javascript:addToCart({{ $product->id }})" label="Order Now" variant="primary" icon="zap" />
+                                <x-button-use href="javascript:addToCart({{ $product->id }})" :label="$heroMeta['cta_label'] ?? 'Order Now'" variant="primary" icon="zap" />
                             @else
                                 <x-button-use href="#" label="Coming Soon" variant="outline" icon="clock" disabled />
                             @endif
-                            <!-- <x-button-use href="{{ url('/intro-videos') }}" label="Learn More" variant="outline"   /> -->
                         </div>
                     </div>
                     <div class="relative">
@@ -50,92 +137,22 @@
 
         {{-- Benefits Section --}}
         <section class="container-base py-20 bg-background">
-            @php
-            $benefits = [
-                [
-                    'icon' => 'heart',
-                    'title' => 'Nutrient-Rich',
-                    'description' => 'Promotes healthy heart function and optimal blood circulation'
-                ],
-                [
-                    'icon' => 'brain',
-                    'title' => 'Health Benefits Galore',
-                    'description' => 'Experience increased energy, improved metabolism, better digestion, and a stronger immune system.'
-                ],
-                [
-                    'icon' => 'shield',
-                    'title' => 'Science-Backed',
-                    'description' => 'Formulated by experts, it\'s designed to meet the demands of a hectic lifestyle while providing comprehensive nutritional support. Your Daily Dose of Wellness'
-                ],
-                [
-                    'icon' => 'trending-up',
-                    'title' => 'Economical Choice',
-                    'description' => 'Save on supplements with this all-in-one solution that\'s easy on your wallet.'
-                ],
-                [
-                    'icon' => 'zap',
-                    'title' => 'Combat Modern Day Challenges',
-                    'description' => 'From stress and pollution to the effects of electromagnetic radiation, Vital Boost is your shield against everyday health hazards'
-                ],
-                [
-                    'icon' => 'users',
-                    'title' => 'A Quality Life Awaits',
-                    'description' => 'Notice the difference in your energy levels, vitality, and overall well-being as you make Vital Boost a part of your daily routine.'
-                ]
-            ];
-
-            $ingredients = [
-                "Vitamin C 1000 mg",
-                "Vit B1 (Thymine) 3.15mg",
-                "Vit B2 (riboflavin) 3.06mg",
-                "Vit B3 (niacinamide) 20mg",
-                "Vit B5 (Calcium pantothenate) 10mg",
-                "Vit B6 (pyridoxine 10mg)",
-                "Vit B12 ( hydroxyl cobalamin 5mcg",
-                "Biotin 315mcg",
-                "Folic acid 800mcg",
-                "Vit A (entire carotene complex) 3,334 iu",
-                "Vit E (d-alpha tocopheral succinate) 100iu",
-                "Lipoic Acid 2mg",
-                "CoenzymeQ10 50mg",
-                "Selenium (Se-Methyselenocysteine) 9.8mcg",
-                "Zinc (methionate and succinate) 36 mg" ,
-                "Iodine (potassium iodide) 100mcg",
-                "Copper 1mg",
-                "Chromium (picolinate) 96mcg",
-                "Potassium (bicarbonate) 250mg",
-                "Molybdenum 80mcg",
-                "Manganese (gluconate 4mg",
-                "Magnesium (citrate,Aspartate,glycinate ascorbate) 192mg",
-                "L-Lysine 250mg",
-                "L-cysteine 250mg",
-                "L-methionine 250mg",
-                "Taurine 250mg",
-                "Choline complex",
-            ];
-            @endphp
-
             <div class="container-base max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16">
-                    <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-4">Why Choose Vital Boost</h2>
+                    <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-4">{{ $benefits->heading ?? 'What Makes Vital Boost Different' }}</h2>
                     <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
-                        Stress and emotions can prevent you from enjoying a happy life.
-                        Another key fact is undernourishment.
-                        It’s an unfortunate fact, we’re not getting the nutrients we need to handle daily “bumps” in our every lives.
-                        You can’t be happy if you don’t feel good.
-                        You can’t feel good if your nutritionally unbalanced!!!<br>
+                        {{ $benefits->body ?? 'Both stress and emotions may prevent you from living happily, too. There is one more thing that we usually ignore: malnutrition. The reality is that we don\'t provide ourselves with enough nutrition that can help us cope with all our everyday tasks. You can\'t lead a happy life if you don\'t feel good. And you can\'t feel good without proper nutrition. That\'s exactly where Vital Boost comes in and helps you.' }}
                     </p>
                 </div>
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    @foreach($benefits as $b)
+                    @foreach($benefitCards as $b)
                     <div class="border-2 hover:border-primary transition-all shadow-soft hover:shadow-medium rounded-xl">
                         <div class="p-6 space-y-4">
                             <div class="iconbg w-14 h-14">
-
-                                <i data-lucide="{{$b['icon']}}" class="h-7 w-7 text-primary-foreground" ></i>
+                                <i data-lucide="{{ $b['icon'] ?? 'heart' }}" class="h-7 w-7 text-primary-foreground"></i>
                             </div>
-                            <h3 class="heading-3   ">{{ $b['title'] }}</h3>
-                            <p class="text-muted-foreground text-[16px]">{{ $b['description'] }}</p>
+                            <h3 class="heading-3">{{ $b['title'] ?? '' }}</h3>
+                            <p class="text-muted-foreground text-[16px]">{{ $b['description'] ?? '' }}</p>
                         </div>
                     </div>
                     @endforeach
@@ -143,7 +160,7 @@
             </div>
         </section>
 
-        {{-- Ingredients Section --}}
+        {{-- Immune System Booster / Ingredients Section --}}
         <section class="section-base py-20 gradient-subtle vital-boost-section">
             <div class="container-base max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="max-w-6xl mx-auto">
@@ -151,10 +168,10 @@
                         <!-- Header Section -->
                         <div class="bg-gradient-to-r from-primary/10 to-primary/5 p-8 lg:p-12">
                             <div class="text-center">
-                                <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-6">VITAL BOOST - IMMUNE SYSTEM ENHANCER</h2>
+                                <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-6">{{ $booster->heading ?? 'Vital Boost — Immune System Booster' }}</h2>
                                 <div class="max-w-4xl mx-auto">
                                     <p class="text-lg lg:text-xl text-muted-foreground leading-relaxed mb-8">
-                                        Today's world offers us a variety of choices. Some beneficial, others detrimental to our health. Although we all share common goals for a better, healthier life with energy and joy, we don't always make the right choices as to the foods we eat and environments in which we live.
+                                        {{ $booster->subheading ?? 'Life is full of options in the modern world. Some are beneficial to our well-being, while some others are actually working against it. Everybody wants to live an energetic and happy life, but we may not be doing everything right.' }}
                                     </p>
                                 </div>
                             </div>
@@ -162,47 +179,31 @@
 
                         <!-- Content Section -->
                         <div class="p-8 lg:p-12">
-                            <!-- Main Description -->
                             <div class="prose prose-lg max-w-none mb-12">
-                                <p class="text-muted-foreground leading-relaxed mb-6">
-                                    Many outside factors prevent us from achieving good health. <span class="text-primary font-semibold">Stress, Pollution, Diet, Radiation, Cell phones, Microwaves, Computers, High tech communication devices</span>, and Electrical conveniences we rely on every day. Their debilitating effects upon us are constant and accumulative.
-                                </p>
-                                
-                                <p class="text-muted-foreground leading-relaxed mb-6">
-                                    Vital Boost was originally formulated by Dr. Zeines, DDS, to help protect his patients from the effects of dental X-rays. Dr. Zeines has expanded and improved upon his supplement to now help protect all of us from everyday devices that emit electro-magnetic radiation (including the Doppler effect from weather radar, wireless Internet).
-                                </p>
-
-                                <p class="text-muted-foreground leading-relaxed mb-8">
-                                    Research is beginning to confirm that even low-level electromagnetic radiation can negatively affect our DNA and cellular health.
-                                </p>
+                                @php
+                                    $boosterBody = $booster->body
+                                        ?? "Several external factors prevent us from being healthy. Such as stress, pollution, nutrition, and constant exposure to technologies. Cell phones, computer systems, microwaves, and any other appliances also belong to this category. They have an effect on our bodies slowly and unnoticeably to us.\n\nVital Boost was created by Dr. Zeines, DDS. He designed it to protect his patients from the effects of dental X-rays. Over time, he expanded the formula. Today, it is designed to help support your body against everyday electromagnetic exposure, from wireless devices to daily tech use.\n\nSome research proves now that even minimal magnetic fields might affect our DNA and cell work.";
+                                    $boosterParagraphs = preg_split('/\R{2,}/', trim($boosterBody));
+                                @endphp
+                                @foreach($boosterParagraphs as $paragraph)
+                                    <p class="text-muted-foreground leading-relaxed mb-6">{{ $paragraph }}</p>
+                                @endforeach
 
                                 <!-- FACT Cards -->
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                                    <div class="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500 p-4 md:p-6 rounded-lg shadow-sm">
-                                        <div class="inline-block bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold mb-3">FACT</div>
-                                        <p class="text-gray-800 font-medium">
-                                            Sperm counts have been decreasing while cancers are increasing.
-                                        </p>
-                                    </div>
-                                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500 p-4 md:p-6 rounded-lg shadow-sm">
-                                        <div class="inline-block bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold mb-3">FACT</div>
-                                        <p class="text-gray-800 font-medium">
-                                            Life spans have increased but quality of life has decreased significantly.
-                                        </p>
-                                    </div>
-                                    <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 border-l-4 border-yellow-500 p-4 md:p-6 rounded-lg shadow-sm">
-                                        <div class="inline-block bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold mb-3">FACT</div>
-                                        <p class="text-gray-800 font-medium">
-                                            More people suffer from chronic pain, weaknesses, depression, fatigue and immune health disorders than ever before.
-                                        </p>
-                                    </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 mt-8">
+                                    @foreach($facts as $i => $fact)
+                                        @php $style = $factStyles[$i % count($factStyles)]; @endphp
+                                        <div class="bg-gradient-to-br {{ $style[0] }} border-l-4 p-4 md:p-6 rounded-lg shadow-sm">
+                                            <div class="inline-block {{ $style[1] }} text-white px-3 py-1 rounded-full text-sm font-bold mb-3">FACT</div>
+                                            <p class="text-gray-800 font-medium">{{ $fact }}</p>
+                                        </div>
+                                    @endforeach
                                 </div>
-
-                                                            </div>
+                            </div>
 
                             <!-- Ingredients Grid -->
                             <div class="mt-12">
-                                <h3 class="text-2xl font-bold text-foreground mb-6 text-center">Premium Ingredients</h3>
+                                <h3 class="text-2xl font-bold text-foreground mb-6 text-center">{{ $boosterMeta['ingredients_heading'] ?? 'Premium Ingredients' }}</h3>
                                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
                                     @foreach($ingredients as $item)
                                     <div class="flex items-start gap-3 p-4 bg-gradient-to-r from-secondary/50 to-secondary/30 rounded-lg border border-secondary/200 hover:shadow-md transition-shadow">
@@ -223,77 +224,41 @@
             <div class="container-base max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="rounded-lg border bg-card text-card-foreground shadow-sm shadow-medium">
                     <div class="flex flex-col space-y-1.5 p-6">
-                        <h3 class="font-semibold tracking-tight text-3xl text-center">How to Use Vital Boost</h3>
+                        <h3 class="font-semibold tracking-tight text-3xl text-center">{{ $usage->heading ?? 'Your Daily Vital Boost Routine' }}</h3>
                     </div>
                     <div class="p-6 pt-0 space-y-6">
                         <div class="grid md:grid-cols-3 gap-6">
+                            @foreach($usageStats as $stat)
                             <div class="text-center p-6 bg-secondary rounded-xl">
-                                <div class="text-4xl font-bold gradient-primary text-transparent bg-clip-text mb-2">1</div>
-                                <p class="text-muted-foreground">Packet</p>
-                                <p class="text-sm text-muted-foreground mt-2">per day</p>
+                                <div class="text-4xl font-bold gradient-primary text-transparent bg-clip-text mb-2">{{ $stat['value'] ?? '' }}</div>
+                                <p class="text-muted-foreground">{{ $stat['label'] ?? '' }}</p>
+                                <p class="text-sm text-muted-foreground mt-2">{{ $stat['sub'] ?? '' }}</p>
                             </div>
-                            <div class="text-center p-6 bg-secondary rounded-xl">
-                                <div
-                                class="text-4xl font-bold gradient-primary text-transparent bg-clip-text mb-2"
-                                >
-                                Mix
-                                </div>
-                                <p class="text-muted-foreground">In Liquid</p>
-                                <p class="text-sm text-muted-foreground mt-2">
-                                smoothie or juice
-                                </p>
-                            </div>
-                            <div class="text-center p-6 bg-secondary rounded-xl">
-                                <div class="text-4xl font-bold gradient-primary text-transparent bg-clip-text mb-2">30</div>
-                                <p class="text-muted-foreground">Day Supply</p>
-                                <p class="text-sm text-muted-foreground mt-2">per box</p>
-                            </div>
+                            @endforeach
                         </div>
                         <div class="p-6 bg-primary/5 rounded-xl border-2 border-primary/20">
-                            <h4 class="font-semibold text-foreground mb-3">Recommended Use:</h4>
+                            <h4 class="font-semibold text-foreground mb-3">{{ $usageMeta['steps_heading'] ?? 'Simple Steps to Follow:' }}</h4>
                             <ul class="space-y-2 text-muted-foreground">
+                                @foreach($usageSteps as $step)
                                 <li class="flex items-start">
                                     <span class="text-primary mr-2">•</span>
-                                    Mix one packet of Vital Boost powder into your morning smoothie
-                                    or juice
+                                    {{ $step }}
                                 </li>
-                                <li class="flex items-start">
-                                    <span class="text-primary mr-2">•</span>
-                                    Powder form allows better absorption than pills or capsules
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-primary mr-2">•</span>
-                                    No fillers or binders — just pure, concentrated nutrients
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-primary mr-2">•</span>
-                                    For best results, use consistently daily for optimal health benefits
-                                </li>
+                                @endforeach
                             </ul>
                         </div>
                         <div class="p-6 bg-secondary rounded-xl">
-                            <h4 class="font-semibold text-foreground mb-3">Why Powder Form?</h4>
+                            <h4 class="font-semibold text-foreground mb-3">{{ $usageMeta['powder_heading'] ?? 'Why Powder Beats Pills?' }}</h4>
                             <p class="text-muted-foreground mb-3">
-                                Vital Boost is not a pill, capsule, or liquid. It's a powdered
-                                drink mix precisely formulated for each day's needs.
+                                {{ $usageMeta['powder_intro'] ?? 'Vital Boost skips the pill and the capsule entirely. It\'s a daily powdered drink mix, built fresh for your body\'s needs.' }}
                             </p>
                             <ul class="space-y-2 text-muted-foreground text-sm">
+                                @foreach($powderPoints as $point)
                                 <li class="flex items-start">
                                     <span class="text-primary mr-2">✓</span>
-                                    Better absorption than pills
+                                    {{ $point }}
                                 </li>
-                                <li class="flex items-start">
-                                    <span class="text-primary mr-2">✓</span>
-                                    More concentrated nutrients
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-primary mr-2">✓</span>
-                                    Saves hundreds compared to multiple pill supplements
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-primary mr-2">✓</span>
-                                    Quick renewal and recovery from stress and daily life
-                                </li>
+                                @endforeach
                             </ul>
                         </div>
                     </div>
@@ -301,28 +266,29 @@
             </div>
         </section>
 
+        {{-- Call To Action --}}
         <section class="py-20 gradient-subtle">
             <div class="container-base max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <div class="rounded-lg border bg-card text-card-foreground shadow-sm shadow-strong">
                     <div class="p-8 lg:p-12">
-                        <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-6">Start Your Journey to Vitality</h2>
+                        <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-6">{{ $cta->heading ?? 'Begin Your Path to Vitality' }}</h2>
                         <p class="text-xl text-muted-foreground mb-4">
-                            Join thousands who have made Vital Boost part of their daily wellness routine
+                            {{ $cta->subheading ?? 'Join the many members who\'ve made Vital Boost part of their daily routine.' }}
                         </p>
                         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
                             <div class="text-center">
-                                <div class="text-4xl font-bold gradient-primary text-transparent bg-clip-text">$79.99</div>
-                                <p class="text-sm text-muted-foreground">One-time purchase</p>
+                                <div class="text-4xl font-bold gradient-primary text-transparent bg-clip-text">{{ $ctaMeta['price_one_time'] ?? '$79.99' }}</div>
+                                <p class="text-sm text-muted-foreground">{{ $ctaMeta['price_one_time_label'] ?? 'One-time purchase' }}</p>
                             </div>
                             <div class="text-muted-foreground hidden sm:block">or</div>
                             <div class="text-center p-4 bg-secondary rounded-lg">
-                                <div class="text-4xl font-bold gradient-primary text-transparent bg-clip-text">$67.99</div>
-                                <p class="text-sm text-muted-foreground">Subscribe &amp; Save 15%</p>
+                                <div class="text-4xl font-bold gradient-primary text-transparent bg-clip-text">{{ $ctaMeta['price_subscription'] ?? '$67.99' }}</div>
+                                <p class="text-sm text-muted-foreground">{{ $ctaMeta['price_subscription_label'] ?? 'Subscribe & Save 15%' }}</p>
                             </div>
                         </div>
-                        <x-button-use href="{{ url('/membership') }}" label="Get Membership" variant="primary"  class="w-2/3 justify-self-center" />
+                        <x-button-use href="{{ url('/membership') }}" :label="$ctaMeta['cta_label'] ?? 'Explore Membership'" variant="primary" class="w-2/3 justify-self-center" />
                         <p class="text-sm text-muted-foreground mt-4">
-                        Members receive additional discounts. Free shipping on orders over <span class="text-primary heading-4">$50</span>..
+                            {{ $ctaMeta['footer_note'] ?? 'Members enjoy additional discounts. Free shipping on orders over $50.' }}
                         </p>
                     </div>
                 </div>

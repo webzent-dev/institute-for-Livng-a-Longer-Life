@@ -6,7 +6,7 @@ use App\Models\VideoTestimonial;
 use App\Models\Testimonial;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\ContentManagement;
+use App\Models\PageContent;
 
 class TestimonialsController extends Controller
 {
@@ -23,8 +23,9 @@ class TestimonialsController extends Controller
         });
         $stats = Stat::where('is_active', true)->get();
         $testimonials = Testimonial::where('is_active', true)->orderBy('sort_order')->paginate(3);
-        $testimonialPageContent = ContentManagement::where('page_name', 'testimonial_page')->first();
-        return view('front.pages.testimonials', compact('stats', 'videoTestimonials', 'testimonials', 'testimonialPageContent'));
+        $sections = PageContent::sections('testimonials');
+
+        return view('front.pages.testimonials', compact('stats', 'videoTestimonials', 'testimonials', 'sections'));
     }
  
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\PageContent;
 
 class ShopController extends Controller
 {
@@ -28,8 +29,12 @@ class ShopController extends Controller
                             ->where('status', 'active')
                             ->select('id', 'first_name', 'last_name')
                             ->get();
-        
-        return view('front.pages.shop', compact('products', 'collaborators'));
+
+        // Keyed by section_key (hero, member_benefits). The view falls back to its
+        // built-in copy for any section that is missing or deactivated.
+        $sections = PageContent::sections('shop');
+
+        return view('front.pages.shop', compact('products', 'collaborators', 'sections'));
     }
 
     public function filter(Request $request)
@@ -57,10 +62,12 @@ class ShopController extends Controller
                             ->where('status', 'active')
                             ->select('id', 'first_name', 'last_name')
                             ->get();
-        
-        return view('front.pages.shop', compact('products', 'collaborators'));
+
+        $sections = PageContent::sections('shop');
+
+        return view('front.pages.shop', compact('products', 'collaborators', 'sections'));
     }
-    
+
     public function productDetails($slug)
     {
         $product = Product::where('slug', $slug)->first();

@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\User;
 use App\Models\Product;
-use App\Models\ContentManagement;
 use App\Models\Course;
+use App\Models\PageContent;
 
 class AboutController extends Controller
 {
@@ -18,15 +18,19 @@ class AboutController extends Controller
     }
     public function aboutZeines()
     {
-        $aboutPageContent = ContentManagement::where('page_name', 'about_page')->first();
-        return view('front.pages.about-dr-zeines',compact('aboutPageContent'));
+        // Keyed by section_key (hero, highlights, biography, philosophy). The view falls back
+        // to its built-in copy for any section that is missing or deactivated.
+        $sections = PageContent::sections('about');
+
+        return view('front.pages.about-dr-zeines', compact('sections'));
     }
     public function collaborators()
     {
         $collaborators = User::where('role', 'collaborator')->withCount('products')->withCount('courses')->where('status', 'active')->get();
         $specialties = $collaborators->pluck('speciality')->filter()->unique()->sort()->values();
-        $collaboratorPageContent = ContentManagement::where('page_name', 'collaborator_page')->first();
-        return view('front.pages.collaborators', compact('collaborators', 'specialties', 'collaboratorPageContent'));
+        $sections = PageContent::sections('collaborators');
+
+        return view('front.pages.collaborators', compact('collaborators', 'specialties', 'sections'));
     }
 
     public function store($id)

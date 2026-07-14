@@ -1,19 +1,38 @@
 @extends('front.layouts.app')
 @section('content')
+@php
+    // CMS sections (App\Models\PageContent, page_key "shop"), keyed by section_key. Every value
+    // falls back to the original hard-coded copy, so the page still renders if a section has not
+    // been seeded or an admin deactivates one.
+    $sections       = $sections ?? collect();
+    $hero           = $sections['hero']            ?? null;
+    $memberBenefits = $sections['member_benefits'] ?? null;
+    $benefitsMeta   = $memberBenefits->meta ?? [];
+
+    $discountTiers = $memberBenefits->items['tiers'] ?? [];
+    if (empty($discountTiers)) {
+        $discountTiers = [
+            ['value' => '10%', 'label' => 'Essential Members'],
+            ['value' => '20%', 'label' => 'Premium Members'],
+            ['value' => '30%', 'label' => 'Elite Members'],
+        ];
+    }
+@endphp
 <div class="min-h-screen flex flex-col">
+    @if($hero || !$sections->count())
     <section class="gradient-subtle pt-10 md:pt-14 lg:pt-16">
         <div class="max-w-7xl mx-auto py-8 px-4">
             <div class="text-center mb-6">
                 <h1 class="text-4xl lg:text-5xl font-bold text-foreground mb-3">
-                    Wellness Store
+                    {{ $hero->heading ?? 'Wellness Store' }}
                 </h1>
                 <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Premium products curated by our expert collaborators.
-                    Members enjoy exclusive discounts on all items.
+                    {{ $hero->body ?? 'Premium products curated by our expert collaborators. Members enjoy exclusive discounts on all items.' }}
                 </p>
             </div>
         </div>
     </section>
+    @endif
 
     <!-- Main Content Area -->
     @php ($cartVal = Session::get('cart', [])) @endphp
@@ -104,46 +123,34 @@
     @endif
 
     {{-- Member Benefits --}}
+    @if($memberBenefits || !$sections->count())
     <section class="py-20 gradient-subtle">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div class="rounded-lg border bg-card text-card-foreground shadow-sm shadow-strong">
                 <div class="p-8">
                     <h2 class="text-3xl font-bold text-foreground mb-4">
-                        Members Save More
+                        {{ $memberBenefits->heading ?? 'Members Save More' }}
                     </h2>
-                    <p class="text-muted-foreground mb-6">Join our membership program and enjoy exclusive discounts on allproducts</p>
+                    <p class="text-muted-foreground mb-6">{{ $memberBenefits->body ?? 'Join our membership program and enjoy exclusive discounts on all products' }}</p>
                     <div class="grid md:grid-cols-3 gap-4 mb-6">
-                        <div class="p-4 bg-secondary rounded-lg">
-                            <div class="text-3xl font-bold gradient-primary text-transparent bg-clip-text mb-2">10%</div>
-                                <div class="text-sm text-muted-foreground">Essential Members</div>
-                            </div>
-
+                        @foreach($discountTiers as $tier)
                             <div class="p-4 bg-secondary rounded-lg">
-                                <div class="text-3xl font-bold gradient-primary text-transparent bg-clip-text mb-2">20%</div>
-                                    <div class="text-sm text-muted-foreground">
-                                        Premium Members
-                                    </div>
-                                </div>
-
-                                <div class="p-4 bg-secondary rounded-lg">
-                                    <div class="text-3xl font-bold gradient-primary text-transparent bg-clip-text mb-2">30%</div>
-                                    <div class="text-sm text-muted-foreground">
-                                        Elite Members
-                                    </div>
-                                </div>
+                                <div class="text-3xl font-bold gradient-primary text-transparent bg-clip-text mb-2">{{ $tier['value'] ?? '' }}</div>
+                                <div class="text-sm text-muted-foreground">{{ $tier['label'] ?? '' }}</div>
                             </div>
-
-                            <a href="{{ url('/membership') }}">
-                                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold h-11 rounded-md px-8">
-                                    Become a Member
-                                </button>
-                            </a>
-                        </div>
+                        @endforeach
                     </div>
+
+                    <a href="{{ url('/membership') }}">
+                        <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold h-11 rounded-md px-8">
+                            {{ $benefitsMeta['cta_label'] ?? 'Become a Member' }}
+                        </button>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
+    @endif
 </div>
 
 <!-- ===================== JS ===================== -->

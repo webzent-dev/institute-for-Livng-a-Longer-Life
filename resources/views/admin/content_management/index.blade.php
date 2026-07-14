@@ -94,39 +94,19 @@
                                         {{-- accordion contents  --}}
                                         <div class="pb-4 pt-0">
                                             <div class="space-y-4 pt-4">
-                                                @if(isset($homePageContent->id))
-                                                    <form method="post" action="{{ route('admin.content.management.updateSiteSettings')}}">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="hidden" name="id" value="{{ $homePageContent->id }}">
-                                                @else
-                                                    <form method="post" action="{{ route('admin.content.management.store')}}">
-                                                        @csrf    
-                                                @endif
-                                                    <input type="hidden" name="form_name" value="home_page">
-                                                    <div class="flex items-center justify-end space-x-2">
-                                                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                                                    </div>
-                                                    
-                                                    <!-- Hero Section -->
-                                                    <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
-                                                        <div class="flex flex-col space-y-1.5 p-6 py-3">
-                                                            <div class="flex items-center justify-between">
-                                                                <!-- <label class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Hero Section</label> -->
-                                                                <div class="flex items-center gap-2">
-                                                                    <div class="space-y-2">
-                                                                        <!-- <x-form.switch name="is_published" label="Active" :checked="true" on-value="published" off-value="draft" on-label="Published" off-label="Draft" class="pt-8"/> -->
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                {{-- Edited section by section (hero, feature blocks, membership heading,
+                                                     community, newsletter, call to action) on its own screen. --}}
+                                                <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
+                                                    <div class="p-6 flex items-center justify-between gap-4">
+                                                        <div>
+                                                            <p class="text-base font-medium">Home Page Sections</p>
+                                                            <p class="text-sm text-muted-foreground mt-1">
+                                                                Edit the hero, feature blocks, membership heading, community section, newsletter panel and call to action individually.
+                                                            </p>
                                                         </div>
-                                                        <div class="p-6 pt-0">
-                                                            <textarea name="page_content" id="home_page_content" rows="3" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none">
-                                                            {{isset($homePageContent->page_content) ? $homePageContent->page_content : ''}}
-                                                            </textarea>
-                                                        </div>
+                                                        <a href="{{ route('admin.content.page', 'home') }}" class="btn btn-primary whitespace-nowrap">Edit Sections</a>
                                                     </div>
-                                                </form>
+                                                </div>
 
                                                 <!-- About Preview -->
                                                 <!-- <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
@@ -232,38 +212,18 @@
                                         {{-- accordion contents  --}}
                                         <div class="pb-4 pt-0">
                                             <div class="space-y-4 pt-4">
-                                                @if(isset($aboutPageContent->id))
-                                                    <form method="post" action="{{ route('admin.content.management.updateSiteSettings')}}">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="hidden" name="id" value="{{ $aboutPageContent->id }}">
-                                                @else
-                                                    <form method="post" action="{{ route('admin.content.management.store')}}">
-                                                        @csrf    
-                                                @endif
-                                                        <input type="hidden" name="form_name" value="about_page">
-                                                        <div class="flex items-center justify-end space-x-2">
-                                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                {{-- Edited section by section (hero, highlight cards, biography, philosophy) on its own screen. --}}
+                                                <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
+                                                    <div class="p-6 flex items-center justify-between gap-4">
+                                                        <div>
+                                                            <p class="text-base font-medium">About Us Page Sections</p>
+                                                            <p class="text-sm text-muted-foreground mt-1">
+                                                                Edit the hero, highlight cards, biography and wellness philosophy individually.
+                                                            </p>
                                                         </div>
-                                                        <!-- Biography -->
-                                                        <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
-                                                            <div class="flex flex-col space-y-1.5 p-6 py-3">
-                                                                <div class="flex items-center justify-between">
-                                                                    <!-- <label class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Biography</label> -->
-                                                                    <div class="flex items-center gap-2">
-                                                                        <div class="space-y-2">
-                                                                            <!-- <x-form.switch name="is_published" label="Active" :checked="true" on-value="published" off-value="draft" on-label="Published" off-label="Draft" class="pt-8"/> -->
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="p-6 pt-0">
-                                                                <textarea name="page_content" id="about_page_content" rows="3" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none">
-                                                                    {{isset($aboutPageContent->page_content) ? $aboutPageContent->page_content : ''}}
-                                                                </textarea>
-                                                            </div>
-                                                        </div>
-                                                    </form>
+                                                        <a href="{{ route('admin.content.page', 'about') }}" class="btn btn-primary whitespace-nowrap">Edit Sections</a>
+                                                    </div>
+                                                </div>
 
                                                 <!-- Credentials & Awards -->
                                                 <!-- <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
@@ -324,38 +284,18 @@
                                         {{-- accordion contents  --}}
                                         <div class="pb-4 pt-0">
                                             <div class="space-y-4 pt-4">
-                                                @if(isset($collaboratorPageContent->id))
-                                                    <form method="post" action="{{ route('admin.content.management.updateSiteSettings')}}">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="hidden" name="id" value="{{ $collaboratorPageContent->id }}">
-                                                @else
-                                                    <form method="post" action="{{ route('admin.content.management.store')}}">
-                                                        @csrf    
-                                                @endif
-                                                        <input type="hidden" name="form_name" value="collaborator_page">
-                                                        <div class="flex items-center justify-end space-x-2">
-                                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                {{-- Edited section by section (intro, call to action) on its own screen. --}}
+                                                <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
+                                                    <div class="p-6 flex items-center justify-between gap-4">
+                                                        <div>
+                                                            <p class="text-base font-medium">Collaborators Page Sections</p>
+                                                            <p class="text-sm text-muted-foreground mt-1">
+                                                                Edit the intro above the collaborator list and the "join our network" call to action.
+                                                            </p>
                                                         </div>
-                                                        <!-- Collaborator Introduction -->
-                                                        <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
-                                                            <div class="flex flex-col space-y-1.5 p-6 py-3">
-                                                                <div class="flex items-center justify-between">
-                                                                    <!-- <label class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Membership Introduction</label> -->
-                                                                    <div class="flex items-center gap-2">
-                                                                        <div class="space-y-2">
-                                                                            <!-- <x-form.switch name="is_published" label="Active" :checked="true" on-value="published" off-value="draft" on-label="Published" off-label="Draft" class="pt-8"/> -->
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="p-6 pt-0">
-                                                                <textarea name="page_content" id="collaborator_page_content" rows="3" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none">
-                                                                {{isset($collaboratorPageContent->page_content) ? $collaboratorPageContent->page_content : ''}}
-                                                                </textarea>
-                                                            </div>
-                                                        </div>
-                                                    </form>
+                                                        <a href="{{ route('admin.content.page', 'collaborators') }}" class="btn btn-primary whitespace-nowrap">Edit Sections</a>
+                                                    </div>
+                                                </div>
 
                                                 <!-- Credentials & Awards -->
                                                 <!-- <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
@@ -416,38 +356,19 @@
                                         {{-- accordion contents  --}}
                                         <div class="pb-4 pt-0">
                                             <div class="space-y-4 pt-4">
-                                                @if(isset($vitalBoostPageContent->id))
-                                                    <form method="post" action="{{ route('admin.content.management.updateSiteSettings')}}">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="hidden" name="id" value="{{ $vitalBoostPageContent->id }}">
-                                                @else
-                                                    <form method="post" action="{{ route('admin.content.management.store')}}">
-                                                        @csrf    
-                                                @endif
-                                                        <input type="hidden" name="form_name" value="vital_boost_page">
-                                                        <div class="flex items-center justify-end space-x-2">
-                                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                {{-- The Vital Boost page is edited section by section (hero, benefits,
+                                                     ingredients, routine, CTA) on its own screen. --}}
+                                                <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
+                                                    <div class="p-6 flex items-center justify-between gap-4">
+                                                        <div>
+                                                            <p class="text-base font-medium">Vital Boost Page Sections</p>
+                                                            <p class="text-sm text-muted-foreground mt-1">
+                                                                Edit the hero, benefit cards, ingredients, daily routine and call to action individually.
+                                                            </p>
                                                         </div>
-                                                        <!-- Vital Boost Introduction -->
-                                                        <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
-                                                            <div class="flex flex-col space-y-1.5 p-6 py-3">
-                                                                <div class="flex items-center justify-between">
-                                                                    <!-- <label class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Membership Introduction</label> -->
-                                                                    <div class="flex items-center gap-2">
-                                                                        <div class="space-y-2">
-                                                                            <!-- <x-form.switch name="is_published" label="Active" :checked="true" on-value="published" off-value="draft" on-label="Published" off-label="Draft" class="pt-8"/> -->
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="p-6 pt-0">
-                                                                <textarea name="page_content" id="vital_boost_page_content" rows="3" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none">
-                                                                {{ isset($vitalBoostPageContent->page_content) ? $vitalBoostPageContent->page_content : '' }} 
-                                                                </textarea>
-                                                            </div>
-                                                        </div>
-                                                    </form>
+                                                        <a href="{{ route('admin.content.vital-boost') }}" class="btn btn-primary whitespace-nowrap">Edit Sections</a>
+                                                    </div>
+                                                </div>
 
                                                 <!-- Credentials & Awards -->
                                                 <!-- <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
@@ -508,38 +429,18 @@
                                         {{-- accordion contents  --}}
                                         <div class="pb-4 pt-0">
                                             <div class="space-y-4 pt-4">
-                                                @if(isset($testimonialPageContent->id))
-                                                    <form method="post" action="{{ route('admin.content.management.updateSiteSettings')}}">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="hidden" name="id" value="{{ $testimonialPageContent->id }}">
-                                                @else
-                                                    <form method="post" action="{{ route('admin.content.management.store')}}">
-                                                        @csrf    
-                                                @endif
-                                                        <input type="hidden" name="form_name" value="testimonial_page">
-                                                        <div class="flex items-center justify-end space-x-2">
-                                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                {{-- Edited section by section (intro, video testimonials, call to action) on its own screen. --}}
+                                                <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
+                                                    <div class="p-6 flex items-center justify-between gap-4">
+                                                        <div>
+                                                            <p class="text-base font-medium">Testimonials Page Sections</p>
+                                                            <p class="text-sm text-muted-foreground mt-1">
+                                                                Edit the intro, the video testimonials heading and the closing call to action.
+                                                            </p>
                                                         </div>
-                                                        <!-- Testimonial Introduction-->
-                                                        <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
-                                                            <div class="flex flex-col space-y-1.5 p-6 py-3">
-                                                                <div class="flex items-center justify-between">
-                                                                    <!-- <label class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Shop Introduction</label> -->
-                                                                    <div class="flex items-center gap-2">
-                                                                        <div class="space-y-2">
-                                                                            <!-- <x-form.switch name="is_published" label="Active" :checked="true" on-value="published" off-value="draft" on-label="Published" off-label="Draft" class="pt-8"/> -->
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="p-6 pt-0">
-                                                                <textarea name="page_content" id="testimonial_page_content" rows="3" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none">
-                                                                {{isset($testimonialPageContent->page_content) ? $testimonialPageContent->page_content : ''}}
-                                                                </textarea>
-                                                            </div>
-                                                        </div>
-                                                    </form>
+                                                        <a href="{{ route('admin.content.page', 'testimonials') }}" class="btn btn-primary whitespace-nowrap">Edit Sections</a>
+                                                    </div>
+                                                </div>
 
                                                 <?php /*
                                                 <!-- Credentials & Awards -->
@@ -602,41 +503,65 @@
                                         {{-- accordion contents  --}}
                                         <div class="pb-4 pt-0">
                                             <div class="space-y-4 pt-4">
-                                                @if(isset($faqPageContent->id))
-                                                <form method="post" action="{{ route('admin.content.management.updateSiteSettings')}}">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <input type="hidden" name="id" value="{{ $faqPageContent->id }}">
-                                                @else
-                                                <form method="post" action="{{ route('admin.content.management.store')}}">
-                                                    @csrf    
-                                                @endif
-                                                    <input type="hidden" name="form_name" value="faq_page">
-                                                    <div class="flex items-center justify-end space-x-2">
-                                                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                                                    </div>
-                                                    <!-- Testimonial Introduction-->
-                                                    <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
-                                                        <div class="flex flex-col space-y-1.5 p-6 py-3">
-                                                            <div class="flex items-center justify-between">
-                                                                <!-- <label class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-base font-medium">Shop Introduction</label> -->
-                                                                <div class="flex items-center gap-2">
-                                                                    <div class="space-y-2">
-                                                                        <!-- <x-form.switch name="is_published" label="Active" :checked="true" on-value="published" off-value="draft" on-label="Published" off-label="Draft" class="pt-8"/> -->
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                {{-- Edited section by section (hero, call to action) on its own screen.
+                                                     The questions themselves live in the FAQs module. --}}
+                                                <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
+                                                    <div class="p-6 flex items-center justify-between gap-4">
+                                                        <div>
+                                                            <p class="text-base font-medium">FAQ Page Sections</p>
+                                                            <p class="text-sm text-muted-foreground mt-1">
+                                                                Edit the FAQ heading and the support call to action.
+                                                            </p>
                                                         </div>
-                                                        <div class="p-6 pt-0">
-                                                            <textarea name="page_content" id="faq_page_content" rows="3" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none">
-                                                            {{isset($faqPageContent->page_content) ? $faqPageContent->page_content : ''}}
-                                                            </textarea>
-                                                        </div>
+                                                        <a href="{{ route('admin.content.page', 'faq') }}" class="btn btn-primary whitespace-nowrap">Edit Sections</a>
                                                     </div>
-                                                </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+
+                                    @foreach([
+                                        ['key' => 'intro_videos', 'title' => 'Intro Videos Page', 'icon' => 'play-circle',
+                                         'label' => 'Intro Videos Page Sections',
+                                         'hint'  => 'Edit the heading above the sample videos and the membership call to action.'],
+                                        ['key' => 'shop', 'title' => 'Store Page', 'icon' => 'shopping-bag',
+                                         'label' => 'Store Page Sections',
+                                         'hint'  => 'Edit the store heading and the member discount tiers shown below the products.'],
+                                        ['key' => 'contact', 'title' => 'Contact Page', 'icon' => 'mail',
+                                         'label' => 'Contact Page Sections',
+                                         'hint'  => 'Edit the hero, form card copy, collaboration note and quick answers panel.'],
+                                        ['key' => 'help_center', 'title' => 'Help Centre Page', 'icon' => 'life-buoy',
+                                         'label' => 'Help Centre Page Sections',
+                                         'hint'  => 'Edit the hero, the getting started steps and the support section.'],
+                                    ] as $sectionPage)
+                                    <div class="">
+                                        <h3 class="accordion-item flex border-t">
+                                            <button type="button" aria-expanded="false" class="flex flex-1 items-center justify-between py-4 font-medium transition-all hover:no-underline">
+                                                <div class="flex items-center gap-3">
+                                                    <i data-lucide="{{ $sectionPage['icon'] }}" class="h-5 w-5 text-primary" aria-hidden="true"></i>
+                                                    <span>{{ $sectionPage['title'] }}</span>
+                                                </div>
+                                                <svg class="h-4 w-4 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="m6 9 6 6 6-6"></path>
+                                                </svg>
+                                            </button>
+                                        </h3>
+                                        {{-- accordion contents  --}}
+                                        <div class="pb-4 pt-0">
+                                            <div class="space-y-4 pt-4">
+                                                <div class="rounded-lg bg-card text-card-foreground shadow-sm border">
+                                                    <div class="p-6 flex items-center justify-between gap-4">
+                                                        <div>
+                                                            <p class="text-base font-medium">{{ $sectionPage['label'] }}</p>
+                                                            <p class="text-sm text-muted-foreground mt-1">{{ $sectionPage['hint'] }}</p>
+                                                        </div>
+                                                        <a href="{{ route('admin.content.page', $sectionPage['key']) }}" class="btn btn-primary whitespace-nowrap">Edit Sections</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
 
                                     {{-- Terms and Conditions Page --}}
                                     <div>
@@ -1354,111 +1279,9 @@ document.getElementById('og-image-upload').addEventListener('change', function(e
 </script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    CKEDITOR.replace('home_page_content', {
-        height: 400,
-        extraAllowedContent: '*(*);*{*}',
-        removePlugins: '',
-        allowedContent: true,
-        disallowedContent: '',
-        basicEntities: false,
-        entities: false,
-        entities_latin: false,
-        entities_greek: false,
-        entities_additional: '',
-        fillEmptyBlocks: false,
-        autoParagraph: false,
-        toolbar: [
-            { name: 'document', items: [ 'Source', '-', 'Preview', 'Print' ] },
-            { name: 'clipboard', items: [ 'Undo', 'Redo' ] },
-            { name: 'styles', items: [ 'Format', 'Font', 'FontSize' ] },
-            { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike' ] },
-            { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-            { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
-            { name: 'links', items: [ 'Link', 'Unlink' ] }
-        ]
-    });
-
-    CKEDITOR.replace('about_page_content', {
-        height: 400,
-        extraAllowedContent: '*[*];*{*}',
-        removePlugins: 'pastefromword, pastetext',
-        allowedContent: true,
-        fullPage: false,
-        ignoreEmptyParagraph: false,
-        fillEmptyBlocks: false,
-        autoParagraph: false,
-        enterMode: CKEDITOR.ENTER_BR,
-        shiftEnterMode: CKEDITOR.ENTER_P,
-        toolbar: [
-            { name: 'document', items: [ 'Source', '-', 'Preview', 'Print' ] },
-            { name: 'clipboard', items: [ 'Undo', 'Redo' ] },
-            { name: 'styles', items: [ 'Format', 'Font', 'FontSize' ] },
-            { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike' ] },
-            { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-            { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
-            { name: 'links', items: [ 'Link', 'Unlink' ] }
-        ]
-    });
-
-    CKEDITOR.replace('collaborator_page_content', {
-        height: 400,
-        extraAllowedContent: '*(*);*{*}',
-        removePlugins: '',
-        toolbar: [
-            { name: 'document', items: [ 'Source', '-', 'Preview', 'Print' ] },
-            { name: 'clipboard', items: [ 'Undo', 'Redo' ] },
-            { name: 'styles', items: [ 'Format', 'Font', 'FontSize' ] },
-            { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike' ] },
-            { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-            { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
-            { name: 'links', items: [ 'Link', 'Unlink' ] }
-        ]
-    });
-
-    CKEDITOR.replace('vital_boost_page_content', {
-        height: 400,
-        extraAllowedContent: '*(*);*{*}',
-        removePlugins: '',
-        toolbar: [
-            { name: 'document', items: [ 'Source', '-', 'Preview', 'Print' ] },
-            { name: 'clipboard', items: [ 'Undo', 'Redo' ] },
-            { name: 'styles', items: [ 'Format', 'Font', 'FontSize' ] },
-            { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike' ] },
-            { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-            { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
-            { name: 'links', items: [ 'Link', 'Unlink' ] }
-        ]
-    });
-
-    CKEDITOR.replace('testimonial_page_content', {
-        height: 400,
-        extraAllowedContent: '*(*);*{*}',
-        removePlugins: '',
-        toolbar: [
-            { name: 'document', items: [ 'Source', '-', 'Preview', 'Print' ] },
-            { name: 'clipboard', items: [ 'Undo', 'Redo' ] },
-            { name: 'styles', items: [ 'Format', 'Font', 'FontSize' ] },
-            { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike' ] },
-            { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-            { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
-            { name: 'links', items: [ 'Link', 'Unlink' ] }
-        ]
-    });
-
-    CKEDITOR.replace('faq_page_content', {
-        height: 400,
-        extraAllowedContent: '*(*);*{*}',
-        removePlugins: '',
-        toolbar: [
-            { name: 'document', items: [ 'Source', '-', 'Preview', 'Print' ] },
-            { name: 'clipboard', items: [ 'Undo', 'Redo' ] },
-            { name: 'styles', items: [ 'Format', 'Font', 'FontSize' ] },
-            { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike' ] },
-            { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] },
-            { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
-            { name: 'links', items: [ 'Link', 'Unlink' ] }
-        ]
-    });
+    {{-- Home, Vital Boost, About, Collaborators, Testimonials, FAQ, Intro Videos, Store, Contact and
+         Help Centre are edited section by section on their own screens, so they have no CKEditor here.
+         Only the legal pages (terms, privacy) still use the raw HTML editor below. --}}
 
     CKEDITOR.replace('terms_and_conditions_page_content', {
         height: 400,

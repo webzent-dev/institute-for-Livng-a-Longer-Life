@@ -1,16 +1,23 @@
 @extends('front.layouts.app')
 @section('content')
+@php
+    // CMS sections (App\Models\PageContent, page_key "collaborators"), keyed by section_key.
+    // Every value falls back to the original hard-coded copy, so the page still renders if a
+    // section has not been seeded or an admin deactivates one.
+    $sections = $sections ?? collect();
+    $hero     = $sections['hero'] ?? null;
+    $cta      = $sections['cta']  ?? null;
+    $ctaMeta  = $cta->meta ?? [];
+@endphp
 <div class="py-10 min-h-screen flex flex-col font-jakarta">
     <main class="flex-1">
-        {!! $collaboratorPageContent->page_content !!}
-        
         {{-- Collaborators Filter Section --}}
         <section class="bg-white border border-gray-200 mb-6 md:mb-10 p-4 md:p-6 rounded-2xl shadow-soft">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col gap-4 items-center justify-center mb-6 md:flex-row">
                     <div>
-                        <h2 class="font-bold text-2xl md:text-3xl">Our Collaborators</h2>
-                        <p class="mt-1 text-md text-muted-foreground">Find experts by name, specialty, or status</p>
+                        <h2 class="font-bold text-2xl md:text-3xl">{{ $hero->heading ?? 'Our Collaborators' }}</h2>
+                        <p class="mt-1 text-md text-muted-foreground">{{ $hero->subheading ?? 'Find experts by name, specialty, or status' }}</p>
                     </div>
                 </div>
 
@@ -367,14 +374,17 @@
         </style>
 
         {{-- CTA icon="user-star" --}}
-        <x-ui.cta-section 
-        title=" Interested in Becoming a Collaborator?"
-        subtitle="Join our network of expert practitioners and share your knowledge with our growing community. Manage your own store, create courses, and make a meaningful impact on people's lives."
+        @if($cta || !$sections->count())
+        <x-ui.cta-section
+        {{-- Bound with ":" so the value is escaped once by the component; "title=..." would double-escape apostrophes. --}}
+        :title="$cta->heading ?? 'Interested in Becoming a Collaborator?'"
+        :subtitle="$cta->body ?? 'Join our network of expert practitioners and share your knowledge with our growing community. Manage your own store, create courses, and make a meaningful impact on people\'s lives.'"
         cardClass="hover:border-gray-200"
         :buttons="[
-            ['route' => 'become-collaborator',   'label' => 'Apply to Collaborate', 'variant' => 'primary', 'icon' => 'external-link'],
+            ['route' => 'become-collaborator',   'label' => $ctaMeta['cta_label'] ?? 'Apply to Collaborate', 'variant' => 'primary', 'icon' => 'external-link'],
         ]"
         />
+        @endif
     </main>
 </div>
 @endsection

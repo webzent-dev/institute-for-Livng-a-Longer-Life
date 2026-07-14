@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Front;
 use App\Models\HelpCategory;
 use App\Models\ContactOption;
+use App\Models\PageContent;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 class HelpCenterController extends Controller
@@ -15,9 +16,11 @@ class HelpCenterController extends Controller
         ])->get();
 
         $contactOptions = ContactOption::all();
+        $sections = PageContent::sections('help_center');
+
         return view(
             'front.pages.help-center',
-            compact('helpTopics', 'contactOptions')
+            compact('helpTopics', 'contactOptions', 'sections')
         );
     }
     
