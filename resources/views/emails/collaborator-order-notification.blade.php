@@ -1,136 +1,90 @@
-<meta charset="UTF-8">
-    <title>New Order - Your Product Sold</title>
+@extends('emails.layouts.master')
 
+@section('title', 'One of your products has sold')
+@section('preheader', 'Order ' . $order->order_number . ' includes one of your products.')
+@section('heading', 'You have a new order')
 
+@section('content')
+    @php
+        // Only this collaborator's lines belong in their copy of the email.
+        $myItems = collect($orderItems)->filter(
+            fn ($item) => in_array($item->product_id, $collaboratorProductIds)
+        );
+        $myEarnings = $myItems->sum(fn ($item) => $item->price * $item->quantity);
+    @endphp
 
-<table width="100%" cellpadding="0" cellspacing="0" style="padding:20px; background:#f4f6f8;">
-<tbody><tr>
-<td align="center">
+    <p style="margin:0 0 16px 0;">
+        Hello {{ ucfirst($collaboratorName) }},
+    </p>
 
-    <!-- Container -->
-    <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:8px; overflow:hidden;">
+    <p style="margin:0 0 20px 0;">
+        Good news — a member has just purchased from your store. Here are the details of your part of
+        this order.
+    </p>
 
-        <!-- Header -->
-        <tbody><tr>
-    <td style="background:#4CAF50; padding:20px; text-align:center;">
-        
-        <img src="https://bikewrapt.com/assets/logo.png" 
-             alt="Logo" 
-             width="130"
-             style="display:block; margin:0 auto 10px auto;">
-
-        <h2 style="color:#fff; margin:0;">New Order Received</h2>
-    </td>
-</tr>
-        <!-- Body -->
+    {{-- Order meta --}}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0; border:1px solid #e5e7eb; border-radius:8px;">
         <tr>
-            <td style="padding:20px; color:#333;">
-
-                <h3 style="margin-top:0;">Hello {{ $collaboratorName }},</h3>
-
-                <p>
-                    Good news! 🎉 One of your products has been ordered.
-                </p>
-
-                <!-- Order Info -->
-                <h3>Order Info</h3>
-                <table width="100%" cellpadding="6" cellspacing="0" style="margin-bottom:15px;">
-                    <tbody><tr>
-                        <td><strong>Order ID:</strong></td>
-                        <td>{{ $order->order_number }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Date:</strong></td>
-                        <td>{{ $order->created_at->format('F d, Y H:i') }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Status:</strong></td>
-                        <td>{{ ucfirst($order->status) }}</td>
-                    </tr>
-                </tbody></table>
-
-                <!-- Customer Info -->
-                <h3>Customer Details</h3>
-                <table width="100%" cellpadding="6" cellspacing="0" style="margin-bottom:15px;">
-                    <tbody><tr>
-                        <td><strong>Name:</strong></td>
-                        <td>{{ $order->first_name }} {{ $order->last_name }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Email:</strong></td>
-                        <td>{{ $order->email }}</td>
-                    </tr>
-                </tbody></table>
-
-                <!-- Collaborator Products Only -->
-                <h3>Your Products in this Order</h3>
-                
-                        @forelse($orderItems as $item)
-                            @if(in_array($item->product_id, $collaboratorProductIds))
-                                
-                            @endif
-                        @empty
-                            
-                        @endforelse
-                    <table width="100%" cellpadding="10" cellspacing="0" style="border-collapse:collapse; border:1px solid #ddd;">
-                    <thead>
-                        <tr style="background:#f2f2f2;">
-                            <th align="left" style="border:1px solid #ddd;">Product</th>
-                            <th align="center" style="border:1px solid #ddd;">Qty</th>
-                            <th align="right" style="border:1px solid #ddd;">Price</th>
-                            <th align="right" style="border:1px solid #ddd;">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody><tr>
-                                    <td style="border:1px solid #ddd;">{{ $item->product_name }}</td>
-                                    <td align="center" style="border:1px solid #ddd;">{{ $item->quantity }}</td>
-                                    <td align="right" style="border:1px solid #ddd;">${{ number_format($item->price, 2) }}</td>
-                                    <td align="right" style="border:1px solid #ddd;">
-                                        ${{ number_format($item->price * $item->quantity, 2) }}
-                                    </td>
-                                </tr><tr>
-                                <td colspan="4" class="p-4 text-center text-gray-500">No items found for this order.</td>
-                            </tr></tbody>
-                </table>
-
-                <!-- Earnings (Optional) -->
-                <table width="100%" cellpadding="6" cellspacing="0" style="margin-top:15px;">
-                    <tbody><tr>
-                        <td align="right"><strong>Your Earnings:</strong></td>
-                        <td align="right">
-                            <strong>${{ number_format($order->subtotal, 2) }}</strong>
-                        </td>
-                    </tr>
-                </tbody></table>
-
-                <h3>Next Steps</h3>
-                <p>
-                    Please prepare your product/service for fulfillment. You may be contacted if further action is required.
-                </p>
-
-                <!-- CTA Button -->
-                <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px;">
-                    <tbody><tr>
-                        <td align="center">
-                            <a href="{{ url('/collaborator/orders') }}" style="background:#2c7be5; color:#fff; padding:12px 20px; text-decoration:none; border-radius:5px; display:inline-block;">
-                               View Order
-                            </a>
-                        </td>
-                    </tr>
-                </tbody></table>
-
+            <td style="padding:14px 18px; background-color:#f9fafb; border-bottom:1px solid #e5e7eb; font-weight:600; font-size:14px; color:#1f2937;">
+                Order {{ $order->order_number }}
             </td>
         </tr>
-
-        <!-- Footer -->
         <tr>
-            <td style="background:#f2f2f2; padding:15px; text-align:center; font-size:12px; color:#777;">
-                {{ config('app.name') }} • Collaborator Notification
+            <td style="padding:14px 18px; font-size:14px; color:#374151;">
+                <strong style="color:#6b7280;">Date:</strong> {{ $order->created_at->format('F d, Y \a\t g:i A') }}<br>
+                <strong style="color:#6b7280;">Status:</strong> {{ ucfirst($order->status) }}<br>
+                <strong style="color:#6b7280;">Customer:</strong> {{ $order->first_name }} {{ $order->last_name }}
             </td>
         </tr>
+    </table>
 
-    </tbody></table>
+    {{-- The collaborator's items only --}}
+    <h2 style="margin:0 0 10px 0; font-size:16px; color:#1f2937;">Your products in this order</h2>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse; margin:0 0 16px 0; font-size:14px;">
+        <thead>
+            <tr>
+                <th align="left"   style="padding:10px 12px; background-color:#f9fafb; border-bottom:2px solid #e5e7eb; color:#6b7280; font-size:12px; text-transform:uppercase; letter-spacing:0.04em;">Product</th>
+                <th align="center" style="padding:10px 12px; background-color:#f9fafb; border-bottom:2px solid #e5e7eb; color:#6b7280; font-size:12px; text-transform:uppercase; letter-spacing:0.04em;">Qty</th>
+                <th align="right"  style="padding:10px 12px; background-color:#f9fafb; border-bottom:2px solid #e5e7eb; color:#6b7280; font-size:12px; text-transform:uppercase; letter-spacing:0.04em;">Price</th>
+                <th align="right"  style="padding:10px 12px; background-color:#f9fafb; border-bottom:2px solid #e5e7eb; color:#6b7280; font-size:12px; text-transform:uppercase; letter-spacing:0.04em;">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($myItems as $item)
+                <tr>
+                    <td align="left"   style="padding:12px; border-bottom:1px solid #e5e7eb; color:#1f2937;">{{ $item->product_name }}</td>
+                    <td align="center" style="padding:12px; border-bottom:1px solid #e5e7eb; color:#374151;">{{ $item->quantity }}</td>
+                    <td align="right"  style="padding:12px; border-bottom:1px solid #e5e7eb; color:#374151;">${{ number_format($item->price, 2) }}</td>
+                    <td align="right"  style="padding:12px; border-bottom:1px solid #e5e7eb; color:#1f2937;">${{ number_format($item->price * $item->quantity, 2) }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="4" align="center" style="padding:16px; border-bottom:1px solid #e5e7eb; color:#6b7280;">No items found for this order.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
 
-</td>
-</tr>
-</tbody></table>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0; font-size:14px;">
+        <tr>
+            <td align="right" style="padding:10px 12px; border-top:2px solid #e5e7eb; font-weight:600; color:#1f2937;">Your items total</td>
+            <td align="right" style="padding:10px 12px; border-top:2px solid #e5e7eb; font-weight:700; color:#065f46; font-size:16px; width:120px;">${{ number_format($myEarnings, 2) }}</td>
+        </tr>
+    </table>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px 0; background-color:#f0fdf4; border-left:4px solid #10b981; border-radius:4px;">
+        <tr>
+            <td style="padding:14px 16px; font-size:14px; color:#065f46;">
+                <strong>Next steps:</strong> please prepare these items for fulfilment and update the order
+                in your dashboard once it has been shipped.
+            </td>
+        </tr>
+    </table>
+
+    @include('emails.partials.button', ['url' => route('collaborator.orders'), 'label' => 'View Order in Your Dashboard'])
+
+    <p style="margin:16px 0 0 0;">
+        Thank you for being part of our network,<br>
+        <strong>The Institute for Living Longer Team</strong>
+    </p>
+@endsection
