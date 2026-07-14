@@ -1,6 +1,14 @@
 @extends('front.layouts.app')
 @section('content')
     @php
+    // CMS sections (App\Models\PageContent, page_key "intro_videos"), keyed by section_key. Every
+    // value falls back to the original hard-coded copy, so the page still renders if a section has
+    // not been seeded or an admin deactivates one.
+    $sections = $sections ?? collect();
+    $hero     = $sections['hero'] ?? null;
+    $cta      = $sections['cta']  ?? null;
+    $ctaMeta  = $cta->meta ?? [];
+
     $videos = [
         [
             'id' => 1,
@@ -127,7 +135,10 @@
         <!-- More Introduction Videos -->
         <section class="py-12 bg-background">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl font-bold text-foreground mb-8">Explore Healthier Living with Our Sample Videos</h2>
+                <h2 class="text-3xl font-bold text-foreground {{ ($hero->subheading ?? '') ? 'mb-2' : 'mb-8' }}">{{ $hero->heading ?? 'Explore Healthier Living with Our Sample Videos' }}</h2>
+                @if(!empty($hero->subheading))
+                    <p class="text-lg text-muted-foreground mb-8">{{ $hero->subheading }}</p>
+                @endif
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach ($introVideos as $video)
                         <x-card class="">
@@ -166,18 +177,20 @@
         </section>
 
         {{-- CTA  icon="check-circle" --}}
+        @if($cta || !$sections->count())
         <x-ui.cta-section
             align="center"
-            title="Ready for More?"
-            subtitle="Become a member to access our complete video library with hundreds of
-            hours of expert content on health, nutrition, exercise, and longevity."
+            {{-- Bound with ":" so the value is escaped once by the component; "title=..." would double-escape apostrophes. --}}
+            :title="$cta->heading ?? 'Ready for More?'"
+            :subtitle="$cta->body ?? 'Become a member to access our complete video library with hundreds of hours of expert content on health, nutrition, exercise, and longevity.'"
             padding="p-2 md:p-2 lg:p-20"
             cardClass="hover:border-gray-200"
             container="max-w-7xl"
             :buttons="[
-                ['route' => 'membership',   'label' => 'Explore Membership Plans', 'variant' => 'outline', 'icon' => 'external-link'],
+                ['route' => 'membership',   'label' => $ctaMeta['cta_label'] ?? 'Explore Membership Plans', 'variant' => 'outline', 'icon' => 'external-link'],
             ]"
         />
+        @endif
     </main>
     
     <!-- Video Modal -->

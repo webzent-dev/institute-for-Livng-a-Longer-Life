@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Front;
 use App\Models\FaqCategory;
+use App\Models\PageContent;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 class FAQController extends Controller
@@ -22,7 +23,10 @@ class FAQController extends Controller
                 })->toArray(),
             ];
         })->toArray();
-        return view('front.pages.faq', compact('faqs'));
+
+        $sections = PageContent::sections('faq');
+
+        return view('front.pages.faq', compact('faqs', 'sections'));
     }
     public function create()
     {

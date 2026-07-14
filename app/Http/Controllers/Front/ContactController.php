@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\WebSetting;
 use App\Models\SiteSetting;
 use App\Models\Location;
+use App\Models\PageContent;
 
 class ContactController extends Controller
 {
@@ -17,7 +18,9 @@ class ContactController extends Controller
         $webSettingData = WebSetting::first();
         $siteSettingData = SiteSetting::first();
         $locations = Location::where('status', 'active')->get();
-        return view('front.pages.contact', compact('webSettingData', 'siteSettingData', 'locations'));
+        $sections = PageContent::sections('contact');
+
+        return view('front.pages.contact', compact('webSettingData', 'siteSettingData', 'locations', 'sections'));
     }
 
     public function store(Request $request)

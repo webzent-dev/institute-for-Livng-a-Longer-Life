@@ -1,17 +1,29 @@
 @extends('front.layouts.app')
 @section('content')
+@php
+    // CMS sections (App\Models\PageContent, page_key "contact"), keyed by section_key. Every value
+    // falls back to the original hard-coded copy, so the page still renders if a section has not
+    // been seeded or an admin deactivates one.
+    $sections      = $sections ?? collect();
+    $hero          = $sections['hero']          ?? null;
+    $formSection   = $sections['form']          ?? null;
+    $collaboration = $sections['collaboration'] ?? null;
+    $quickAnswers  = $sections['quick_answers'] ?? null;
+    $quickMeta     = $quickAnswers->meta ?? [];
+@endphp
 <div class="min-h-screen flex flex-col">
     <main class="flex-1 ">
         {{-- Hero Section --}}
+        @if($hero || !$sections->count())
         <section class="gradient-subtle py-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h1 class="text-4xl lg:text-4xl font-bold text-foreground mb-6">Get in Touch</h1>
+                <h1 class="text-4xl lg:text-4xl font-bold text-foreground mb-6">{{ $hero->heading ?? 'Get in Touch' }}</h1>
                 <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
-                    Have questions about our programs, membership, or collaborations?
-                    We're here to help you on your wellness journey.
+                    {{ $hero->body ?? "Have questions about our programs, membership, or collaborations? We're here to help you on your wellness journey." }}
                 </p>
             </div>
         </section>
+        @endif
 
         {{-- Contact Information --}}
         <section class="py-5 bg-background ">
@@ -57,23 +69,24 @@
                                     @endif
                                 </x-card-content>
                             </x-card>
+                            @if($collaboration || !$sections->count())
                             <x-card class="shadow-medium bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/20 hover:border-muted-foreground/20 flex-1">
                                 <x-card-content class="p-6">
-                                    <h3 class="font-semibold text-foreground mb-2">Interested in Collaborating?</h3>
+                                    <h3 class="font-semibold text-foreground mb-2">{{ $collaboration->heading ?? 'Interested in Collaborating?' }}</h3>
                                     <p class="text-muted-foreground text-sm mb-4">
-                                        If you're a health professional interested in joining our network
-                                        of collaborators, please mention it in your message.
+                                        {{ $collaboration->body ?? "If you're a health professional interested in joining our network of collaborators, please mention it in your message." }}
                                     </p>
                                 </x-card-content>
                             </x-card>
+                            @endif
                         </div>
 
                         <div class="md:col-span-2 flex flex-col">
                             <x-card class="shadow-medium hover:border-muted-foreground/20 flex-1 flex flex-col">
                                 <x-card-header>
-                                    <x-card-title class="text-2xl">Ask Anything You Want To Know</x-card-title>
+                                    <x-card-title class="text-2xl">{{ $formSection->heading ?? 'Ask Anything You Want To Know' }}</x-card-title>
                                     <p class="text-muted-foreground text-[16px]">
-                                        Fill out the form below and we'll get back to you within 24 hours
+                                        {{ $formSection->subheading ?? "Fill out the form below and we'll get back to you within 24 hours" }}
                                     </p>
                                 </x-card-header>
                                 <x-card-content class="flex-1 flex flex-col">
@@ -178,24 +191,26 @@
         <x-maps-grid />
 
         {{-- FAQ Section k --}}
+        @if($quickAnswers || !$sections->count())
         <section class="py-20 gradient-subtle">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="rounded-lg border bg-card text-card-foreground shadow-sm shadow-strong">
                     <div class="p-8 text-center">
-                        <h2 class="text-3xl font-bold text-foreground mb-4">Looking for Quick Answers?</h2>
-                        <p class="text-muted-foreground mb-6">Check out our frequently asked questions or explore our resources</p>
+                        <h2 class="text-3xl font-bold text-foreground mb-4">{{ $quickAnswers->heading ?? 'Looking for Quick Answers?' }}</h2>
+                        <p class="text-muted-foreground mb-6">{{ $quickAnswers->body ?? 'Check out our frequently asked questions or explore our resources' }}</p>
                         <div class="flex flex-col sm:flex-row gap-4 justify-center">
                             <a href="{{ url('/faq') }}">
-                                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground h-11 rounded-md px-8">View FAQ</button>
+                                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground h-11 rounded-md px-8">{{ $quickMeta['faq_label'] ?? 'View FAQ' }}</button>
                             </a>
                             <a href="{{ url('/help-center') }}">
-                                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground h-11 rounded-md px-8">Help Center</button>
+                                <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground h-11 rounded-md px-8">{{ $quickMeta['help_label'] ?? 'Help Center' }}</button>
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+        @endif
     </main>
 </div>
 <script>

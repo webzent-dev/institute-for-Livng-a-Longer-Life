@@ -1,18 +1,37 @@
 @extends('front.layouts.app')
 @section('content')
+@php
+    // CMS sections (App\Models\PageContent, page_key "testimonials"), keyed by section_key. Every
+    // value falls back to the original hard-coded copy, so the page still renders if a section has
+    // not been seeded or an admin deactivates one.
+    $sections = $sections ?? collect();
+    $hero     = $sections['hero']   ?? null;
+    $videos   = $sections['videos'] ?? null;
+    $cta      = $sections['cta']    ?? null;
+    $ctaMeta  = $cta->meta ?? [];
+@endphp
 <div class="py-10 min-h-screen flex flex-col">
     <main class="flex-1">
-        {!! $testimonialPageContent->page_content !!}
+        @if($hero)
+        <section class="py-10 gradient-subtle">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl lg:text-5xl font-bold text-foreground mb-4">{{ $hero->heading }}</h1>
+                <p class="text-xl text-muted-foreground max-w-3xl mx-auto">{{ $hero->body }}</p>
+            </div>
+        </section>
+        @endif
 
+        @if($videos || !$sections->count())
         <section class="py-10 bg-background">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-4">Video Testimonials</h2>
-                    <p class="text-xl text-muted-foreground">Real Stories, Real Experiences</p>
+                    <h2 class="text-3xl lg:text-5xl font-bold text-foreground mb-4">{{ $videos->heading ?? 'Video Testimonials' }}</h2>
+                    <p class="text-xl text-muted-foreground">{{ $videos->subheading ?? 'Real Stories, Real Experiences' }}</p>
                 </div>
                <x-ui.carousel :items="$videoTestimonials" autoplay="true" speed="3000" />
             </div>
         </section>
+        @endif
         <section class="py-12 gradient-subtle">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -57,14 +76,17 @@
 
         {{-- JavaScript Pagination Logic --}}
         {{-- CTA bookmark-check icon="bookmark-check" --}}
-        <x-ui.cta-section align="center" title="Ready to Write Your Success Story?"
-            subtitle="Join thousands of members who are already transforming their lives. Start your journey to better health today."
+        @if($cta || !$sections->count())
+        {{-- Bound with ":" so the value is escaped once by the component; "title=..." would double-escape apostrophes. --}}
+        <x-ui.cta-section align="center" :title="$cta->heading ?? 'Ready to Write Your Success Story?'"
+            :subtitle="$cta->subheading ?? 'Join thousands of members who are already transforming their lives. Start your journey to better health today.'"
             cardClass="hover:border-gray-200"
             :buttons="[
-                ['route' => 'membership',   'label' => 'Get Started Today', 'variant' => 'primary',  ],
-                ['route' => 'intro-videos', 'label' => 'Watch Intro Videos', 'variant' => 'outline',  ],
+                ['route' => 'membership',   'label' => $ctaMeta['primary_label'] ?? 'Get Started Today', 'variant' => 'primary',  ],
+                ['route' => 'intro-videos', 'label' => $ctaMeta['outline_label'] ?? 'Watch Intro Videos', 'variant' => 'outline',  ],
             ]"
         />
+        @endif
     </main>
 </div>
 <script>

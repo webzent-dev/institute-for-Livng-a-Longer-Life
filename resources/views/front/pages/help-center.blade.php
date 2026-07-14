@@ -1,5 +1,25 @@
 @extends('front.layouts.app')
 @section('content')
+@php
+    // CMS sections (App\Models\PageContent, page_key "help_center"), keyed by section_key. Every
+    // value falls back to the original hard-coded copy, so the page still renders if a section has
+    // not been seeded or an admin deactivates one.
+    $sections       = $sections ?? collect();
+    $hero           = $sections['hero']            ?? null;
+    $gettingStarted = $sections['getting_started'] ?? null;
+    $support        = $sections['support']         ?? null;
+    $supportMeta    = $support->meta ?? [];
+
+    $startSteps = $gettingStarted->items['steps'] ?? [];
+    if (empty($startSteps)) {
+        $startSteps = [
+            ['title' => 'Choose Your Membership',  'description' => 'Select the plan that best fits your wellness goals and budget'],
+            ['title' => 'Complete Registration',   'description' => 'Fill out your profile information and set up your account'],
+            ['title' => 'Access Your Dashboard',   'description' => 'Log in to explore available content, upcoming sessions, and resources'],
+            ['title' => 'Start Learning',          'description' => 'Watch intro videos, join live sessions, and begin your health journey'],
+        ];
+    }
+@endphp
 <div class="min-h-screen flex flex-col">
     <main class="flex-1">
         <section class="gradient-subtle py-16">
@@ -7,9 +27,9 @@
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-primary mb-6">
                     <i data-lucide="life-buoy"  class="h-8 w-8 text-primary-foreground" ></i>
                 </div>
-                <h1 class="text-4xl lg:text-6xl font-bold text-foreground mb-6">Help Center</h1>
+                <h1 class="text-4xl lg:text-6xl font-bold text-foreground mb-6">{{ $hero->heading ?? 'Help Center' }}</h1>
                 <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
-                    Everything you need to know about using the Institute for Living Longer
+                    {{ $hero->body ?? 'Everything you need to know about using the Institute for Living Longer' }}
                 </p>
             </div>
 
@@ -80,70 +100,42 @@
             </div>
         </section>
 
+        @if($gettingStarted || !$sections->count())
         <section class="gradient-subtle py-20">
             <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
                 <div class="rounded-lg border bg-card text-card-foreground shadow-sm shadow-strong">
                     <div class="flex flex-col space-y-1.5 p-6 text-center">
-                        <h3 class="mb-4 text-3xl font-semibold tracking-tight">Quick Start Guide</h3>
+                        <h3 class="mb-4 text-3xl font-semibold tracking-tight">{{ $gettingStarted->heading ?? 'Quick Start Guide' }}</h3>
                         <p class="text-muted-foreground">
-                            New to the platform? Follow these simple steps to get started
+                            {{ $gettingStarted->subheading ?? 'New to the platform? Follow these simple steps to get started' }}
                         </p>
                     </div>
                     <div class="space-y-6 p-6 pt-0">
+                        @foreach($startSteps as $i => $step)
                         <div class="flex items-start space-x-4">
                             <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full gradient-primary">
-                                <span class="text-xl font-bold text-primary-foreground">1</span>
+                                <span class="text-xl font-bold text-primary-foreground">{{ $i + 1 }}</span>
                             </div>
                             <div class="flex-1">
-                                <h3 class="mb-1 text-lg font-semibold text-foreground">Choose Your Membership</h3>
+                                <h3 class="mb-1 text-lg font-semibold text-foreground">{{ $step['title'] ?? '' }}</h3>
                                 <p class="text-muted-foreground">
-                                    Select the plan that best fits your wellness goals and budget
+                                    {{ $step['description'] ?? '' }}
                                 </p>
                             </div>
                         </div>
-                        <div class="flex items-start space-x-4">
-                            <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full gradient-primary">
-                                <span class="text-xl font-bold text-primary-foreground">2</span>
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="mb-1 text-lg font-semibold text-foreground">Complete Registration</h3>
-                                <p class="text-muted-foreground">
-                                    Fill out your profile information and set up your account
-                                </p>
-                            </div>
-                        </div>
-                        <div class="flex items-start space-x-4">
-                            <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full gradient-primary">
-                                <span class="text-xl font-bold text-primary-foreground">3</span>
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="mb-1 text-lg font-semibold text-foreground">Access Your Dashboard</h3>
-                                <p class="text-muted-foreground">
-                                    Log in to explore available content, upcoming sessions, and resources
-                                </p>
-                            </div>
-                        </div>
-                        <div class="flex items-start space-x-4">
-                            <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full gradient-primary">
-                                <span class="text-xl font-bold text-primary-foreground">4</span>
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="mb-1 text-lg font-semibold text-foreground">Start Learning</h3>
-                                <p class="text-muted-foreground">
-                                    Watch intro videos, join live sessions, and begin your health journey
-                                </p>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
         </section>
+        @endif
 
+        @if($support || !$sections->count())
         <section class="py-20 bg-background">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-foreground mb-4">Need More Help<span class="text-primary">?</sapan></h2>
-                    <p class="text-xl text-muted-foreground">Our support team is ready to assist you</p>
+                    <h2 class="text-3xl font-bold text-foreground mb-4">{{ $support->heading ?? 'Need More Help?' }}</h2>
+                    <p class="text-xl text-muted-foreground">{{ $support->subheading ?? 'Our support team is ready to assist you' }}</p>
                 </div>
                 <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                     @foreach ($contactOptions as $option)
@@ -167,14 +159,15 @@
                 </div>
                 <div class="flex flex-col items-center justify-center mt-12 gap-2">
                     <x-button-use href="{{ url('/faq') }}" variant="outline" size="lg"  >
-                        View Frequently Asked Questions
+                        {{ $supportMeta['faq_label'] ?? 'View Frequently Asked Questions' }}
                     </x-button-use>
                     <x-button-use href="{{ url('/contact') }}" variant="outline" size="lg"  >
-                        Support Center
+                        {{ $supportMeta['support_label'] ?? 'Support Center' }}
                     </x-button-use>
                 </div>
             </div>
         </section>
+        @endif
     </main>
 </div>
 <script src="https://unpkg.com/lucide@latest"></script>

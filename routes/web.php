@@ -32,6 +32,8 @@ use App\Http\Controllers\Front\StripeWebhookController;
 use App\Http\Controllers\Front\MemberController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\ContentManagementController;
+use App\Http\Controllers\Admin\VitalBoostContentController;
+use App\Http\Controllers\Admin\PageContentController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\AdminTestimonialController;
 use App\Http\Controllers\Admin\AdminVideoTestimonialController;
@@ -135,6 +137,14 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
     Route::get('/content/management', [ContentManagementController::class, 'index'])->name('admin.content.management');
     Route::post('/content/management', [ContentManagementController::class, 'store'])->name('admin.content.management.store');
     Route::put('/content/management', [ContentManagementController::class, 'updateSiteSettings'])->name('admin.content.management.updateSiteSettings');
+
+    //Vital Boost page sections
+    Route::get('/content/vital-boost', [VitalBoostContentController::class, 'index'])->name('admin.content.vital-boost');
+    Route::put('/content/vital-boost', [VitalBoostContentController::class, 'update'])->name('admin.content.vital-boost.update');
+
+    //Section-based pages (about, collaborators, intro_videos, shop, contact, faq, help_center, testimonials)
+    Route::get('/content/pages/{page}', [PageContentController::class, 'index'])->name('admin.content.page');
+    Route::put('/content/pages/{page}', [PageContentController::class, 'update'])->name('admin.content.page.update');
     //------------Content management end here--------//
 
     //------------Zoom Session management start here--------//
