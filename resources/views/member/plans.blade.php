@@ -6,7 +6,7 @@
             <h4 class="text-2xl font-bold text-foreground">Manage Your Plan</h4>
             <p class="text-gray-600 text-base">Upgrade or downgrade your membership</p>
         </div>
-        <div class="flex flex-col lg:flex-row gap-8 justify-center items-stretch">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
             @foreach($memberships as $plan)
                 @php
                     $isPopular = ($plan->popular == 'yes') ? true : false;
@@ -15,8 +15,10 @@
                     $membership_features = explode(",", $plan->membership_features);
                     $membership_benefits = explode(",", $plan->membership_benefits);
                 @endphp
-            <div class="relative"  x-data="{ selectedPlan: { name: '', price: '', period: '' } }">
-                <div class="flex flex-col {{ $isPopular ? 'border-primary border-4 shadow-strong md:scale-105 bg-card' : 'border-2 shadow-medium bg-card' }} rounded-2xl  ">
+            {{-- h-full on both so every card fills its stretched flex cell and all cards
+                 end up the same height, regardless of how many features/benefits each has. --}}
+            <div class="relative h-full"  x-data="{ selectedPlan: { name: '', price: '', period: '' } }">
+                <div class="flex flex-col h-full {{ $isPopular ? 'border-primary border-4 shadow-strong bg-card' : 'border-2 shadow-medium bg-card' }} rounded-2xl  ">
                     @if($isPopular)
                     <div class="relative">
                         <div class="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
@@ -79,7 +81,7 @@
                         </div>
 
                         <button type="button"
-                        class="{{ $isPopular ? 'gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold' : 'border-2 border-primary  text-primary hover:bg-primary hover:text-primary-foreground' }} h-11 rounded-md px-8 w-full mt-8 {{ $isCurrentPlan ? 'opacity-50 cursor-not-allowed' : '' }}"
+                        class="{{ $isPopular ? 'gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold' : 'border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground' }} inline-flex items-center justify-center text-center leading-tight rounded-md px-4 py-3 w-full mt-8 text-sm {{ $isCurrentPlan ? 'opacity-50 cursor-not-allowed' : '' }}"
                         data-plan-id="{{ $plan['id'] }}"
                         data-plan-name="{{ $plan['membership_name'] }}"
                         data-plan-price="{{ $plan['membership_price'] }}"
@@ -92,11 +94,11 @@
                                 Upgrade to {{ $plan->membership_name }}
                             @endif
                         </button>
+                        {{-- The membership-card component emits the three closing </div>
+                             tags for the content, card and wrapper above (shared contract
+                             with membership.blade.php), so we must NOT close them here. --}}
                         <x-membership-card :plan="$plan" />
-                        @endforeach
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </div>
@@ -121,22 +123,4 @@
             </div>
         </div>
     </div>
-</div>
-<script>
-// Simple interactivity for buttons
-document.addEventListener(
-    'DOMContentLoaded', function() {
-        const downgradeBtn = document.querySelector('button:first-of-type');
-        const upgradeBtn = document.querySelector('button:last-of-type');
-        downgradeBtn.addEventListener(
-            'click',
-            function() { alert('Downgrade to Standard plan selected'); }
-        );
-        upgradeBtn.addEventListener(
-            'click',
-            function() { alert('Upgrade to Lifetime plan selected'); }
-        );
-    }
-);
-</script>
 @endsection
