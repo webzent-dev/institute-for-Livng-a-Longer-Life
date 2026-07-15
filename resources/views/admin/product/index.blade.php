@@ -48,22 +48,24 @@
                     <h2 class="text-lg font-semibold leading-none tracking-tight mb-2 text-left">Add New Product</h2>
                     <form method="POST" class="space-y-3 overflow-y-auto scrollbar-custom max-h-[60vh] scroll-smooth px-5" enctype="multipart/form-data">
                         @csrf
-                        <x-form.select label="Product Category" name="category" placeholder="Select Product Category" required
-                        :selected="['institute']"
-                        :options="[
-                        ['value' => 'institute', 'label' => 'Institute Product'],
-                        ['value' => 'collaborator', 'label' => 'Collaborator Product'],
-                        ['value' => 'member_exclusive', 'label' => 'Member Exclusive Product'],
-                        ]"
-                        />
-                        <x-form.select label="Product Type" name="product_type" placeholder="Select Product Type" required
-                        :selected="['supplement']"
-                        :options="[
-                        ['value' => 'supplement', 'label' => 'Supplement'],
-                        ['value' => 'guide', 'label' => 'Guide'],
-                        ['value' => 'book', 'label' => 'Book'],
-                        ]"
-                        />
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium leading-none">Product Category <span class="required" style="color: red;">*</span></label>
+                            <select name="category" id="create_category" required class="vb-couple-category flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                                <option value="institute">Institute Product</option>
+                                <option value="collaborator">Collaborator Product</option>
+                                <option value="member_exclusive">Member Exclusive Product</option>
+                                <option value="vital_boost">Vital Boost</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium leading-none">Product Type <span class="required" style="color: red;">*</span></label>
+                            <select name="product_type" id="create_product_type" required class="vb-couple-type flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                                <option value="supplement">Supplement</option>
+                                <option value="vital_boost">Vital Boost</option>
+                                <option value="guide">Guide</option>
+                                <option value="book">Book</option>
+                            </select>
+                        </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium leading-none">User <span class="required" style="color: red;">*</span></label>
                             <select name="user_id" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" required>
@@ -144,6 +146,20 @@
                     </form>
                 </x-ui.modal>
 
+                @if(($activeVitalBoostCount ?? 0) > 1)
+                <div class="rounded-lg border border-amber-300 bg-amber-50 text-amber-900 p-4">
+                    <div class="flex items-start gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 flex-shrink-0 text-amber-600">
+                            <circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold">Multiple active Vital Boost products</h4>
+                            <p class="text-sm mt-1">You have <strong>{{ $activeVitalBoostCount }}</strong> active Vital Boost products ({{ $activeVitalBoostNames }}). The public Vital Boost page shows only the <strong>first active one</strong> — please deactivate the others to avoid confusion.</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <!-- Tabs -->
                 <div dir="ltr" data-orientation="horizontal">
                     <div role="tablist" aria-orientation="horizontal" class="grid h-10 w-full grid-cols-3 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground" tabindex="0">
@@ -168,6 +184,12 @@
                                     <div>
                                         <h3 class="text-2xl font-semibold leading-none tracking-tight text-black mb-0">Institute Products</h3>
                                         <p class="text-sm text-muted-foreground">Products sold by the Institute for Living Longer</p>
+                                        <div class="flex items-center gap-2 mt-3">
+                                            <a href="{{ route('admin.products') }}#institute_products"
+                                               class="whitespace-nowrap px-3 py-1.5 text-xs font-medium rounded-md border {{ empty($instituteFilter) ? 'bg-primary text-white border-primary' : 'bg-background text-muted-foreground hover:bg-muted' }}">All</a>
+                                            <a href="{{ route('admin.products', ['institute_filter' => 'vital_boost']) }}#institute_products"
+                                               class="whitespace-nowrap px-3 py-1.5 text-xs font-medium rounded-md border {{ ($instituteFilter ?? '') === 'vital_boost' ? 'bg-primary text-white border-primary' : 'bg-background text-muted-foreground hover:bg-muted' }}">Vital Boost only</a>
+                                        </div>
                                     </div>
                                     <div class="w-[220px]">
                                         <input id="search_institute_products" name="search_institute_products" type="text" placeholder="Search institute products..." onkeyup="searchInstituteProducts()" class="flex h-10 w-full rounded-md
@@ -575,7 +597,7 @@
                     url: url,
                     type: 'POST',
                     data: { status: newStatus },
-                    success: function () {
+                    success: function (response) {
                         // Update badge
                         $this.data('status', newStatus);
                         $this.text(newStatus.charAt(0).toUpperCase() + newStatus.slice(1));
@@ -585,6 +607,10 @@
                         } else {
                             $this.removeClass('bg-green-100 text-green-700').addClass('bg-red-100 text-red-700');
                             showToast('Product has been deactivated successfully.', 'error');
+                        }
+                        // Multi-active Vital Boost guard warning from the server.
+                        if (response && response.warning) {
+                            showToast(response.warning, 'error');
                         }
                     },
                     error: function (xhr) {
@@ -693,6 +719,32 @@
                 rows[i].style.display = match ? '' : 'none';
             }
         }
+    </script>
+    {{-- Vital Boost couples Product Type and Category: choosing Vital Boost on either
+         forces the other to Vital Boost and locks the remaining options. --}}
+    <script>
+    (function () {
+        function initVbCouple() {
+            var cat = document.querySelector('.vb-couple-category');
+            var type = document.querySelector('.vb-couple-type');
+            if (!cat || !type) return;
+
+            // Keep the pair consistent without ever locking a field: choosing Vital Boost
+            // on one forces it on the other, and choosing a non-Vital-Boost value on one
+            // (while the other is Vital Boost) resets that other to a sensible default, so
+            // the user can always switch back freely — no page reload needed.
+            type.addEventListener('change', function () {
+                if (type.value === 'vital_boost') { cat.value = 'vital_boost'; }
+                else if (cat.value === 'vital_boost') { cat.value = 'institute'; }
+            });
+            cat.addEventListener('change', function () {
+                if (cat.value === 'vital_boost') { type.value = 'vital_boost'; }
+                else if (type.value === 'vital_boost') { type.value = 'supplement'; }
+            });
+        }
+        if (document.readyState !== 'loading') { initVbCouple(); }
+        else { document.addEventListener('DOMContentLoaded', initVbCouple); }
+    })();
     </script>
     <script src="{{asset('js/constraint.js')}}"></script>
     <script src="{{asset('js/common.js')}}"></script>

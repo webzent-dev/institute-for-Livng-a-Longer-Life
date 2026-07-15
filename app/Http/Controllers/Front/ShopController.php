@@ -13,11 +13,14 @@ class ShopController extends Controller
     public function index()
     {
         $products = Product::with('user')
-        ->whereIn('category',['collaborator','institute'])
-        ->whereIn('product_type',['supplement','guide','book'])
+        ->whereIn('category',['collaborator','institute','vital_boost'])
+        ->whereIn('product_type',['supplement','guide','book','vital_boost'])
         ->where('status', 'active')
         ->where(function($query) {
-            $query->where('category', 'institute')
+            // Institute + Vital Boost products are always shown; collaborator products
+            // only while their seller is active. Vital Boost is available in the common
+            // store for everyone at its actual price (non-members pay full price).
+            $query->whereIn('category', ['institute', 'vital_boost'])
                   ->orWhereHas('user', function($userQuery) {
                       $userQuery->where('status', 'active');
                   });
@@ -41,7 +44,7 @@ class ShopController extends Controller
     {
         $search = $request->search;
         $category = $request->category;
-        $products = Product::whereIn('category', ['collaborator', 'institute'])
+        $products = Product::whereIn('category', ['collaborator', 'institute', 'vital_boost'])
         ->when($search, function($q) use ($search) {
             $q->where('name', 'like', "%$search%");
         })
@@ -50,7 +53,7 @@ class ShopController extends Controller
         })
         ->where('status', 'active')
         ->where(function($query) {
-            $query->where('category', 'institute')
+            $query->whereIn('category', ['institute', 'vital_boost'])
                   ->orWhereHas('user', function($userQuery) {
                       $userQuery->where('status', 'active');
                   });

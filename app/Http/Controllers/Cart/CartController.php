@@ -43,9 +43,12 @@ class CartController extends Controller
                 $itemTotal = $product->price * $quantity;
                 $total += $itemTotal;
                 
+                $meta = \App\Support\CartPurchaseMeta::for((int) $product->id);
                 $cartItem = [
                     'id' => $product->id,
                     'name' => $product->name,
+                    'purchase_type' => $meta['purchase_type'],
+                    'plan' => $meta['plan'],
                     'vendor' => $vendorName,
                     'vendor_id' => $product->user->id,
                     'vendor_role' => $product->user->role,
@@ -133,6 +136,15 @@ class CartController extends Controller
             // Store updated cart in session
             Session::put('cart', $cart);
 
+            // Record the purchase type (one-time vs monthly/yearly subscription).
+            // Only Vital Boost products support subscriptions; everything else is
+            // normalised to a one-time purchase.
+            if ($product->product_type === 'vital_boost') {
+                \App\Support\CartPurchaseMeta::put((int) $productId, $request->input('purchase_type'), $request->input('plan'));
+            } else {
+                \App\Support\CartPurchaseMeta::forget((int) $productId);
+            }
+
             return response()->json([
                 'status' => true,
                 'message' => 'Product added to cart successfully',
@@ -216,6 +228,7 @@ class CartController extends Controller
         if (isset($cart[$productId])) {
             unset($cart[$productId]);
             Session::put('cart', $cart);
+            \App\Support\CartPurchaseMeta::forget((int) $productId);
 
             return response()->json([
                 'status' => true,
@@ -239,6 +252,7 @@ class CartController extends Controller
     public function clearCart()
     {
         Session::forget('cart');
+        \App\Support\CartPurchaseMeta::clear();
 
         return response()->json([
             'success' => true,

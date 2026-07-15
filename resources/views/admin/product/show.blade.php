@@ -77,23 +77,24 @@
                             @csrf
                             @method('PUT')
                             <input type="hidden" name="product_id" value="{{ $productDetail->id }}">
-                            <x-form.select label="Product Category" name="category" placeholder="Select Product Category" required
-                                :selected="[$productDetail->category]"
-                                :options="[
-                                    ['value' => 'institute', 'label' => 'Institute Product'],
-                                    ['value' => 'collaborator', 'label' => 'Collaborator Product'],
-                                    ['value' => 'member_exclusive', 'label' => 'Member Exclusive Product']
-                                ]"
-                            />
-                            <x-form.select label="Product Type" name="product_type" placeholder="Select Product Type" required
-                                :selected="[$productDetail->product_type]"
-                                :options="[
-                                    ['value' => 'supplement', 'label' => 'Supplement'],
-                                    ['value' => 'vital_boost', 'label' => 'Vital Boost'],
-                                    ['value' => 'guide', 'label' => 'Guide'],
-                                    ['value' => 'book', 'label' => 'Book']
-                                ]"
-                            />
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium leading-none">Product Category <span class="required" style="color: red;">*</span></label>
+                                <select name="category" required class="vb-couple-category flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                                    <option value="institute" @selected($productDetail->category === 'institute')>Institute Product</option>
+                                    <option value="collaborator" @selected($productDetail->category === 'collaborator')>Collaborator Product</option>
+                                    <option value="member_exclusive" @selected($productDetail->category === 'member_exclusive')>Member Exclusive Product</option>
+                                    <option value="vital_boost" @selected($productDetail->category === 'vital_boost')>Vital Boost</option>
+                                </select>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium leading-none">Product Type <span class="required" style="color: red;">*</span></label>
+                                <select name="product_type" required class="vb-couple-type flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                                    <option value="supplement" @selected($productDetail->product_type === 'supplement')>Supplement</option>
+                                    <option value="vital_boost" @selected($productDetail->product_type === 'vital_boost')>Vital Boost</option>
+                                    <option value="guide" @selected($productDetail->product_type === 'guide')>Guide</option>
+                                    <option value="book" @selected($productDetail->product_type === 'book')>Book</option>
+                                </select>
+                            </div>
                             <div class="space-y-2">
                                 <label class="text-sm font-medium leading-none">User <span class="required" style="color: red;">*</span></label>
                                 <select name="user_id" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" required>
@@ -277,6 +278,32 @@
                 });
             }
         }
+        </script>
+        {{-- Vital Boost couples Product Type and Category: choosing Vital Boost on either
+             forces the other to Vital Boost and locks the remaining options. --}}
+        <script>
+        (function () {
+            function initVbCouple() {
+                var cat = document.querySelector('.vb-couple-category');
+                var type = document.querySelector('.vb-couple-type');
+                if (!cat || !type) return;
+
+                // Keep the pair consistent without ever locking a field: choosing Vital Boost
+                // on one forces it on the other, and choosing a non-Vital-Boost value on one
+                // (while the other is Vital Boost) resets that other to a sensible default, so
+                // the user can always switch back freely — no page reload needed.
+                type.addEventListener('change', function () {
+                    if (type.value === 'vital_boost') { cat.value = 'vital_boost'; }
+                    else if (cat.value === 'vital_boost') { cat.value = 'institute'; }
+                });
+                cat.addEventListener('change', function () {
+                    if (cat.value === 'vital_boost') { type.value = 'vital_boost'; }
+                    else if (type.value === 'vital_boost') { type.value = 'supplement'; }
+                });
+            }
+            if (document.readyState !== 'loading') { initVbCouple(); }
+            else { document.addEventListener('DOMContentLoaded', initVbCouple); }
+        })();
         </script>
         <script src="{{asset('js/constraint.js')}}"></script>
         <script src="{{asset('js/common.js')}}"></script>

@@ -10,6 +10,8 @@ use App\Models\OrderItem;
 use App\Models\PaymentHistory;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\VitalBoostSubscription;
+use App\Services\Pricing\VitalBoostPricingService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Stripe\Charge;
@@ -20,6 +22,10 @@ use App\Services\StripeService;
 
 class OrderFulfilmentService
 {
+    public function __construct(private VitalBoostPricingService $pricing)
+    {
+    }
+
     /**
      * Run all post-payment side-effects for a completed Stripe checkout session.
      * Safe to call from both the browser redirect (success()) and the webhook.
@@ -91,6 +97,9 @@ class OrderFulfilmentService
         // Mark order paid
         if ($paymentIntent->status === 'succeeded') {
             $order->update(['payment_status' => 'completed']);
+
+            // Create Vital Boost subscription records for any subscription lines.
+            $this->createVitalBoostSubscriptions($order, $orderItems);
         }
 
         // Card details
@@ -130,6 +139,66 @@ class OrderFulfilmentService
                 'payment_for'    => 'order',
                 'status'         => $data['status'],
                 'created_at'     => Carbon::now(),
+            ]);
+        }
+    }
+
+    /**
+     * Persist a Vital Boost subscription for each subscription line on the order.
+     * Idempotent: skips a line that already has a subscription for this order, so
+     * a re-fulfilled order never duplicates records.
+     */
+    private function createVitalBoostSubscriptions(Order $order, $orderItems): void
+    {
+        $member = $order->user_id ? User::find($order->user_id) : null;
+        $memberPercent = \App\Support\MembershipDiscount::activePercentFor($member);
+
+        foreach ($orderItems as $item) {
+            if ($item->purchase_type !== VitalBoostPricingService::TYPE_SUBSCRIPTION) {
+                continue;
+            }
+            if (!in_array($item->subscription_plan, [VitalBoostPricingService::PLAN_MONTHLY, VitalBoostPricingService::PLAN_YEARLY], true)) {
+                continue;
+            }
+
+            $exists = VitalBoostSubscription::where('order_id', $order->id)
+                ->where('product_id', $item->product_id)
+                ->exists();
+            if ($exists) {
+                continue;
+            }
+
+            // Recompute the line breakdown (member-aware) so the subscription stores
+            // the same numbers the buyer was charged. Shipping is excluded here and
+            // recomputed at renewal.
+            $breakdown = $this->pricing->calculate(
+                (float) $item->price,
+                (int) $item->quantity,
+                VitalBoostPricingService::TYPE_SUBSCRIPTION,
+                $item->subscription_plan,
+                $memberPercent,
+                0
+            );
+
+            $periodDays = (int) config('vital_boost.billing_period_days.' . $item->subscription_plan, 30);
+
+            VitalBoostSubscription::create([
+                'user_id'               => $order->user_id,
+                'order_id'              => $order->id,
+                'product_id'            => $item->product_id,
+                'email'                 => $order->email,
+                'product_name'          => $item->product_name,
+                'plan'                  => $item->subscription_plan,
+                'quantity'              => $item->quantity,
+                'unit_price'            => $breakdown->unitPrice,
+                'membership_percent'    => $breakdown->membershipPercent,
+                'subscription_percent'  => $breakdown->subscriptionPercent,
+                'membership_discount'   => $breakdown->membershipDiscount,
+                'subscription_discount' => $breakdown->subscriptionDiscount,
+                'item_total'            => $breakdown->subtotalAfterDiscounts(),
+                'status'                => 'active',
+                'started_at'            => Carbon::now(),
+                'next_billing_at'       => Carbon::now()->addDays($periodDays),
             ]);
         }
     }

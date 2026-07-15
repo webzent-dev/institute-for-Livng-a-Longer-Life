@@ -240,6 +240,12 @@
                             <span class="font-medium text-green-600">-${{ number_format($memberDiscount, 2) }}</span>
                         </div>
                         @endif
+                        @if(($subscriptionDiscount ?? 0) > 0)
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Subscription Discount</span>
+                            <span class="font-medium text-green-600">-${{ number_format($subscriptionDiscount, 2) }}</span>
+                        </div>
+                        @endif
                     </div>
                     <div class="border-t border-gray-200 pt-4 mt-4">
                         <div class="flex justify-between text-lg font-bold">
@@ -269,6 +275,7 @@ document.getElementById('terms').addEventListener('change', function() {
 function cartState() {
     let cartItems = @json($cartItems);
     let serverMemberDiscount = {{ $memberDiscount ?? 0 }};
+    let serverSubscriptionDiscount = {{ $subscriptionDiscount ?? 0 }};
     return {
         items: cartItems.map(item => ({
             ...item,
@@ -336,9 +343,12 @@ function cartState() {
         memberDiscount() {
             return serverMemberDiscount;
         },
+        subscriptionDiscount() {
+            return serverSubscriptionDiscount;
+        },
         total() {
             let shipping = parseFloat($('#shipping_cost').val()) || 0;
-            return this.subtotal() + shipping - this.memberDiscount();
+            return this.subtotal() + shipping - this.memberDiscount() - this.subscriptionDiscount();
         },
         proceedToCheckout() {
             window.location.href = baseurl+'/checkout/shipping';

@@ -17,3 +17,8 @@ Artisan::command('shipping:test-shippo', function () {
 Schedule::command('membership:send-renewal-reminders')
     ->dailyAt('09:00')
     ->withoutOverlapping();
+
+// Email Vital Boost subscribers whose subscription is due to renew once a day.
+Schedule::command('vital-boost:send-renewal-reminders')
+    ->dailyAt('09:15')
+    ->withoutOverlapping();

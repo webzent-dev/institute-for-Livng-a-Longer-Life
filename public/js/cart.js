@@ -1,12 +1,13 @@
 var baseurl = $('meta[name=base-url]').attr("content");
-function addToCart(product_id){
+function addToCart(product_id, purchase_type, plan){
     //var quantity = $('#quantity').val();
     $('#add_to_cart_button_' + product_id).html('Adding...');
     $('#add_to_cart_button_' + product_id).attr('disabled', true);
     $.ajax({
         method: "POST",
         url:  baseurl + "/addtocart",
-        data: {quantity: 1, product_id: product_id},
+        // purchase_type / plan default for normal products; consumed by the cart from Phase 3 on.
+        data: {quantity: 1, product_id: product_id, purchase_type: purchase_type || 'one_time', plan: plan || ''},
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },

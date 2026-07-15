@@ -80,6 +80,15 @@ class MemberController extends Controller
         return view('member.subscription');
     }
 
+    public function member_vitalBoostSubscriptions()
+    {
+        $subscriptions = \App\Models\VitalBoostSubscription::where('user_id', auth()->id())
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('member.vital-boost-subscriptions', compact('subscriptions'));
+    }
+
     public function member_orders()
     {
         //Get orders 

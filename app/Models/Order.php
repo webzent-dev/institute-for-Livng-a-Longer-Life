@@ -26,6 +26,8 @@ class Order extends Model
         'shipping_cost',
         'tax',
         'discount',
+        'membership_discount',
+        'subscription_discount',
         'total',
         'status',
         'payment_status',
@@ -49,6 +51,11 @@ class Order extends Model
     public function subOrders()
     {
         return $this->hasMany(SubOrder::class);
+    }
+
+    public function vitalBoostSubscriptions()
+    {
+        return $this->hasMany(VitalBoostSubscription::class);
     }
     
 }

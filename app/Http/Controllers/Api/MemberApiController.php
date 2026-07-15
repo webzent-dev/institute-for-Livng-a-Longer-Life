@@ -76,11 +76,6 @@ class MemberApiController extends Controller
 
     private function getDiscountPercent(?string $planName): int
     {
-        return match (strtolower($planName ?? '')) {
-            'standard' => 5,
-            'premium' => 10,
-            'lifetime' => 20,
-            default => 0,
-        };
+        return (int) round(\App\Support\MembershipDiscount::percentFor($planName));
     }
 }

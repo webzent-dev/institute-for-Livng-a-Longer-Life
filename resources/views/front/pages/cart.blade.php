@@ -47,6 +47,9 @@
                                             <div>
                                                 <h3 class="font-semibold text-lg text-gray-900" x-text="item.name"></h3>
                                                 <p class="text-sm text-green-600 mt-1">by <span x-text="item.vendor || 'Institute'"></span></p>
+                                                <span x-show="item.purchase_type === 'subscription'"
+                                                      class="inline-block mt-1 rounded-full bg-primary/10 text-primary text-[11px] font-semibold px-2 py-0.5"
+                                                      x-text="(item.plan === 'yearly' ? 'Yearly' : 'Monthly') + ' subscription' + (item.plan === 'yearly' ? ' · free shipping' : '')"></span>
                                             </div>
 
                                             <button @click="removeFromCart(item.id)" class="text-red-500 hover:text-red-700 transition p-2 rounded-md hover:shadow-sm hover:bg-accent hover:text-accent-foreground" title="Remove from cart">

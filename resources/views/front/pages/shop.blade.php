@@ -211,7 +211,8 @@ document.addEventListener('DOMContentLoaded', function() {
         uniqueCategories.forEach(category => {
             const option = document.createElement('option');
             option.value = category;
-            option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+            // Underscores → spaces, Title Case: "vital_boost" → "Vital Boost".
+            option.textContent = String(category).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
             categoryFilter.appendChild(option);
         });
 

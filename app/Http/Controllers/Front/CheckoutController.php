@@ -39,12 +39,76 @@ class CheckoutController extends Controller
     protected $shippingService;
     protected $addressValidationService;
     protected $fulfilmentService;
+    protected $pricing;
 
-    public function __construct(ShippingService $shippingService, AddressValidationService $addressValidationService, OrderFulfilmentService $fulfilmentService)
+    public function __construct(ShippingService $shippingService, AddressValidationService $addressValidationService, OrderFulfilmentService $fulfilmentService, \App\Services\Pricing\VitalBoostPricingService $pricing)
     {
         $this->shippingService = $shippingService;
         $this->addressValidationService = $addressValidationService;
         $this->fulfilmentService = $fulfilmentService;
+        $this->pricing = $pricing;
+    }
+
+    /**
+     * Total additional subscription discount across all Vital Boost subscription
+     * lines in the cart. Membership discount is handled separately by
+     * calculateMemberDiscount(); this returns only the subscription portion, so
+     * the two never double-count.
+     */
+    private function subscriptionDiscountForCart(array $cart): float
+    {
+        $memberPercent = \App\Support\MembershipDiscount::activePercentFor(Auth::user());
+        $total = 0.0;
+
+        foreach ($cart as $productId => $qty) {
+            $meta = \App\Support\CartPurchaseMeta::for((int) $productId);
+            if ($meta['purchase_type'] !== \App\Services\Pricing\VitalBoostPricingService::TYPE_SUBSCRIPTION) {
+                continue;
+            }
+
+            $product = Product::find($productId);
+            if (!$product || !$this->pricing->isVitalBoost($product)) {
+                continue;
+            }
+
+            $breakdown = $this->pricing->forProduct(
+                $product,
+                (int) $qty,
+                \App\Services\Pricing\VitalBoostPricingService::TYPE_SUBSCRIPTION,
+                $meta['plan'],
+                $memberPercent,
+                0
+            );
+            $total += $breakdown->subscriptionDiscount;
+        }
+
+        return round($total, 2);
+    }
+
+    /**
+     * A seller's shipment ships free when every item in it is a yearly Vital Boost
+     * subscription (per the business rule "yearly subscriptions receive free
+     * shipping"). Mixed shipments are charged normally.
+     *
+     * @param  array  $items  Seller group items: [['product' => Product, 'quantity' => int], ...]
+     */
+    private function sellerGroupShipsFree(array $items): bool
+    {
+        if (empty($items)) {
+            return false;
+        }
+
+        foreach ($items as $item) {
+            $product = $item['product'] ?? null;
+            if (!$product || !$this->pricing->isVitalBoost($product)) {
+                return false;
+            }
+            if (!\App\Support\CartPurchaseMeta::isYearlySubscription((int) $product->id)) {
+                return false;
+            }
+        }
+
+        return true;
     }
     
     public function shipping()
@@ -309,12 +373,18 @@ class CheckoutController extends Controller
                     continue;
                 }
 
+                // Yearly Vital Boost subscriptions ship free; a seller group made up
+                // entirely of them is not charged shipping.
+                $shipsFree = $this->sellerGroupShipsFree($quote['items'] ?? []);
+                $shippingRates[$sellerId]['free_shipping'] = $shipsFree;
+
                 $selectedMethods[$sellerId] = [
                     'service' => $quote['selected_rate_key'],
                     'rate' => $quote['selected_rate'],
-                    'handling_fee' => $quote['handling_fee'],
+                    'handling_fee' => $shipsFree ? 0 : $quote['handling_fee'],
+                    'free_shipping' => $shipsFree,
                 ];
-                $totalShippingCost += $this->shippingService->sellerShippingCharge($quote);
+                $totalShippingCost += $shipsFree ? 0 : $this->shippingService->sellerShippingCharge($quote);
             }
 
             Session::put('checkout.delivery', [
@@ -445,7 +515,14 @@ class CheckoutController extends Controller
             
             $shippingRates = $this->shippingService->calculateSplitShippingRates($cart, $destinationAddress);
 
-            $totalShippingCost = $this->shippingService->calculateTotalShippingCost($shippingRates);
+            // Waive shipping for seller groups that are entirely yearly Vital Boost
+            // subscriptions, so the displayed total matches what will be charged.
+            $totalShippingCost = 0;
+            foreach ($shippingRates as $sellerId => $quote) {
+                $shipsFree = $this->sellerGroupShipsFree($quote['items'] ?? []);
+                $shippingRates[$sellerId]['free_shipping'] = $shipsFree;
+                $totalShippingCost += $shipsFree ? 0 : $this->shippingService->sellerShippingCharge($quote);
+            }
 
             // Keep the exact quotes the buyer is shown, so deliveryStore() charges
             // the prices on screen instead of re-quoting them against the carrier.
@@ -463,7 +540,18 @@ class CheckoutController extends Controller
             \Log::error('Stack trace: ' . $e->getTraceAsString());
         }
 
-        return view('front.checkout.delivery', compact('cartItems', 'shippingRates', 'totalShippingCost'));
+        // Member + subscription discount preview so the delivery summary matches review.
+        $instituteSubtotal = 0;
+        foreach ($cart as $productId => $qty) {
+            $product = Product::find($productId);
+            if ($product && $product->category !== 'collaborator') {
+                $instituteSubtotal += $product->price * $qty;
+            }
+        }
+        $memberDiscount = $this->calculateMemberDiscount($instituteSubtotal);
+        $subscriptionDiscount = $this->subscriptionDiscountForCart($cart);
+
+        return view('front.checkout.delivery', compact('cartItems', 'shippingRates', 'totalShippingCost', 'memberDiscount', 'subscriptionDiscount'));
     }
 
     public function review()
@@ -485,8 +573,9 @@ class CheckoutController extends Controller
             }
         }
         $memberDiscount = $this->calculateMemberDiscount($instituteSubtotal);
+        $subscriptionDiscount = $this->subscriptionDiscountForCart($cart);
 
-        return view('front.checkout.review', compact('cartItems', 'memberDiscount'));
+        return view('front.checkout.review', compact('cartItems', 'memberDiscount', 'subscriptionDiscount'));
     }
 
     public function thankyou()
@@ -511,6 +600,7 @@ class CheckoutController extends Controller
         $this->fulfilmentService->fulfil($order, $session);
 
         session()->forget('cart');
+        \App\Support\CartPurchaseMeta::clear();
         session()->forget('checkout.shipping');
         session()->forget('checkout.shipping_quotes');
         session()->forget('checkout.delivery');
@@ -579,17 +669,11 @@ class CheckoutController extends Controller
             return 0;
         }
 
-        $user = Auth::user();
-        $discountPercent = match(strtolower($user->plan_name ?? '')) {
-            'standard' => 5,
-            'premium' => 10,
-            'lifetime' => 20,
-            default => 0,
-        };
+        // Single source of truth (config/vital_boost.php); returns the tier % only
+        // while the membership is active.
+        $discountPercent = \App\Support\MembershipDiscount::activePercentFor(Auth::user());
 
-        if ($discountPercent > 0
-            && !empty($user->plan_expiry)
-            && \Carbon\Carbon::parse($user->plan_expiry)->isFuture()) {
+        if ($discountPercent > 0) {
             return round($instituteSubtotal * ($discountPercent / 100), 2);
         }
 
@@ -627,12 +711,15 @@ class CheckoutController extends Controller
         }
 
         // Apply membership tier discount on institute products only
-        $discount = $this->calculateMemberDiscount($instituteSubtotal);
+        $membershipDiscount = $this->calculateMemberDiscount($instituteSubtotal);
+        // Additional subscription discount on Vital Boost subscription lines
+        $subscriptionDiscount = $this->subscriptionDiscountForCart($cart);
+        $discount = round($membershipDiscount + $subscriptionDiscount, 2);
 
         $total = $subtotal + $totalShipping - $discount;
 
         /************Stripe payment start here****************/
-        $stripeUrl = DB::transaction(function () use ($cart, $shipping, $delivery, $payment, $billing, $totalShipping, $shippingQuotes, $subtotal, $discount, $total) {
+        $stripeUrl = DB::transaction(function () use ($cart, $shipping, $delivery, $payment, $billing, $totalShipping, $shippingQuotes, $subtotal, $discount, $membershipDiscount, $subscriptionDiscount, $total) {
             // Create main order
             $order = Order::create([
                 'order_number' => 'ORD_'.time(),
@@ -653,6 +740,8 @@ class CheckoutController extends Controller
                 'shipping_cost'=>$totalShipping,
                 'tax' => 0,
                 'discount' => $discount,
+                'membership_discount' => $membershipDiscount,
+                'subscription_discount' => $subscriptionDiscount,
                 'total'=>$total,
                 'status' => 'pending',
                 'payment_status'=>'pending',
@@ -664,11 +753,14 @@ class CheckoutController extends Controller
             // Create order items and sub-orders
             foreach($cart as $productId => $qty){
                 $product = Product::findOrFail($productId);
+                $meta = \App\Support\CartPurchaseMeta::for((int) $productId);
                 OrderItem::create([
                     'user_id'=>auth()->id(),
                     'order_id'=>$order->id,
                     'product_id'=>$productId,
                     'product_name' => $product->name,
+                    'purchase_type' => $meta['purchase_type'],
+                    'subscription_plan' => $meta['plan'],
                     'quantity'=>$qty,
                     'price'=>$product->price,
                     'total' => $product->price * $qty
@@ -730,6 +822,13 @@ class CheckoutController extends Controller
             $selectedRate = $quote['selected_rate'] ?? null;
             $shippingAmount = (float) ($selectedRate['amount'] ?? 0);
             $handlingFee = $selectedRate ? (float) ($quote['handling_fee'] ?? 0) : 0;
+
+            // Yearly Vital Boost subscription shipments ship free (keeps the sub-order
+            // total consistent with the waived order total).
+            if ($this->sellerGroupShipsFree($items)) {
+                $shippingAmount = 0;
+                $handlingFee = 0;
+            }
 
             // Calculate sub-order totals
             $subtotal = 0;

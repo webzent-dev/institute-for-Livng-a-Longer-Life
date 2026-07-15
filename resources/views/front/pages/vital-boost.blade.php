@@ -109,13 +109,64 @@
                             </p>
                         </div>
                         @endif
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            @if($product)
-                                <x-button-use href="javascript:addToCart({{ $product->id }})" :label="$heroMeta['cta_label'] ?? 'Order Now'" variant="primary" icon="zap" />
-                            @else
-                                <x-button-use href="#" label="Coming Soon" variant="outline" icon="clock" disabled />
-                            @endif
+                        @if($product && $pricing)
+                        {{-- Purchase-type selector with a live, member-aware price breakdown.
+                             All figures come from the central VitalBoostPricingService. --}}
+                        <div class="max-w-md" x-data="vitalBoostPurchase(@js($pricing), {{ $product->id }}, {{ auth()->check() ? 'true' : 'false' }})">
+                            <p class="text-sm font-semibold text-foreground mb-3">Choose how you'd like to buy:</p>
+
+                            <div class="grid grid-cols-3 gap-3 mb-4">
+                                <template x-for="opt in options" :key="opt.key">
+                                    <button type="button" @click="selected = opt.key"
+                                        :class="selected === opt.key ? 'border-primary bg-primary/5 ring-2 ring-primary/30' : 'border-gray-200 hover:border-primary/50'"
+                                        class="text-left rounded-xl border-2 p-3 transition-all">
+                                        <span class="block text-xs font-semibold text-muted-foreground" x-text="opt.label"></span>
+                                        <span class="block text-lg font-bold text-foreground" x-text="'$' + money(data[opt.key].subtotal_after_discounts)"></span>
+                                        <span x-show="opt.badge" class="mt-1 inline-block rounded-full bg-primary/10 text-primary text-[10px] font-semibold px-2 py-0.5" x-text="opt.badge"></span>
+                                    </button>
+                                </template>
+                            </div>
+
+                            <div class="rounded-xl border bg-card text-card-foreground p-4 space-y-1.5 text-sm mb-4">
+                                <div class="flex justify-between text-muted-foreground">
+                                    <span>Price</span><span x-text="'$' + money(current().base)"></span>
+                                </div>
+                                <div class="flex justify-between text-primary" x-show="current().membership_discount > 0">
+                                    <span x-text="'Member discount (' + current().membership_percent + '%)'"></span>
+                                    <span x-text="'-$' + money(current().membership_discount)"></span>
+                                </div>
+                                <div class="flex justify-between text-primary" x-show="current().subscription_discount > 0">
+                                    <span x-text="'Subscribe &amp; save (' + current().subscription_percent + '%)'"></span>
+                                    <span x-text="'-$' + money(current().subscription_discount)"></span>
+                                </div>
+                                <div class="flex justify-between text-muted-foreground">
+                                    <span>Shipping</span>
+                                    <span x-text="current().shipping_waived ? 'Free' : 'Calculated at checkout'"></span>
+                                </div>
+                                <div class="border-t pt-2 flex justify-between font-bold text-foreground">
+                                    <span>Item total</span><span x-text="'$' + money(current().subtotal_after_discounts)"></span>
+                                </div>
+                            </div>
+
+                            <button type="button" id="add_to_cart_button_{{ $product->id }}" @click="addSelectedToCart()"
+                                class="gradient-primary text-primary-foreground font-semibold inline-flex items-center justify-center gap-2 h-12 w-full rounded-md hover:opacity-90 transition">
+                                <i data-lucide="zap" class="w-5 h-5"></i>
+                                <span x-text="ctaLabel()"></span>
+                            </button>
+
+                            <p class="text-xs text-muted-foreground mt-2" x-show="!isMember">
+                                <a href="{{ url('/membership') }}" class="text-primary font-medium underline">Become a member</a> for an extra discount on every order.
+                            </p>
                         </div>
+                        @elseif($product)
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <x-button-use href="javascript:addToCart({{ $product->id }})" :label="$heroMeta['cta_label'] ?? 'Order Now'" variant="primary" icon="zap" />
+                        </div>
+                        @else
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <x-button-use href="#" label="Coming Soon" variant="outline" icon="clock" disabled />
+                        </div>
+                        @endif
                     </div>
                     <div class="relative">
                         <div class="rounded-lg bg-card text-card-foreground shadow-sm shadow-strong border-2 border-primary/20">
@@ -296,5 +347,35 @@
         </section>
     </main>
 </div>
+<script>
+    // Drives the Vital Boost purchase-type selector. All prices are pre-computed
+    // server-side by VitalBoostPricingService and passed in as `data`, keyed by option.
+    function vitalBoostPurchase(data, productId, isMember) {
+        return {
+            data: data,
+            productId: productId,
+            isMember: isMember,
+            selected: 'one_time',
+            get options() {
+                return [
+                    { key: 'one_time', label: 'One-time', badge: null },
+                    { key: 'monthly',  label: 'Monthly',  badge: this.data.monthly.subscription_percent > 0 ? ('Save ' + this.data.monthly.subscription_percent + '%') : null },
+                    { key: 'yearly',   label: 'Yearly',   badge: 'Free shipping' },
+                ];
+            },
+            current() { return this.data[this.selected]; },
+            money(v) { return Number(v).toFixed(2); },
+            ctaLabel() {
+                if (this.selected === 'one_time') return 'Add to Cart';
+                return 'Subscribe ' + (this.selected === 'monthly' ? 'Monthly' : 'Yearly');
+            },
+            addSelectedToCart() {
+                var type = this.selected === 'one_time' ? 'one_time' : 'subscription';
+                var plan = this.selected === 'one_time' ? null : this.selected;
+                addToCart(this.productId, type, plan);
+            }
+        };
+    }
+</script>
 <script src="{{ asset('js/cart.js') }}"></script>
 @endsection
