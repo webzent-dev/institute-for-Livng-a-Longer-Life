@@ -256,54 +256,61 @@ class IndexController extends Controller
                 'status'         => $paymentIntent->status,
             ];
     
-            if($paymentIntent->status == 'succeeded'){
+            // Idempotency guard: apply the membership update only once per Stripe payment.
+            // Refreshing or re-hitting /success must not re-run it, otherwise the
+            // renewal-aware logic below would stack another period onto plan_expiry.
+            $alreadyProcessed = PaymentHistory::where('transaction_id', $paymentIntent->id)->exists();
+
+            if($paymentIntent->status == 'succeeded' && !$alreadyProcessed){
                 $planDetail = session('planDetail');
-                if(strtolower($planDetail->membership_period) == 'month'){
-                    $plan_expiry = Carbon::now()->addDays(30);
-                }else if(strtolower($planDetail->membership_period) == 'year'){
-                    $plan_expiry = Carbon::now()->addDays(365);
+
+                // Determine which user this payment belongs to: a logged-in member
+                // (upgrade / renewal) or a guest who just signed up on /membership.
+                $isGuestSignup = !Auth::check();
+                $user_id = Auth::check() ? auth()->user()->id : session('user_id');
+                $user = User::findOrFail($user_id);
+
+                // Renewal-aware expiry. If the member is paying for the SAME plan they
+                // already hold and it hasn't lapsed yet, stack the new period on top of
+                // the remaining time instead of discarding it. New purchases and tier
+                // changes start from today.
+                $baseDate = Carbon::now();
+                if (!empty($user->plan_expiry)
+                    && (int) $user->plan_id === (int) $planDetail->id
+                    && Carbon::parse($user->plan_expiry)->isFuture()) {
+                    $baseDate = Carbon::parse($user->plan_expiry);
+                }
+
+                $membershipPeriod = strtolower($planDetail->membership_period);
+                if($membershipPeriod == 'month'){
+                    $plan_expiry = $baseDate->copy()->addDays(30);
+                }else if($membershipPeriod == 'year'){
+                    $plan_expiry = $baseDate->copy()->addDays(365);
                 }else {
                     //set plan expiry for lifetime or other types of plans
-                    $plan_expiry = Carbon::now()->addYears(100); // Set a far future date for lifetime plans
+                    $plan_expiry = $baseDate->copy()->addYears(100); // Set a far future date for lifetime plans
                 }
-    
-                //Update users table
-                if(Auth::check()){
-                    $user_id = auth()->user()->id;
-                    $user = User::findOrFail($user_id);
-                    
-                    // Update stripe_customer_id if not already set
-                    if (!$user->stripe_customer_id && $session->customer) {
-                        $user->stripe_customer_id = $session->customer;
-                    }
-                    
-                    $user->update([
-                        'plan_id' => $planDetail->id,
-                        'plan_name' => $planDetail->membership_name,
-                        'plan_price' => $planDetail->membership_price,
-                        'plan_period' => $planDetail->membership_period,
-                        'plan_expiry' => isset($plan_expiry) ? $plan_expiry : null,
-                        'stripe_customer_id' => $user->stripe_customer_id ?? $session->customer
-                    ]);
-                }else{
-                    $user_id = session('user_id');
-                    $user = User::findOrFail($user_id);
-                    
-                    // Update stripe_customer_id if not already set
-                    if (!$user->stripe_customer_id && $session->customer) {
-                        $user->stripe_customer_id = $session->customer;
-                    }
-                    
-                    $user->update([
-                        'plan_id' => $planDetail->id,
-                        'plan_name' => $planDetail->membership_name,
-                        'plan_price' => $planDetail->membership_price,
-                        'plan_period' => $planDetail->membership_period,
-                        'plan_expiry' => isset($plan_expiry) ? $plan_expiry : null,
-                        'stripe_customer_id' => $user->stripe_customer_id ?? $session->customer,
-                        'status' => 'active'
-                    ]);
+
+                // Update stripe_customer_id if not already set
+                if (!$user->stripe_customer_id && $session->customer) {
+                    $user->stripe_customer_id = $session->customer;
                 }
+
+                $updateData = [
+                    'plan_id' => $planDetail->id,
+                    'plan_name' => $planDetail->membership_name,
+                    'plan_price' => $planDetail->membership_price,
+                    'plan_period' => $planDetail->membership_period,
+                    'plan_expiry' => $plan_expiry,
+                    'stripe_customer_id' => $user->stripe_customer_id ?? $session->customer,
+                ];
+
+                // A guest signup's account is only activated once payment completes.
+                if ($isGuestSignup) {
+                    $updateData['status'] = 'active';
+                }
+
+                $user->update($updateData);
 
                 // Assign a unique membership number on first membership purchase
                 if (empty($user->membership_number)) {

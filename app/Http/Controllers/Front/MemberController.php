@@ -748,6 +748,53 @@ class MemberController extends Controller
         /************Stripe payment end here*****************/
     }
 
+    public function renewMembership(Request $request){
+        $user_id = auth()->user()->id;
+        $userDetail = User::find($user_id);
+
+        // Renewal re-purchases the member's CURRENT plan. The expiry-extension logic
+        // in IndexController::getTransactionDetail() stacks the new period on top of
+        // any remaining time, so renewing early never loses days.
+        $planDetail = Membership::find($userDetail->plan_id);
+        if (empty($planDetail)) {
+            return back()->with('error', 'You do not have a plan to renew. Please choose a plan first.');
+        }
+
+        /************Stripe payment start here****************/
+        session(['planDetail' => $planDetail]);
+
+        // Get or create Stripe customer for the user
+        $customer = $this->getOrCreateStripeCustomer($userDetail);
+
+        $this->getStripeSecret();
+        $session = \Stripe\Checkout\Session::create([
+            'payment_method_types' => ['card'],
+            'customer' => $customer->id, // Associate with existing customer
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'usd',
+                    'product_data' => [
+                        'name' => $planDetail['membership_name'],
+                        'description' => $planDetail['membership_name'],
+                    ],
+                    'unit_amount' => (int)($planDetail['membership_price'] * 100), // Dynamic total in cents
+                ],
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'invoice_creation' => [
+                'enabled' => true
+            ],
+            'payment_intent_data' => [
+                'setup_future_usage' => 'on_session', // This saves the payment method
+            ],
+            'success_url' => route('payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => route('payment.cancel')
+        ]);
+        return redirect($session->url, 303);
+        /************Stripe payment end here*****************/
+    }
+
     public function getStripeSecret()
     {
         StripeService::configure();

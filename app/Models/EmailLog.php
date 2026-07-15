@@ -97,6 +97,7 @@ class EmailLog extends Model
             'collaborator_login' => 'Collaborator Login',
             'member_signup' => 'Member Signup',
             'order_confirmation' => 'Order Confirmation',
+            'renewal_reminder' => 'Membership Renewal Reminder',
             'custom' => 'Custom Email',
         ];
 

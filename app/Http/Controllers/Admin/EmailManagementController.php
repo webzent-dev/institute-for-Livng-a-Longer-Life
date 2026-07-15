@@ -107,8 +107,19 @@ class EmailManagementController extends Controller
                 'name' => 'Order Status Update',
                 'description' => 'Sent when order status is updated',
                 'enabled' => true
+            ],
+            'renewal_reminder' => [
+                'name' => 'Membership Renewal Reminder',
+                'description' => 'Sent automatically to members 7 days and 1 day before their membership expires, and on the day it expires',
+                'enabled' => true
             ]
         ];
+
+        // Overlay persisted on/off states so toggles reflect what admins have saved.
+        $savedStates = \App\Models\EmailSetting::pluck('enabled', 'email_type');
+        foreach ($emailTypes as $key => $type) {
+            $emailTypes[$key]['enabled'] = (bool) ($savedStates[$key] ?? $type['enabled']);
+        }
 
         // Add variables required by layout
         $totalUsers = User::count();
@@ -381,8 +392,8 @@ class EmailManagementController extends Controller
             'enabled' => 'required|boolean'
         ]);
 
-        // This would typically save to database or config file
-        // For now, we'll just return success
+        \App\Models\EmailSetting::setEnabled($request->email_type, (bool) $request->enabled);
+
         return response()->json(['success' => 'Email template status updated successfully']);
     }
 
@@ -575,7 +586,7 @@ class EmailManagementController extends Controller
     public function editEmail(Request $request)
     {
         $request->validate([
-            'email_type' => 'required|in:admin_collaborator_notification,admin_member_notification,admin_order_notification,collaborator_active,collaborator_inactive,collaborator_login,collaborator_order_notification,member_active,member_inactive,member_signup,order_confirmation,order_status_update'
+            'email_type' => 'required|in:admin_collaborator_notification,admin_member_notification,admin_order_notification,collaborator_active,collaborator_inactive,collaborator_login,collaborator_order_notification,member_active,member_inactive,member_signup,order_confirmation,order_status_update,renewal_reminder'
         ]);
 
         $emailType = $request->email_type;
@@ -619,6 +630,9 @@ class EmailManagementController extends Controller
                     break;
                 case 'order_status_update':
                     $templatePath = resource_path('views/emails/order_status_notification.blade.php');
+                    break;
+                case 'renewal_reminder':
+                    $templatePath = resource_path('views/emails/membership-renewal-reminder.blade.php');
                     break;
             }
 
@@ -685,7 +699,7 @@ class EmailManagementController extends Controller
     public function updateEmailTemplate(Request $request)
     {
         $request->validate([
-            'email_type' => 'required|in:admin_collaborator_notification,admin_member_notification,admin_order_notification,collaborator_active,collaborator_inactive,collaborator_login,collaborator_order_notification,member_active,member_inactive,member_signup,order_confirmation,order_status_update',
+            'email_type' => 'required|in:admin_collaborator_notification,admin_member_notification,admin_order_notification,collaborator_active,collaborator_inactive,collaborator_login,collaborator_order_notification,member_active,member_inactive,member_signup,order_confirmation,order_status_update,renewal_reminder',
             'content' => 'required|string'
         ]);
 
@@ -730,6 +744,9 @@ class EmailManagementController extends Controller
                     break;
                 case 'order_status_update':
                     $templatePath = resource_path('views/emails/order_status_notification.blade.php');
+                    break;
+                case 'renewal_reminder':
+                    $templatePath = resource_path('views/emails/membership-renewal-reminder.blade.php');
                     break;
             }
 
