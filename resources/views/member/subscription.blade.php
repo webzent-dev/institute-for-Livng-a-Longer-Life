@@ -115,27 +115,70 @@
             </div>
         </div>
 
-        <!-- Auto-Renewal Notice -->
-        <div class="rounded-lg border text-card-foreground shadow-sm border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20">
+        <!-- Renewal Notice -->
+        @php
+            $expiryDate = \Carbon\Carbon::parse(auth()->user()->plan_expiry);
+            // Lifetime plans are set 100 years out and never need renewing.
+            $isLifetime = strtolower(auth()->user()->plan_period) === 'lifetime'
+                || $expiryDate->gt(\Carbon\Carbon::now()->addYears(50));
+            $daysLeft = floor(\Carbon\Carbon::now()->diffInDays($expiryDate, false));
+            $isExpired = $daysLeft <= 0;
+            $isExpiringSoon = !$isExpired && $daysLeft <= 7;
+        @endphp
+
+        @unless($isLifetime)
+        @php
+            // Colour the card by urgency: red when expired, amber when due soon, neutral otherwise.
+            $tone = $isExpired
+                ? ['border' => 'border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20', 'icon' => 'text-red-600', 'btn' => 'bg-red-600 hover:bg-red-700 text-white']
+                : ($isExpiringSoon
+                    ? ['border' => 'border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20', 'icon' => 'text-amber-600', 'btn' => 'bg-primary hover:bg-primary/90 text-primary-foreground']
+                    : ['border' => 'border-primary/20 bg-primary/5', 'icon' => 'text-primary', 'btn' => 'bg-primary hover:bg-primary/90 text-primary-foreground']);
+        @endphp
+        <div class="rounded-lg border text-card-foreground shadow-sm {{ $tone['border'] }}">
             <div class="p-6 pt-6">
                 <div class="flex items-start gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert h-5 w-5 {{ $tone['icon'] }} flex-shrink-0 mt-0.5">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" x2="12" y1="8" y2="12"></line>
                     <line x1="12" x2="12.01" y1="16" y2="16"></line>
                     </svg>
-                    <div>
-                    <h4 class="font-medium text-foreground">Auto-Renewal Enabled</h4>
+                    <div class="flex-1">
+                    <h4 class="font-medium text-foreground">
+                        @if($isExpired)
+                            Your membership has expired
+                        @elseif($isExpiringSoon)
+                            Your membership expires soon
+                        @else
+                            Renew your membership
+                        @endif
+                    </h4>
                     <p class="text-sm text-muted-foreground mt-1">
-                        Your subscription will automatically renew on January 1, 2026. You can cancel or modify this at any time.
+                        @if($isExpired)
+                            Your {{ auth()->user()->plan_name }} membership expired on {{ $expiryDate->format('M j, Y') }}. Renew now to restore access to member benefits.
+                        @elseif($isExpiringSoon)
+                            Your {{ auth()->user()->plan_name }} membership expires on {{ $expiryDate->format('M j, Y') }} ({{ $daysLeft }} {{ \Illuminate\Support\Str::plural('day', $daysLeft) }} left). Renew now to keep your benefits without interruption.
+                        @else
+                            Your {{ auth()->user()->plan_name }} membership is active until {{ $expiryDate->format('M j, Y') }}. You can renew any time — the new period is added on top of your remaining days, so you never lose time by renewing early.
+                        @endif
                     </p>
-                    <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 underline-offset-4 hover:underline h-10 py-2 px-0 mt-2 text-amber-700 dark:text-amber-400">
-                        Manage Auto-Renewal Settings
-                    </button>
+                    <form method="POST" action="{{ route('member.renew-membership') }}" class="mt-3">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 {{ $tone['btn'] }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                                <path d="M21 3v5h-5"></path>
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                                <path d="M8 16H3v5"></path>
+                            </svg>
+                            {{ $isExpired ? 'Renew Membership' : 'Renew Now' }} &mdash; ${{ auth()->user()->plan_price }}
+                        </button>
+                    </form>
                     </div>
                 </div>
             </div>
         </div>
+        @endunless
         @else
         <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
             <div class="flex flex-col space-y-1.5 p-6">

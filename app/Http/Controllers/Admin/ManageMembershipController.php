@@ -11,6 +11,7 @@ class ManageMembershipController extends Controller
 
     protected $properties;
     protected $status;
+    protected $membership;
 
     public function __construct()
     {

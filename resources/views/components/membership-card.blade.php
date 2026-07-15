@@ -1,13 +1,13 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
     <el-dialog>
-        <dialog id="dialog" aria-labelledby="dialog-title" class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
+        <dialog id="dialog-{{ $plan['id'] }}" aria-labelledby="dialog-title" class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
             <el-dialog-backdrop class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"></el-dialog-backdrop>
             <div tabindex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0">            
                 <el-dialog-panel class="relative transform overflow-hidden rounded-lg bg-transparent text-left   transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95 px-8">
                     <div  class=" z-50 w-full max-w-lg bg-white rounded-lg shadow-lg p-6 mx-4" >
-                        <button type="button" command="close" commandfor="dialog"  onclick="document.getElementById('modal-2').classList.add('hidden')" class="absolute top-3 right-3 text-gray-600 font-extrabold shadow-sm hover:text-red-700   p-2  text-xl">✕</button>
+                        <button type="button" command="close" commandfor="dialog-{{ $plan['id'] }}" onclick="document.getElementById('dialog-{{ $plan['id'] }}').close()" class="absolute top-3 right-3 text-gray-600 font-extrabold shadow-sm hover:text-red-700   p-2  text-xl">✕</button>
                         <div class="py-5">
-                            <h2 class="font-semibold tracking-tight text-2xl">Join <span x-text="selectedPlan.name"></span></h2>
+                            <h2 class="font-semibold tracking-tight text-2xl">Join {{ $plan['membership_name'] }}</h2>
                             <p class="text-sm text-gray-600 my-4">
                                 Complete your registration to start your wellness journey. <!--<br> <span x-text="selectedPlan.pricePeriod" class="text-orange-500"></span>-->
                             </p>
@@ -21,8 +21,8 @@
 
                             @auth
                             <div class="flex items-baseline justify-center">
-                                <span class="text-5xl font-bold text-foreground" x-text="selectedPlan.price">$0</span>
-                                <span class="text-muted-foreground ml-2" x-text="selectedPlan.period">/Year</span>
+                                <span class="text-5xl font-bold text-foreground">${{ $plan['membership_price'] }}</span>
+                                <span class="text-muted-foreground ml-2">/{{ $plan['membership_period'] }}</span>
                             </div>
                             
                             <div class="p-5 border rounded-lg bg-gray-50 space-y-3">
@@ -44,10 +44,10 @@
                                 <form method="POST" action="{{ route('member.upgrade-membership') }}">
                                     @csrf
                                     {{-- Selected plan info --}}
-                                    <input type="hidden" name="plan_id" id="plan_id" value="{{ $plan['id'] }}">
-                                    <input type="hidden" name="plan_name" id="plan_name" value="{{ $plan['membership_name'] }}">
-                                    <input type="hidden" name="plan_price" id="plan_price" value="{{ $plan['membership_price'] }}">
-                                    <input type="hidden" name="plan_period" id="plan_period" value="{{ $plan['membership_period'] }}">
+                                    <input type="hidden" name="plan_id" value="{{ $plan['id'] }}">
+                                    <input type="hidden" name="plan_name" value="{{ $plan['membership_name'] }}">
+                                    <input type="hidden" name="plan_price" value="{{ $plan['membership_price'] }}">
+                                    <input type="hidden" name="plan_period" value="{{ $plan['membership_period'] }}">
                                     <button type="submit" class="mt-3 w-full bg-primary text-white py-2 rounded hover:opacity-90 transition">
                                         Proceed to Checkout 💳
                                     </button>
@@ -148,7 +148,6 @@
 
                                 {{-- SUCCESS --}}
                                 <p x-show="successMsg" class="text-green-600 font-semibold" x-text="successMsg"></p>
-                                <input type="hidden" id="membership_plan_id" name="plan_id">
                             </form>
                         @endguest
                     </div>
@@ -162,22 +161,13 @@
 </div>
 <script>
 function openPlanModal(button) {
-    // Read plan info from button attributes
-    const id  = button.getAttribute("data-plan-id");
-    const name = button.getAttribute("data-plan-name");
-    const price = button.getAttribute("data-plan-price");
-    const period = button.getAttribute("data-plan-period");
-    document.getElementById("dialog").show();
-
-    // Update modal values
-    document.querySelector("[x-text='selectedPlan.name']").innerText = name;
-    document.querySelector("[x-text='selectedPlan.price']").innerText = '$'+price;
-    document.querySelector("[x-text='selectedPlan.period']").innerText = period;
-    document.getElementById("plan_id").value = id;
-    document.getElementById("membership_plan_id").value = id;
-    document.getElementById("plan_name").value = name;
-    document.getElementById("plan_price").value = price;
-    document.getElementById("plan_period").value = period;
+    // Each plan renders its own <dialog id="dialog-{planId}"> already populated with
+    // that plan's values, so we simply open the dialog matching the clicked plan.
+    const id = button.getAttribute("data-plan-id");
+    const dialog = document.getElementById("dialog-" + id);
+    if (dialog) {
+        dialog.show();
+    }
 }
 
 function membershipForm(id) {

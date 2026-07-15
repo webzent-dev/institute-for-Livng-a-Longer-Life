@@ -220,7 +220,7 @@
                             </div>
                         </div>
                         <p class="mt-6 text-sm text-muted-foreground">
-                            All plans are billed monthly. You can upgrade, downgrade, or cancel at any time.
+                            Each plan is a one-time payment for its period (monthly, yearly or lifetime). You can renew, upgrade or change your plan any time from your member dashboard.
                         </p>
                     </div>
                 </div>
