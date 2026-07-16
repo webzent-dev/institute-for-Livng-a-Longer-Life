@@ -337,20 +337,22 @@
                         @php 
                             $cart = session('cart', []); 
                         @endphp
-                        @foreach($cart as $productId => $quantity)
-                            @php 
-                                $product = App\Models\Product::find($productId);
+                        @foreach($cart as $lineKey => $quantity)
+                            @php
+                                $product = App\Models\Product::find(App\Support\CartLine::productId($lineKey));
+                                if (!$product) { continue; }
+                                $meta = App\Support\CartLine::meta($lineKey);
                                 $item = [
-                                    'id' => $product->id,
                                     'name' => $product->name,
                                     'price' => $product->price,
-                                    'quantity' => $quantity
+                                    'quantity' => $quantity,
+                                    'label' => App\Support\CartLine::label($meta['purchase_type'], $meta['plan']),
                                 ];
                             @endphp
                         <div class="flex justify-between items-center">
                             <div class="flex-1">
                                 <div class="font-medium text-gray-900">{{ $item['name'] }}</div>
-                                <div class="text-sm text-gray-500">Qty: {{ $item['quantity'] }}</div>
+                                <div class="text-sm text-gray-500">{{ $item['label'] }} · Qty: {{ $item['quantity'] }}</div>
                             </div>
                             <div class="font-medium text-gray-900">${{ number_format($item['price'] * $item['quantity'], 2) }}</div>
                         </div>
@@ -519,6 +521,7 @@ function cartState() {
         items: cartItems.map(item => ({
             ...item,
             id: item.id,
+            line_key: item.line_key,
             name: item.name,
             vendor: item.vendor,
             quantity: Number(item.quantity),
@@ -526,10 +529,10 @@ function cartState() {
             originalPrice: item.originalPrice,
             image: item.image
         })),
-        updateQuantity(id, qty) {
+        updateQuantity(lineKey, qty) {
             if (qty < 1) return;
             this.items = this.items.map(item => {
-                if (item.id === id) item.quantity = qty; 
+                if (item.line_key === lineKey) item.quantity = qty;
                 return item;
             });
 
@@ -537,25 +540,25 @@ function cartState() {
                 $.ajax({
                     url: baseurl+'/cart/update',
                     type: 'POST',
-                    data: {product_id: id, quantity: qty},
+                    data: {line_key: lineKey, quantity: qty},
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    success: function (data) { 
-                        if (data.status == true) { 
-                            toastr.success(data.message); 
-                            $('#cart_count').html(data.cartCount); 
-                        } else { 
-                            toastr.error(data.message); 
-                        } 
-                    } 
+                    success: function (data) {
+                        if (data.status == true) {
+                            toastr.success(data.message);
+                            $('#cart_count').html(data.cartCount);
+                        } else {
+                            toastr.error(data.message);
+                        }
+                    }
                 });
             }
         },
-        removeFromCart(id) {
-            this.items = this.items.filter(item => item.id !== id);
+        removeFromCart(lineKey) {
+            this.items = this.items.filter(item => item.line_key !== lineKey);
             var r = confirm('Are you sure want to remove this product from cart?');
-            if(id != '' && r){
+            if(lineKey != '' && r){
                 $.ajax({
                     url: baseurl+"/cart/remove",
                     type: "post",
@@ -564,7 +567,7 @@ function cartState() {
                     },
                     cache: false,
                     async: false,
-                    data: { product_id: id},
+                    data: { line_key: lineKey },
                     success: function (response) {
                         if (response.status == true) {
                             toastr.success(response.message);

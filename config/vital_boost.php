@@ -20,14 +20,15 @@ return [
     | Subscription discounts (percentage off)
     |--------------------------------------------------------------------------
     |
-    | Additional discount for Vital Boost subscription purchases, applied AFTER
-    | the membership discount (per the pricing calculation order). Available to
-    | members and non-members alike.
+    | Discount for Vital Boost subscription purchases. Discounts are NOT clubbed:
+    | only non-members (guests) receive this subscription discount (2% monthly /
+    | 5% yearly). Active members instead receive only their membership discount —
+    | no subscription discount is applied for them.
     |
     */
     'subscription_discounts' => [
-        'monthly' => (float) env('VB_SUBSCRIPTION_DISCOUNT_MONTHLY', 15),
-        'yearly'  => (float) env('VB_SUBSCRIPTION_DISCOUNT_YEARLY', 15),
+        'monthly' => (float) env('VB_SUBSCRIPTION_DISCOUNT_MONTHLY', 2),
+        'yearly'  => (float) env('VB_SUBSCRIPTION_DISCOUNT_YEARLY', 5),
     ],
 
     /*

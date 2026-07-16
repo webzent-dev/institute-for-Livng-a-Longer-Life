@@ -7,9 +7,15 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\PageContent;
+use App\Services\Pricing\VitalBoostPricingService;
+use App\Support\MembershipDiscount;
 
 class ShopController extends Controller
 {
+    public function __construct(private VitalBoostPricingService $pricing)
+    {
+    }
+
     public function index()
     {
         $products = Product::with('user')
@@ -37,7 +43,11 @@ class ShopController extends Controller
         // built-in copy for any section that is missing or deactivated.
         $sections = PageContent::sections('shop');
 
-        return view('front.pages.shop', compact('products', 'collaborators', 'sections'));
+        // Member-aware price breakdowns for the Vital Boost purchase-type selector
+        // rendered on the shop card. Keyed by product id.
+        $vitalBoostPricing = $this->vitalBoostPricing($products);
+
+        return view('front.pages.shop', compact('products', 'collaborators', 'sections', 'vitalBoostPricing'));
     }
 
     public function filter(Request $request)
@@ -68,7 +78,40 @@ class ShopController extends Controller
 
         $sections = PageContent::sections('shop');
 
-        return view('front.pages.shop', compact('products', 'collaborators', 'sections'));
+        $vitalBoostPricing = $this->vitalBoostPricing($products);
+
+        return view('front.pages.shop', compact('products', 'collaborators', 'sections', 'vitalBoostPricing'));
+    }
+
+    /**
+     * Build member-aware price breakdowns for every Vital Boost product in the given
+     * collection, keyed by product id, with one_time / monthly / yearly options.
+     * Non-Vital-Boost products are skipped. Shipping is 0 here (resolved at checkout).
+     */
+    private function vitalBoostPricing($products): array
+    {
+        $memberPercent = MembershipDiscount::activePercentFor(auth()->user());
+        $map = [];
+
+        foreach ($products as $product) {
+            if (! $this->pricing->isVitalBoost($product)) {
+                continue;
+            }
+
+            $map[$product->id] = [
+                'one_time' => $this->pricing->forProduct(
+                    $product, 1, VitalBoostPricingService::TYPE_ONE_TIME, null, $memberPercent, 0
+                )->toArray(),
+                'monthly' => $this->pricing->forProduct(
+                    $product, 1, VitalBoostPricingService::TYPE_SUBSCRIPTION, VitalBoostPricingService::PLAN_MONTHLY, $memberPercent, 0
+                )->toArray(),
+                'yearly' => $this->pricing->forProduct(
+                    $product, 1, VitalBoostPricingService::TYPE_SUBSCRIPTION, VitalBoostPricingService::PLAN_YEARLY, $memberPercent, 0
+                )->toArray(),
+            ];
+        }
+
+        return $map;
     }
 
     public function productDetails($slug)

@@ -60,13 +60,13 @@ class CheckoutController extends Controller
         $memberPercent = \App\Support\MembershipDiscount::activePercentFor(Auth::user());
         $total = 0.0;
 
-        foreach ($cart as $productId => $qty) {
-            $meta = \App\Support\CartPurchaseMeta::for((int) $productId);
+        foreach ($cart as $lineKey => $qty) {
+            $meta = \App\Support\CartLine::meta($lineKey);
             if ($meta['purchase_type'] !== \App\Services\Pricing\VitalBoostPricingService::TYPE_SUBSCRIPTION) {
                 continue;
             }
 
-            $product = Product::find($productId);
+            $product = Product::find(\App\Support\CartLine::productId($lineKey));
             if (!$product || !$this->pricing->isVitalBoost($product)) {
                 continue;
             }
@@ -103,7 +103,9 @@ class CheckoutController extends Controller
             if (!$product || !$this->pricing->isVitalBoost($product)) {
                 return false;
             }
-            if (!\App\Support\CartPurchaseMeta::isYearlySubscription((int) $product->id)) {
+            // Each line carries its own purchase choice; only yearly subscription
+            // lines ship free.
+            if (($item['plan'] ?? null) !== \App\Services\Pricing\VitalBoostPricingService::PLAN_YEARLY) {
                 return false;
             }
         }
@@ -445,8 +447,21 @@ class CheckoutController extends Controller
         }
 
         $cartItems = $this->getCartTotal();
+
+        // Member + subscription discount preview so the payment summary matches the
+        // delivery/review pages and the amount that is finally charged.
+        $instituteSubtotal = 0;
+        foreach ($cart as $lineKey => $qty) {
+            $product = Product::find(\App\Support\CartLine::productId($lineKey));
+            if ($product && $product->category !== 'collaborator') {
+                $instituteSubtotal += $product->price * $qty;
+            }
+        }
+        $memberDiscount = $this->calculateMemberDiscount($instituteSubtotal);
+        $subscriptionDiscount = $this->subscriptionDiscountForCart($cart);
+
         $countries = Country::all();
-        return view('front.checkout.payment', compact('cartItems', 'countries'));
+        return view('front.checkout.payment', compact('cartItems', 'countries', 'memberDiscount', 'subscriptionDiscount'));
     }
 
     public function paymentStore(Request $request){
@@ -542,8 +557,8 @@ class CheckoutController extends Controller
 
         // Member + subscription discount preview so the delivery summary matches review.
         $instituteSubtotal = 0;
-        foreach ($cart as $productId => $qty) {
-            $product = Product::find($productId);
+        foreach ($cart as $lineKey => $qty) {
+            $product = Product::find(\App\Support\CartLine::productId($lineKey));
             if ($product && $product->category !== 'collaborator') {
                 $instituteSubtotal += $product->price * $qty;
             }
@@ -600,7 +615,6 @@ class CheckoutController extends Controller
         $this->fulfilmentService->fulfil($order, $session);
 
         session()->forget('cart');
-        \App\Support\CartPurchaseMeta::clear();
         session()->forget('checkout.shipping');
         session()->forget('checkout.shipping_quotes');
         session()->forget('checkout.delivery');
@@ -637,16 +651,21 @@ class CheckoutController extends Controller
         $total = 0;
         $cartItems = [];
 
-        foreach ($cart as $productId => $quantity) {
+        foreach ($cart as $lineKey => $quantity) {
             //Get product detail with user detail
-            $product = Product::with('user')->find($productId);
+            $product = Product::with('user')->find(\App\Support\CartLine::productId($lineKey));
             if ($product) {
                 $itemTotal = $product->price * $quantity;
                 $total += $itemTotal;
+                $meta = \App\Support\CartLine::meta($lineKey);
                 $cartItems[] = [
                     'id' => $product->id,
+                    'line_key' => (string) $lineKey,
                     'name' => $product->name,
                     'vendor' => $product->user->name,
+                    'purchase_type' => $meta['purchase_type'],
+                    'plan' => $meta['plan'],
+                    'purchase_label' => \App\Support\CartLine::label($meta['purchase_type'], $meta['plan']),
                     'quantity' => $quantity,
                     'itemTotal' => $itemTotal,
                     'price' => $product->price,
@@ -700,8 +719,8 @@ class CheckoutController extends Controller
         // Calculate order totals
         $subtotal = 0;
         $instituteSubtotal = 0;
-        foreach($cart as $productId => $qty){
-            $product = Product::findOrFail($productId);
+        foreach($cart as $lineKey => $qty){
+            $product = Product::findOrFail(\App\Support\CartLine::productId($lineKey));
             $lineTotal = $product->price * $qty;
             $subtotal += $lineTotal;
             // Institute products are everything that is not a collaborator product
@@ -712,6 +731,11 @@ class CheckoutController extends Controller
 
         // Apply membership tier discount on institute products only
         $membershipDiscount = $this->calculateMemberDiscount($instituteSubtotal);
+        // Snapshot the buyer's plan name so the membership discount label stays
+        // accurate even if the member later changes or loses their plan.
+        $membershipPlanName = ($membershipDiscount > 0 && Auth::check())
+            ? (Auth::user()->plan_name ?? null)
+            : null;
         // Additional subscription discount on Vital Boost subscription lines
         $subscriptionDiscount = $this->subscriptionDiscountForCart($cart);
         $discount = round($membershipDiscount + $subscriptionDiscount, 2);
@@ -719,7 +743,7 @@ class CheckoutController extends Controller
         $total = $subtotal + $totalShipping - $discount;
 
         /************Stripe payment start here****************/
-        $stripeUrl = DB::transaction(function () use ($cart, $shipping, $delivery, $payment, $billing, $totalShipping, $shippingQuotes, $subtotal, $discount, $membershipDiscount, $subscriptionDiscount, $total) {
+        $stripeUrl = DB::transaction(function () use ($cart, $shipping, $delivery, $payment, $billing, $totalShipping, $shippingQuotes, $subtotal, $discount, $membershipDiscount, $membershipPlanName, $subscriptionDiscount, $total) {
             // Create main order
             $order = Order::create([
                 'order_number' => 'ORD_'.time(),
@@ -741,6 +765,7 @@ class CheckoutController extends Controller
                 'tax' => 0,
                 'discount' => $discount,
                 'membership_discount' => $membershipDiscount,
+                'membership_plan_name' => $membershipPlanName,
                 'subscription_discount' => $subscriptionDiscount,
                 'total'=>$total,
                 'status' => 'pending',
@@ -750,10 +775,13 @@ class CheckoutController extends Controller
                 'notes' => $delivery['delivery_instructions'] ?? null
             ]);
 
-            // Create order items and sub-orders
-            foreach($cart as $productId => $qty){
+            // Create order items and sub-orders. Each cart line becomes its own
+            // order item, carrying its purchase type/plan (one-time / monthly /
+            // yearly), so the same product can appear several times.
+            foreach($cart as $lineKey => $qty){
+                $productId = \App\Support\CartLine::productId($lineKey);
                 $product = Product::findOrFail($productId);
-                $meta = \App\Support\CartPurchaseMeta::for((int) $productId);
+                $meta = \App\Support\CartLine::meta($lineKey);
                 OrderItem::create([
                     'user_id'=>auth()->id(),
                     'order_id'=>$order->id,
@@ -860,13 +888,25 @@ class CheckoutController extends Controller
                 'package_dimensions' => $quote['package_details'] ?? null,
             ]);
 
-            // Create sub-order items
+            // Create sub-order items. Each cart line is its own sub-order item and
+            // carries its purchase type/plan, so the same product bought several
+            // ways (one-time, monthly, yearly) is listed distinctly for the seller.
             foreach ($items as $item) {
                 $product = $item['product'];
+                $purchaseType = $item['purchase_type'] ?? \App\Services\Pricing\VitalBoostPricingService::TYPE_ONE_TIME;
+                $plan = $item['plan'] ?? null;
+                $purchaseLabel = \App\Support\CartLine::label($purchaseType, $plan);
+
+                // Subscriptions are annotated on the display name so the plan is
+                // obvious wherever the item name is shown; one-time keeps the name.
+                $displayName = $purchaseType === \App\Services\Pricing\VitalBoostPricingService::TYPE_SUBSCRIPTION
+                    ? $product->name . ' — ' . $purchaseLabel
+                    : $product->name;
+
                 SubOrderItem::create([
                     'sub_order_id' => $subOrder->id,
                     'product_id' => $product->id,
-                    'product_name' => $product->name,
+                    'product_name' => $displayName,
                     'quantity' => $item['quantity'],
                     'price' => $product->price,
                     'total' => $product->price * $item['quantity'],
@@ -876,6 +916,9 @@ class CheckoutController extends Controller
                         'originalPrice' => $product->originalPrice,
                         'image' => $product->image,
                         'weight' => $product->weight,
+                        'purchase_type' => $purchaseType,
+                        'subscription_plan' => $plan,
+                        'purchase_label' => $purchaseLabel,
                         'dimensions' => [
                             'length' => $product->length,
                             'width' => $product->width,

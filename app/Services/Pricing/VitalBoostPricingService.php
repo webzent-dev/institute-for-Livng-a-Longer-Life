@@ -82,10 +82,12 @@ class VitalBoostPricingService
         $membershipDiscount = round($base * $membershipPercent / 100, 2);
         $afterMembership    = round($base - $membershipDiscount, 2);
 
-        // 3. Subscription discount (subscription purchases only), applied on the
-        //    already-discounted running total.
+        // 3. Subscription discount (subscription purchases only). Discounts are not
+        //    clubbed: only guests get the subscription discount. Active members (a
+        //    non-zero membership percent) receive their membership discount only.
+        $isMember = $membershipPercent > 0;
         $subscriptionPercent  = $purchaseType === self::TYPE_SUBSCRIPTION
-            ? $this->subscriptionPercent($plan)
+            ? $this->subscriptionPercent($plan, $isMember)
             : 0.0;
         $subscriptionDiscount = round($afterMembership * $subscriptionPercent / 100, 2);
         $afterSubscription    = round($afterMembership - $subscriptionDiscount, 2);
@@ -114,11 +116,13 @@ class VitalBoostPricingService
     }
 
     /**
-     * Subscription discount percentage for a plan, from config.
+     * Subscription discount percentage from config. Discounts are not clubbed:
+     * only guests receive the per-plan (monthly/yearly) subscription discount;
+     * active members receive their membership discount only (0 here).
      */
-    public function subscriptionPercent(?string $plan): float
+    public function subscriptionPercent(?string $plan, bool $isMember = false): float
     {
-        if ($plan === null) {
+        if ($plan === null || $isMember) {
             return 0.0;
         }
 

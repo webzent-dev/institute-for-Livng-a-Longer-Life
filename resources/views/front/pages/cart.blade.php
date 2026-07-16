@@ -28,7 +28,7 @@
 
                 <template x-if="items.length > 0">
                     <div class="space-y-4">
-                        <template x-for="item in items" :key="item.id">
+                        <template x-for="item in items" :key="item.line_key">
                             <div class="bg-white rounded-lg border bg-card text-card-foreground shadow-sm p-6  transition">
                                 <div class="flex gap-6">
                                     {{-- Image Slot class="rounded-lg border bg-card text-card-foreground shadow-sm shadow-soft" --}}
@@ -47,12 +47,12 @@
                                             <div>
                                                 <h3 class="font-semibold text-lg text-gray-900" x-text="item.name"></h3>
                                                 <p class="text-sm text-green-600 mt-1">by <span x-text="item.vendor || 'Institute'"></span></p>
-                                                <span x-show="item.purchase_type === 'subscription'"
-                                                      class="inline-block mt-1 rounded-full bg-primary/10 text-primary text-[11px] font-semibold px-2 py-0.5"
-                                                      x-text="(item.plan === 'yearly' ? 'Yearly' : 'Monthly') + ' subscription' + (item.plan === 'yearly' ? ' · free shipping' : '')"></span>
+                                                <span class="inline-block mt-1 rounded-full text-[11px] font-semibold px-2 py-0.5"
+                                                      :class="item.purchase_type === 'subscription' ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-600'"
+                                                      x-text="item.purchase_label + (item.plan === 'yearly' ? ' · free shipping' : '')"></span>
                                             </div>
 
-                                            <button @click="removeFromCart(item.id)" class="text-red-500 hover:text-red-700 transition p-2 rounded-md hover:shadow-sm hover:bg-accent hover:text-accent-foreground" title="Remove from cart">
+                                            <button @click="removeFromCart(item.line_key, item.name, item.purchase_label)" class="text-red-500 hover:text-red-700 transition p-2 rounded-md hover:shadow-sm hover:bg-accent hover:text-accent-foreground" title="Remove from cart">
                                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                                 </svg>
@@ -62,11 +62,11 @@
                                         {{-- Quantity + Pricing --}}
                                         <div class="flex items-center justify-between mt-4">
                                             <div class="flex items-center gap-3 bg-gray-100 rounded-lg p-1">
-                                                <button @click="updateQuantity(item.id, item.quantity - 1)" :disabled="item.quantity <= 1" class="btn-outline h-8 w-8 ">
+                                                <button @click="updateQuantity(item.line_key, item.quantity - 1)" :disabled="item.quantity <= 1" class="btn-outline h-8 w-8 ">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus h-4 w-4"><path d="M5 12h14"></path></svg>
                                                 </button>
                                                 <span class="font-medium w-8 text-center" x-text="item.quantity"></span>
-                                                <button @click="updateQuantity(item.id, item.quantity + 1)"class="btn-outline h-8 w-8">
+                                                <button @click="updateQuantity(item.line_key, item.quantity + 1)"class="btn-outline h-8 w-8">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus h-4 w-4"><path d="M5 12h14"></path><path d="M12 5v14"></path>
                                                     </svg>
                                                 </button>
@@ -98,9 +98,9 @@
                     <template x-if="items.length > 0">
                         <div>
                             <div class="space-y-3 mb-6">
-                                <template x-for="item in items" :key="item.id">
+                                <template x-for="item in items" :key="item.line_key">
                                     <div class="flex justify-between text-sm">
-                                        <span class="text-gray-600" x-text="item.name + ' × ' + item.quantity"></span>
+                                        <span class="text-gray-600" x-text="item.name + ' (' + item.purchase_label + ') × ' + item.quantity"></span>
                                         <span class="text-gray-900 font-medium" x-text="currency(item.price * item.quantity)"></span>
                                     </div>
                                 </template>
@@ -163,31 +163,35 @@ function cartState() {
         items: cartItems.map(item => ({
             ...item,
             id: item.id,
+            line_key: item.line_key,
             name: item.name,
             vendor: item.vendor,
+            purchase_type: item.purchase_type,
+            plan: item.plan,
+            purchase_label: item.purchase_label,
             quantity: Number(item.quantity),
             price: item.price,
             originalPrice: item.originalPrice,
             image: item.image
         })),
-        updateQuantity(id, qty) {
+        updateQuantity(lineKey, qty) {
             if (qty < 1) return;
 
             const self = this;
-            const current = this.items.find(item => item.id === id);
+            const current = this.items.find(item => item.line_key === lineKey);
             if (!current) return;
             const previousQty = current.quantity;
 
             // Optimistically reflect the new quantity in the UI
             this.items = this.items.map(item => {
-                if (item.id === id) item.quantity = qty;
+                if (item.line_key === lineKey) item.quantity = qty;
                 return item;
             });
 
             // Roll the quantity back to what it was before the (rejected) change
             const revertQuantity = function () {
                 self.items = self.items.map(item => {
-                    if (item.id === id) item.quantity = previousQty;
+                    if (item.line_key === lineKey) item.quantity = previousQty;
                     return item;
                 });
             };
@@ -195,7 +199,7 @@ function cartState() {
             $.ajax({
                 url: baseurl+'/cart/update',
                 type: 'POST',
-                data: {product_id: id, quantity: qty},
+                data: {line_key: lineKey, quantity: qty},
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
@@ -215,29 +219,30 @@ function cartState() {
                 }
             });
         },
-        removeFromCart(id) {
-            this.items = this.items.filter(item => item.id !== id);
-            var r = confirm('Are you sure want to remove this product from cart?');
-            if(id != '' && r){
-                $.ajax({
-                    url: baseurl+"/cart/remove",
-                    type: "post",
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    cache: false,
-                    async: false,
-                    data: { product_id: id},
-                    success: function (response) {
-                        if (response.status == true) {
-                            toastr.success(response.message);
-                            setTimeout(function () { location.reload(); }, 2000);
-                        } else {
-                            toastr.error(response.message);
-                        }
+        removeFromCart(lineKey, name, label) {
+            var prompt = 'Are you sure want to remove ' + (name ? '"' + name + (label ? ' — ' + label : '') + '"' : 'this product') + ' from cart?';
+            var r = confirm(prompt);
+            if(lineKey === '' || lineKey === undefined || !r) return;
+
+            this.items = this.items.filter(item => item.line_key !== lineKey);
+            $.ajax({
+                url: baseurl+"/cart/remove",
+                type: "post",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                cache: false,
+                async: false,
+                data: { line_key: lineKey },
+                success: function (response) {
+                    if (response.status == true) {
+                        toastr.success(response.message);
+                        setTimeout(function () { location.reload(); }, 2000);
+                    } else {
+                        toastr.error(response.message);
                     }
-                });
-            }
+                }
+            });
         },
         subtotal() {
             return this.items.reduce((sum, item) => sum + item.price * item.quantity, 0);

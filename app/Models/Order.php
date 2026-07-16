@@ -27,6 +27,7 @@ class Order extends Model
         'tax',
         'discount',
         'membership_discount',
+        'membership_plan_name',
         'subscription_discount',
         'total',
         'status',

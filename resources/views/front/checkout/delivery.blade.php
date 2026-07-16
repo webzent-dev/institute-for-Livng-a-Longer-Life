@@ -181,20 +181,22 @@
                 </div>
                 <div class="space-y-3 mb-4">
                     @php $cart = session('cart', []); @endphp
-                    @foreach($cart as $productId => $quantity)
-                    @php 
-                    $product = App\Models\Product::find($productId);
+                    @foreach($cart as $lineKey => $quantity)
+                    @php
+                    $product = App\Models\Product::find(App\Support\CartLine::productId($lineKey));
+                    if (!$product) { continue; }
+                    $meta = App\Support\CartLine::meta($lineKey);
                     $item = [
-                        'id' => $product->id,
                         'name' => $product->name,
                         'price' => $product->price,
-                        'quantity' => $quantity
+                        'quantity' => $quantity,
+                        'label' => App\Support\CartLine::label($meta['purchase_type'], $meta['plan']),
                     ];
                     @endphp
                     <div class="flex justify-between items-center">
                         <div class="flex-1">
                             <div class="font-medium text-gray-900">{{ $item['name'] }}</div>
-                            <div class="text-sm text-gray-500">Qty: {{ $item['quantity'] }}</div>
+                            <div class="text-sm text-gray-500">{{ $item['label'] }} · Qty: {{ $item['quantity'] }}</div>
                         </div>
                         <div class="font-medium text-gray-900" data-price="{{ $item['price'] * $item['quantity'] }}">${{ number_format($item['price'] * $item['quantity'], 2) }}</div>
                     </div>
