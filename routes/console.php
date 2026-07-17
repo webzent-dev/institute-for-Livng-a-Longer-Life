@@ -22,3 +22,5 @@ Schedule::command('membership:send-renewal-reminders')
 Schedule::command('vital-boost:send-renewal-reminders')
     ->dailyAt('09:15')
     ->withoutOverlapping();
+
+Schedule::command('queue:work --stop-when-empty')->everyMinute();
