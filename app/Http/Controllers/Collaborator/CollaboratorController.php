@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Collaborator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\CollaboratorLoginMail;
@@ -19,9 +20,7 @@ use App\Models\CollaboratorBusinessDetails;
 use App\Models\CollaboratorBankDetails;
 use App\Services\ShippingLabelService;
 use App\Services\ShippingService;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Database\UniqueConstraintViolationException;
 use App\Mail\AdminCollaboratorNotification;
 use App\Mail\OrderStatusNotification;
@@ -216,62 +215,61 @@ class CollaboratorController extends Controller
     
     public function store(Request $request)
     {
-        /*$request->validate([
-            'first_name' => 'required',
-            'last_name'  => 'required',
+        // Validated outside the try below: ValidationException extends \Exception,
+        // so the catch-all would swallow it and hide the field errors from the form.
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
             'email'      => 'required|email|unique:users,email',
-            'phone'      => 'required',
-            'password'   => 'required|min:8|confirmed',
-            'specialty'  => 'required',
-            'professional_credentials' => 'required',
+            'phone'      => 'required|string|max:20',
+            'password'   => 'required|string|min:8|confirmed',
+            'speciality' => 'required|string|max:255',
+            'professional_credentials' => 'required|string|max:255',
             'experience' => 'required',
-            'organization' => 'required',
+            'organization' => 'required|string|max:255',
             'website'    => 'nullable|url',
-            'collaborator_massge' => 'required' 
-        ]);*/
-        
+            'collaborator_message' => 'required',
+        ]);
+
         try{
-            if($request->password != $request->password_confirmation){
-                return redirect()->route('become.collaborator.store')->with('error', 'Passwords do not match.');
-            }else{
-                $user = User::create([
-                    'first_name' => $request->first_name,
-                    'last_name'  => $request->last_name,
-                    'email'      => $request->email,
-                    'phone'      => $request->phone,
-                    'password'   => Hash::make(Str::random(32)),
-                    'speciality'  => $request->speciality,
-                    'professional_credentials' => $request->professional_credentials,
-                    'experience' => $request->experience,
-                    'organization' => $request->organization,
-                    'website'    => $request->website,
-                    'collaborator_message' => $request->collaborator_message,
-                    'role'       => 'collaborator',
-                    'status'     => 'inactive'
-                ]);
+            $user = User::create([
+                'first_name' => $validated['first_name'],
+                'last_name'  => $validated['last_name'],
+                'email'      => $validated['email'],
+                'phone'      => $validated['phone'],
+                'password'   => Hash::make($validated['password']),
+                'speciality'  => $validated['speciality'],
+                'professional_credentials' => $validated['professional_credentials'],
+                'experience' => $validated['experience'],
+                'organization' => $validated['organization'],
+                'website'    => $validated['website'] ?? null,
+                'collaborator_message' => $validated['collaborator_message'],
+                'role'       => 'collaborator',
+                'status'     => 'inactive'
+            ]);
 
-                if(!empty($user->email)) {
-                    $resetToken = Password::createToken($user);
-                    $resetUrl = route('password.reset', ['token' => $resetToken, 'email' => $user->email]);
-                    Mail::to($user->email)->send(
-                        new CollaboratorLoginMail($user, null, $resetUrl)
-                    );
-                }
-
-                //Send email to admin for new collaborator registration
-                $adminDetail = User::where('role', 'admin')->first();
-                $adminEmail = $adminDetail ? $adminDetail->email : null;
-                if(!empty($adminEmail)){
-                    Mail::to($adminEmail)->send(
-                        new AdminCollaboratorNotification($user)
-                    );
-                }
-
-                return redirect()->route('become.collaborator.store')->with('success', 'Collaborator has been created successfully. Please wait for admin approval.');
+            if(!empty($user->email)) {
+                // They chose their own password here, so there is no reset link to
+                // send and nothing secret to put in the email.
+                Mail::to($user->email)->send(
+                    new CollaboratorLoginMail($user)
+                );
             }
+
+            //Send email to admin for new collaborator registration
+            $adminDetail = User::where('role', 'admin')->first();
+            $adminEmail = $adminDetail ? $adminDetail->email : null;
+            if(!empty($adminEmail)){
+                Mail::to($adminEmail)->send(
+                    new AdminCollaboratorNotification($user)
+                );
+            }
+
+            return redirect()->route('become.collaborator.store')->with('success', 'Collaborator has been created successfully. Please wait for admin approval.');
         } catch (UniqueConstraintViolationException $e) {
             return redirect()->route('become.collaborator.store')->with('error', 'Email already exists. Please use a different email address.');
         } catch (\Exception $e) {
+            Log::error('Collaborator signup failed: ' . $e->getMessage());
             return redirect()->route('become.collaborator.store')->with('error', 'An error occurred while creating the collaborator. Please try again.');
         }
     }

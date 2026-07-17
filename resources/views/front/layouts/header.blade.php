@@ -87,9 +87,13 @@
                         </a>
                     @endif
                 @endauth
+                {{-- Nothing to sell a member whose plan is still running. A cancelled
+                     member keeps their benefits until expiry, so they don't see it either. --}}
+                @unless(auth()->check() && auth()->user()->membershipIsActive())
                 <a href="{{ url('/membership') }}" class="ml-4 px-5 py-2 rounded-md bg-primary text-white font-semibold hover:opacity-90">
                     Get Membership
                 </a>
+                @endunless
             </div>
 
             <!-- Mobile Menu Button -->
@@ -161,7 +165,9 @@
                     @endif
                 @endauth
 
+                @unless(auth()->check() && auth()->user()->membershipIsActive())
                 <a href="{{ url('/membership') }}" class=" px-5 py-2 rounded-md bg-primary text-white font-semibold hover:opacity-90">Get Membership</a>
+                @endunless
             </div>
         </div>
    </div>

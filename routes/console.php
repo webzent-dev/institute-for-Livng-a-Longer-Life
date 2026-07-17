@@ -13,6 +13,12 @@ Artisan::command('shipping:test-shippo', function () {
     // This will be handled by the TestShippoIntegration command
 })->purpose('Test Shippo API integration');
 
+// Charge members who opted into automatic renewal. Runs before the reminders
+// below so a member who renews here is no longer nagged to renew by hand.
+Schedule::command('membership:auto-renew')
+    ->dailyAt('08:45')
+    ->withoutOverlapping();
+
 // Email members whose membership is expiring soon (or just expired) once a day.
 Schedule::command('membership:send-renewal-reminders')
     ->dailyAt('09:00')

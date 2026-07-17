@@ -59,6 +59,13 @@ class SendMembershipRenewalReminders extends Command
                 continue;
             }
 
+            // Members on automatic renewal are charged by membership:auto-renew and
+            // must not be told to renew by hand. That command emails them itself if
+            // the charge fails.
+            if ($member->shouldAutoRenew()) {
+                continue;
+            }
+
             $expiry = Carbon::parse($member->plan_expiry)->startOfDay();
             $daysLeft = (int) $today->diffInDays($expiry, false);
 

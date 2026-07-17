@@ -419,6 +419,9 @@ Route::prefix('member')->middleware([RoleMiddleware::class.':user'])->group(func
     Route::post('/update-password', [MemberController::class, 'updatePassword'])->name('member.updatepassword');
     Route::post('/upgrade-membership', [MemberController::class, 'upgradeMembership'])->name('member.upgrade-membership');
     Route::post('/renew-membership', [MemberController::class, 'renewMembership'])->name('member.renew-membership');
+    Route::post('/cancel-subscription', [MemberController::class, 'cancelSubscription'])->name('member.cancel-subscription');
+    Route::post('/resume-subscription', [MemberController::class, 'resumeSubscription'])->name('member.resume-subscription');
+    Route::post('/auto-renew', [MemberController::class, 'updateAutoRenew'])->name('member.auto-renew');
     Route::post('/delete-payment-method', [MemberController::class, 'deletePaymentMethod'])->name('member.delete-payment-method');
     Route::post('/set-default-payment-method', [MemberController::class, 'setDefaultPaymentMethod'])->name('member.set-default-payment-method');
     Route::post('/add-payment-method', [MemberController::class, 'addPaymentMethod'])->name('member.add-payment-method');

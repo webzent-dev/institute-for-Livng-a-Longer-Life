@@ -76,8 +76,116 @@ class MemberController extends Controller
 
     public function member_subscription()
     {
-        $nextBilling = auth()->user()->plan_expiry;
-        return view('member.subscription');
+        return view('member.subscription', [
+            'hasSavedCard' => $this->memberHasSavedCard(auth()->user()),
+        ]);
+    }
+
+    /**
+     * Cancel the membership.
+     *
+     * Benefits carry on until plan_expiry — the member already paid for that
+     * period. Cancelling only stops the next automatic charge.
+     */
+    public function cancelSubscription()
+    {
+        $user = auth()->user();
+
+        if (!($user->plan_id > 0)) {
+            return back()->with('error', 'You do not have a membership to cancel.');
+        }
+
+        if ($user->membershipIsCancelled()) {
+            return back()->with('error', 'Your membership is already cancelled.');
+        }
+
+        $user->update([
+            'auto_renew' => false,
+            'membership_cancelled_at' => Carbon::now(),
+        ]);
+
+        $expiry = Carbon::parse($user->plan_expiry)->format('M j, Y');
+
+        return back()->with('success', "Your membership has been cancelled. You keep your benefits until {$expiry}, and you will not be charged again.");
+    }
+
+    /**
+     * Undo a cancellation and put automatic renewal back on.
+     */
+    public function resumeSubscription()
+    {
+        $user = auth()->user();
+
+        if (!$user->membershipIsCancelled()) {
+            return back()->with('error', 'Your membership is not cancelled.');
+        }
+
+        $user->update([
+            'membership_cancelled_at' => null,
+            'auto_renew' => true,
+        ]);
+
+        if (!$this->memberHasSavedCard($user)) {
+            return back()->with('success', 'Your membership has been resumed. Add a card by renewing once manually, otherwise automatic renewal cannot charge you.');
+        }
+
+        return back()->with('success', 'Your membership has been resumed and will renew automatically.');
+    }
+
+    /**
+     * Switch automatic renewal on or off without cancelling.
+     */
+    public function updateAutoRenew(Request $request)
+    {
+        $validated = $request->validate([
+            'auto_renew' => 'required|boolean',
+        ]);
+
+        $user = auth()->user();
+
+        if (!($user->plan_id > 0)) {
+            return back()->with('error', 'You do not have a membership to change.');
+        }
+
+        if ($user->hasLifetimeMembership()) {
+            return back()->with('error', 'Lifetime memberships never need renewing.');
+        }
+
+        $user->update(['auto_renew' => $validated['auto_renew']]);
+
+        if (!$validated['auto_renew']) {
+            return back()->with('success', 'Automatic renewal is off. Your membership will simply end on its expiry date unless you renew.');
+        }
+
+        if (!$this->memberHasSavedCard($user)) {
+            return back()->with('success', 'Automatic renewal is on. Renew once manually to save a card, otherwise there is nothing for us to charge.');
+        }
+
+        return back()->with('success', 'Automatic renewal is on. We will charge your saved card before your membership expires.');
+    }
+
+    /**
+     * Whether Stripe holds a card we could charge off-session.
+     */
+    private function memberHasSavedCard(User $user): bool
+    {
+        if (!$user->stripe_customer_id) {
+            return false;
+        }
+
+        try {
+            StripeService::configure();
+            $methods = \Stripe\PaymentMethod::all([
+                'customer' => $user->stripe_customer_id,
+                'type' => 'card',
+                'limit' => 1,
+            ]);
+
+            return count($methods->data) > 0;
+        } catch (\Exception $e) {
+            \Log::error('Could not check saved cards: ' . $e->getMessage(), ['user_id' => $user->id]);
+            return false;
+        }
     }
 
     public function member_vitalBoostSubscriptions()
@@ -118,7 +226,12 @@ class MemberController extends Controller
     public function member_plans()
     {
         $memberships = Membership::where('status', 'active')->get();
-        return view('member.plans',compact('memberships'));
+
+        // The plan they hold today, so each card can say Upgrade / Downgrade / Current
+        // rather than calling everything an upgrade.
+        $currentPlan = Membership::find(auth()->user()->plan_id);
+
+        return view('member.plans', compact('memberships', 'currentPlan'));
     }
 
     public function member_payments()
@@ -748,7 +861,9 @@ class MemberController extends Controller
                 'enabled' => true
             ],
             'payment_intent_data' => [
-                'setup_future_usage' => 'on_session', // This saves the payment method
+                // off_session (not on_session) so the card is saved with a mandate to
+                // charge it later without the member present — what membership:auto-renew needs.
+                'setup_future_usage' => 'off_session',
             ],
             'success_url' => route('payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('payment.cancel')
@@ -795,7 +910,9 @@ class MemberController extends Controller
                 'enabled' => true
             ],
             'payment_intent_data' => [
-                'setup_future_usage' => 'on_session', // This saves the payment method
+                // off_session (not on_session) so the card is saved with a mandate to
+                // charge it later without the member present — what membership:auto-renew needs.
+                'setup_future_usage' => 'off_session',
             ],
             'success_url' => route('payment.success') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('payment.cancel')
