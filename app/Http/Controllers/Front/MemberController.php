@@ -549,7 +549,11 @@ class MemberController extends Controller
 
     public function member_videoLibrary($activeTab = 'category')
     {
-        $collaborators = User::where('role', 'collaborator')->get();
+        // Only collaborators who are still active — a deactivated collaborator
+        // must not be listed, nor their videos reachable.
+        $collaborators = User::where('role', 'collaborator')
+            ->where('status', 'active')
+            ->get();
 
         //Course categories
         $courseCategories = [
@@ -563,14 +567,27 @@ class MemberController extends Controller
             'lifestyle' => 'Lifestyle'
         ];
 
-        return view('member.member-video-library', compact('collaborators', 'courseCategories', 'activeTab'));
+        // Grouped here rather than queried from the Blade template, so the
+        // active-owner rule is applied once instead of per category.
+        $coursesByCategory = Course::with('user')
+            ->fromActiveOwner()
+            ->whereIn('category', array_keys($courseCategories))
+            ->get()
+            ->groupBy('category');
+
+        return view('member.member-video-library', compact('collaborators', 'courseCategories', 'coursesByCategory', 'activeTab'));
     }
 
     public function collaboratorVideos($id)
     {
-        $collaborator = User::findOrFail($id);
-        $courses = Course::where('user_id', $id)->get();
-        
+        // Deep links must not expose a deactivated collaborator either.
+        $collaborator = User::where('id', $id)
+            ->where('role', 'collaborator')
+            ->where('status', 'active')
+            ->firstOrFail();
+
+        $courses = Course::where('user_id', $collaborator->id)->get();
+
         return view('member.collaborator-videos', compact('collaborator', 'courses'));
     }
 
