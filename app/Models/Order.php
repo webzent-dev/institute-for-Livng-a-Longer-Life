@@ -54,6 +54,38 @@ class Order extends Model
         return $this->hasMany(SubOrder::class);
     }
 
+    /**
+     * Whether this order can be viewed in the member dashboard.
+     *
+     * Guest checkouts have no account to sign in to, so emails must not offer
+     * them a link to /member/orders — it would only bounce them to a login.
+     */
+    public function belongsToMember(): bool
+    {
+        return $this->user_id !== null && optional($this->user)->role === 'user';
+    }
+
+    /**
+     * Move the order to the status its sub-orders agree on.
+     *
+     * One seller shipping their own parcel doesn't make the whole order shipped,
+     * so the order only follows once every seller has reached the same status.
+     *
+     * @return bool True when the order's status actually changed.
+     */
+    public function syncStatusFromSubOrders(): bool
+    {
+        $statuses = $this->subOrders()->pluck('status')->unique();
+
+        if ($statuses->count() !== 1 || $this->status === $statuses->first()) {
+            return false;
+        }
+
+        $this->status = $statuses->first();
+        $this->save();
+
+        return true;
+    }
     public function vitalBoostSubscriptions()
     {
         return $this->hasMany(VitalBoostSubscription::class);
