@@ -10,6 +10,7 @@
         <script src="https://unpkg.com/alpinejs" defer></script>
         <script src="https://unpkg.com/lucide@latest"></script>
         <style>
+            [x-cloak] { display: none !important; }
             /* Custom scrollbar styles */
             .scrollbar-thin {
                 scrollbar-width: thin;
@@ -156,48 +157,6 @@
                                     @endif
                                 </div>
 
-                                <!-- Product Table -->
-                                <div class="bg-white rounded-xl shadow border">
-                                    <div class="p-4 sm:p-6 border-b">
-                                        <h3 class="text-xl font-semibold">Order Items</h3>
-                                    </div>
-                                    <div class="overflow-x-auto">
-                                        <table class="w-full text-sm min-w-[500px]">
-                                            <thead class="bg-gray-100 text-left">
-                                                <tr>
-                                                    <th class="p-3 sm:p-4 text-left">Product</th>
-                                                    <th class="p-3 sm:p-4 text-right sm:text-left">Price</th>
-                                                    <th class="p-3 sm:p-4 text-center sm:text-left">Qty</th>
-                                                    <th class="p-3 sm:p-4 text-right">Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse($orderItems as $item)
-                                                    @if(in_array($item->product_id, $collaboratorProductIds))
-                                                        <tr class="border-t hover:bg-gray-50">
-                                                            <td class="p-3 sm:p-4">
-                                                                <div class="font-medium text-gray-900">{{$item->product->name}}</div>
-                                                            </td>
-                                                            <td class="p-3 sm:p-4 text-right sm:text-left">
-                                                                <span class="sm:hidden font-medium">Price: </span>${{number_format($item->price,2)}}
-                                                            </td>
-                                                            <td class="p-3 sm:p-4 text-center sm:text-left">
-                                                                <span class="sm:hidden font-medium">Qty: </span>{{$item->quantity}}
-                                                            </td>
-                                                            <td class="p-3 sm:p-4 text-right font-semibold">
-                                                                <span class="sm:hidden font-medium">Total: </span>${{number_format($item->price * $item->quantity,2)}}
-                                                            </td>
-                                                        </tr>
-                                                    @endif
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="4" class="p-4 text-center text-gray-500">No items found for this order.</td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
                             </div>
 
                             <!-- RIGHT SECTION (ORDER SUMMARY) -->
@@ -241,6 +200,191 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Product Table -->
+                        <div class="bg-white rounded-xl shadow border">
+                            <div class="p-4 sm:p-6 border-b">
+                                <h3 class="text-xl font-semibold">Order Items</h3>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm min-w-[500px]">
+                                    <thead class="bg-gray-100 text-left">
+                                        <tr>
+                                            <th class="p-3 sm:p-4 text-left">Product</th>
+                                            <th class="p-3 sm:p-4 text-left">Seller</th>
+                                            <th class="p-3 sm:p-4 text-right sm:text-left">Price</th>
+                                            <th class="p-3 sm:p-4 text-center sm:text-left">Qty</th>
+                                            <th class="p-3 sm:p-4 text-right">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($orderItems as $item)
+                                            @php
+                                                $isCollaboratorItem = in_array($item->product_id, $collaboratorProductIds);
+                                                $sellerName = $isCollaboratorItem && $item->product && $item->product->user
+                                                    ? trim($item->product->user->first_name . ' ' . $item->product->user->last_name)
+                                                    : 'Institute';
+                                            @endphp
+                                            <tr class="border-t hover:bg-gray-50">
+                                                <td class="p-3 sm:p-4">
+                                                    <div class="font-medium text-gray-900">{{ $item->product->name ?? $item->product_name }}</div>
+                                                </td>
+                                                <td class="p-3 sm:p-4">
+                                                    <span class="sm:hidden font-medium">Seller: </span>
+                                                    <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent text-white {{ $isCollaboratorItem ? 'bg-purple-500' : 'bg-slate-500' }}">
+                                                        {{ $sellerName }}
+                                                    </span>
+                                                </td>
+                                                <td class="p-3 sm:p-4 text-right sm:text-left">
+                                                    <span class="sm:hidden font-medium">Price: </span>${{number_format($item->price,2)}}
+                                                </td>
+                                                <td class="p-3 sm:p-4 text-center sm:text-left">
+                                                    <span class="sm:hidden font-medium">Qty: </span>{{$item->quantity}}
+                                                </td>
+                                                <td class="p-3 sm:p-4 text-right font-semibold">
+                                                    <span class="sm:hidden font-medium">Total: </span>${{number_format($item->price * $item->quantity,2)}}
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="p-4 text-center text-gray-500">No items found for this order.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Shipping & Labels (one block per seller) -->
+                        @if(isset($subOrders) && $subOrders->count() > 0)
+                        <div class="bg-white rounded-xl shadow border">
+                            <div class="p-4 sm:p-6 border-b">
+                                <h3 class="text-xl font-semibold">Shipping &amp; Labels</h3>
+                                <p class="text-sm text-gray-500">
+                                    Every seller ships from their own address, so each one's label is generated separately.
+                                </p>
+                            </div>
+                            <div class="divide-y">
+                                @foreach($subOrders as $subOrder)
+                                    @php
+                                        $seller = $subOrder->seller;
+                                        $isCollaboratorSubOrder = $seller && $seller->role === 'collaborator';
+                                        $subOrderSellerName = $isCollaboratorSubOrder
+                                            ? trim($seller->first_name . ' ' . $seller->last_name)
+                                            : 'Institute';
+                                    @endphp
+                                    <div class="p-4 sm:p-6 space-y-4" x-data="{ confirmOpen: false }">
+                                        <!-- Seller header -->
+                                        <div class="flex flex-wrap items-start justify-between gap-3">
+                                            <div>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-semibold text-gray-900">{{ $subOrderSellerName }}</span>
+                                                    <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent text-white {{ $isCollaboratorSubOrder ? 'bg-purple-500' : 'bg-slate-500' }}">
+                                                        {{ $isCollaboratorSubOrder ? 'Collaborator' : 'Institute' }}
+                                                    </span>
+                                                </div>
+                                                <p class="text-xs text-gray-500 mt-1">{{ $subOrder->sub_order_number }}</p>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent text-white @if($subOrder->status == 'delivered') bg-green-500 @elseif($subOrder->status == 'cancelled') bg-red-500 @elseif($subOrder->status == 'shipped') bg-blue-500 @else bg-orange-500 @endif">
+                                                    {{ ucfirst($subOrder->status) }}
+                                                </span>
+                                                @if($subOrder->label_url)
+                                                    <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-green-500 text-white">Label Ready</span>
+                                                @else
+                                                    <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-yellow-500 text-white">No Label</span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <!-- Items in this seller's parcel -->
+                                        <ul class="text-sm text-gray-600 list-disc list-inside">
+                                            @foreach($subOrder->items as $subItem)
+                                                <li>{{ $subItem->product_name }} &times; {{ $subItem->quantity }}</li>
+                                            @endforeach
+                                        </ul>
+
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <!-- Status -->
+                                            <form method="POST" action="{{ route('admin.sub-orders.update', $subOrder->id) }}"
+                                                x-ref="statusForm"
+                                                @if($isCollaboratorSubOrder) @submit.prevent="confirmOpen = true" @endif>
+                                                @csrf
+                                                @method('PUT')
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                                <div class="flex gap-2">
+                                                    <select name="status" class="border rounded-xl px-4 py-2 bg-white text-gray-700 w-full">
+                                                        @foreach(['pending','confirmed','processing','shipped','delivered','cancelled'] as $statusOption)
+                                                            <option value="{{ $statusOption }}" @selected($subOrder->status === $statusOption)>{{ ucfirst($statusOption) }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button type="submit" class="shrink-0 inline-flex items-center justify-center rounded-md gradient-primary text-primary-foreground hover:opacity-90 font-semibold px-4 py-2 text-[14px]">
+                                                        Update
+                                                    </button>
+                                                </div>
+                                            </form>
+
+                                            <!-- Label -->
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Shipping Label</label>
+                                                @if($subOrder->label_url)
+                                                    <div class="text-sm text-gray-600 mb-2">
+                                                        Tracking: <span class="font-medium">{{ $subOrder->tracking_number ?? 'N/A' }}</span>
+                                                        ({{ $subOrder->carrier ?? 'N/A' }})
+                                                    </div>
+                                                    <div class="flex gap-2">
+                                                        <a href="{{ route('admin.download-label', $subOrder->id) }}" target="_blank"
+                                                            class="inline-flex items-center justify-center rounded-md gradient-primary text-primary-foreground hover:opacity-90 font-semibold px-4 py-2 text-[14px]">
+                                                            Download (PDF)
+                                                        </a>
+                                                        <button type="button" onclick="window.open('{{ $subOrder->label_url }}', '_blank')"
+                                                            class="inline-flex items-center justify-center rounded-md border border-input bg-white hover:bg-gray-50 font-semibold px-4 py-2 text-[14px]">
+                                                            Print
+                                                        </button>
+                                                    </div>
+                                                @elseif(!$subOrder->shippo_rate_id)
+                                                    <p class="text-sm text-red-600">No shipping rate — label cannot be generated.</p>
+                                                @else
+                                                    <form method="POST" action="{{ route('admin.generate-label', $subOrder->id) }}">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="inline-flex items-center justify-center rounded-md bg-green-600 text-white hover:bg-green-700 font-semibold px-4 py-2 text-[14px]">
+                                                            Generate Label
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        @if($isCollaboratorSubOrder)
+                                        <!-- Confirm before touching a collaborator's sub-order -->
+                                        <div x-show="confirmOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center">
+                                            <div class="absolute inset-0 bg-black/50" @click="confirmOpen = false"></div>
+                                            <div class="relative bg-white rounded-xl shadow-lg p-6 w-full max-w-md mx-4">
+                                                <h4 class="text-lg font-semibold text-gray-900">Update this collaborator's order?</h4>
+                                                <p class="text-sm text-gray-600 mt-2">
+                                                    This part of the order belongs to <span class="font-semibold">{{ $subOrderSellerName }}</span>.
+                                                    Changing its status updates their record, and the customer is emailed once every seller
+                                                    on this order reaches the same status.
+                                                </p>
+                                                <div class="flex justify-end gap-3 mt-6">
+                                                    <button type="button" @click="confirmOpen = false"
+                                                        class="inline-flex items-center justify-center rounded-md border border-input bg-white hover:bg-gray-50 font-semibold px-4 py-2 text-[14px]">
+                                                        Cancel
+                                                    </button>
+                                                    <button type="button" @click="$refs.statusForm.submit()"
+                                                        class="inline-flex items-center justify-center rounded-md gradient-primary text-primary-foreground hover:opacity-90 font-semibold px-4 py-2 text-[14px]">
+                                                        Yes, update status
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </main>
             </div>

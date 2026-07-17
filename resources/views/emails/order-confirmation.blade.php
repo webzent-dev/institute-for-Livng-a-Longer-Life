@@ -111,7 +111,9 @@
         </tr>
     </table>
 
-    @include('emails.partials.button', ['url' => url('/member/orders'), 'label' => 'View Your Orders'])
+    @if($order->belongsToMember())
+        @include('emails.partials.button', ['url' => url('/member/orders'), 'label' => 'View Your Orders'])
+    @endif
 
     <p style="margin:16px 0 0 0;">
         Thank you for shopping with us,<br>

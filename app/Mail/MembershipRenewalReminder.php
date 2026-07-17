@@ -2,12 +2,13 @@
 
 namespace App\Mail;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class MembershipRenewalReminder extends Mailable
+class MembershipRenewalReminder extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

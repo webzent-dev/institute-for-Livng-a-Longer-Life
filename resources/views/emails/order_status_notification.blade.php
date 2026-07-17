@@ -34,7 +34,9 @@
         @endif
     </table>
 
-    @include('emails.partials.button', ['url' => url('/member/orders'), 'label' => 'View Your Order'])
+    @if($order->belongsToMember())
+        @include('emails.partials.button', ['url' => url('/member/orders'), 'label' => 'View Your Order'])
+    @endif
 
     <p style="margin:16px 0 0 0; font-size:14px; color:#6b7280;">
         If you have any questions about this order, just reach out to our support team — we are happy to help.

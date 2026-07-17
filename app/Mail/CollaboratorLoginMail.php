@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Mail;
-use App\Models\User;
+
+use Illuminate\Contracts\Queue\ShouldQueue;use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class CollaboratorLoginMail extends Mailable
+class CollaboratorLoginMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

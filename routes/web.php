@@ -93,6 +93,10 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
     );
     Route::put('/orders/{id}/update', [AdminOrderController::class, 'update'])->name('admin.orders.update');
     Route::get('/orders/details/{id}', [AdminOrderController::class, 'getOrderDetails'])->name('admin.order.details');
+    // Sub-order (split shipping) routes — one sub-order per seller, so labels are generated per seller
+    Route::put('/orders/sub/{id}/update', [AdminOrderController::class, 'updateSubOrder'])->name('admin.sub-orders.update');
+    Route::post('/orders/sub/{id}/generate-label', [AdminOrderController::class, 'generateShippingLabel'])->name('admin.generate-label');
+    Route::get('/orders/sub/{id}/download-label', [AdminOrderController::class, 'downloadLabel'])->name('admin.download-label');
     //------------Orders management end here--------//
 
     //------------Course management start here--------//

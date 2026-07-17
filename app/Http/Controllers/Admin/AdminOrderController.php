@@ -9,11 +9,26 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\SubOrder;
 use App\Mail\OrderStatusNotification;
+use App\Services\ShippingLabelService;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 class AdminOrderController extends Controller
 {
+    /**
+     * Statuses an order or sub-order can be moved to.
+     */
+    private const STATUSES = [
+        'pending',
+        'confirmed',
+        'processing',
+        'shipped',
+        'delivered',
+        'cancelled',
+    ];
+
     /**
      * Display a listing of the resource.
      */
@@ -96,12 +111,13 @@ class AdminOrderController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * /orders/{id} and /orders/details/{id} are two doors onto the same page,
+     * so both serve the full detail view with per-seller shipping and labels.
      */
     public function show(string $id)
     {
-        $orderDetail = Order::findorFail($id);
-        $orderItems = OrderItem::where('order_id', $orderDetail->id)->get();
-        return view('admin.orders.show', compact('orderDetail', 'orderItems'));
+        return $this->getOrderDetails((int) $id);
     }
 
     /**
@@ -114,22 +130,78 @@ class AdminOrderController extends Controller
     public function getOrderDetails(int $id)
     {
         $orderDetail = Order::findorFail($id);
-        $orderItems = OrderItem::where('order_id', $orderDetail->id)->get();
+        $orderItems = OrderItem::with('product.user')->where('order_id', $orderDetail->id)->get();
 
         //Get Collaborators with Products
-        $collaborators = User::where('role', 'collaborator')->get();
-        $collaboratorProductIds = [];
-        foreach($collaborators as $collaborator) {
-            //Get collaborator products
-            $collaboratorProducts = Product::where('user_id', $collaborator->id)->get();
+        $collaboratorProductIds = Product::whereHas('user', function ($query) {
+            $query->where('role', 'collaborator');
+        })->pluck('id')->toArray();
 
-            //Create array of product ids
-            foreach($collaboratorProducts as $product) {
-                $collaboratorProductIds[] = $product->id;
+        //One sub-order per seller, so each seller's label is generated on its own row
+        $subOrders = SubOrder::with(['seller', 'items'])
+            ->where('order_id', $orderDetail->id)
+            ->orderBy('created_at')
+            ->get();
+
+        return view('admin.orders.order_details', compact('orderDetail', 'orderItems', 'collaboratorProductIds', 'subOrders'));
+    }
+
+    /**
+     * Update a single sub-order's status.
+     *
+     * The admin manages every seller's sub-order here, whether the seller is the
+     * Institute itself or a collaborator.
+     */
+    public function updateSubOrder(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'status' => ['required', Rule::in(self::STATUSES)],
+        ]);
+
+        $subOrder = SubOrder::with('order')->findOrFail($id);
+        $subOrder->status = $validated['status'];
+        $subOrder->save();
+
+        // The parent order only follows once every seller agrees — one seller
+        // shipping their parcel doesn't make the whole order shipped.
+        $order = $subOrder->order;
+
+        if ($order->syncStatusFromSubOrders()) {
+            //Send email notification to user about order status update
+            if (!empty($order->email)) {
+                Mail::to($order->email)->send(
+                    new OrderStatusNotification($order)
+                );
             }
         }
 
-        return view('admin.orders.order_details', compact('orderDetail', 'orderItems', 'collaboratorProductIds'));
+        return redirect()->back()->with('success', 'Sub-order status has been updated successfully.');
+    }
+
+    /**
+     * Generate a Shippo shipping label for a single sub-order.
+     */
+    public function generateShippingLabel(Request $request, string $id)
+    {
+        $subOrder = SubOrder::findOrFail($id);
+
+        $result = app(ShippingLabelService::class)->purchase($subOrder);
+
+        return redirect()->back()->with($result['ok'] ? 'success' : 'error', $result['message']);
+    }
+
+    /**
+     * Redirect to the label PDF for download.
+     */
+    public function downloadLabel(string $id)
+    {
+        $subOrder = SubOrder::findOrFail($id);
+
+        if (!$subOrder->label_pdf_url) {
+            return redirect()->back()->with('error', 'No label available for download.');
+        }
+
+        return redirect($subOrder->label_pdf_url);
     }
 
     /**
