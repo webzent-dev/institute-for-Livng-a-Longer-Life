@@ -71,7 +71,20 @@
                                         @endif
                                     </h3>
                                     <div class="space-y-3">
-                                        @if(!empty($sellerRates['rates']))
+                                        @if(!empty($sellerRates['free_shipping']))
+                                            <label class="flex items-start p-4 border-2 rounded-lg border-primary bg-primary/5">
+                                                <input type="radio" name="delivery_method_{{ $sellerId }}" value="free_{{ $sellerId }}" checked class="mt-1 mr-3 delivery-method-radio" data-seller-id="{{ $sellerId }}" data-rate-key="free" data-amount="0" data-handling-fee="0">
+                                                <div class="flex-1">
+                                                    <div class="flex justify-between items-start">
+                                                        <div>
+                                                            <div class="font-medium text-gray-900">Free shipping</div>
+                                                            <div class="text-sm text-gray-600">Included with your yearly Vital Boost subscription</div>
+                                                        </div>
+                                                        <div class="text-right"><div class="font-medium text-green-600">$0.00</div></div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        @elseif(!empty($sellerRates['rates']))
                                             @php
                                                 // Pre-select the same rate the backend defaults this seller to, so the
                                                 // summary and the order total agree before the buyer touches anything.
@@ -168,20 +181,22 @@
                 </div>
                 <div class="space-y-3 mb-4">
                     @php $cart = session('cart', []); @endphp
-                    @foreach($cart as $productId => $quantity)
-                    @php 
-                    $product = App\Models\Product::find($productId);
+                    @foreach($cart as $lineKey => $quantity)
+                    @php
+                    $product = App\Models\Product::find(App\Support\CartLine::productId($lineKey));
+                    if (!$product) { continue; }
+                    $meta = App\Support\CartLine::meta($lineKey);
                     $item = [
-                        'id' => $product->id,
                         'name' => $product->name,
                         'price' => $product->price,
-                        'quantity' => $quantity
+                        'quantity' => $quantity,
+                        'label' => App\Support\CartLine::label($meta['purchase_type'], $meta['plan']),
                     ];
                     @endphp
                     <div class="flex justify-between items-center">
                         <div class="flex-1">
                             <div class="font-medium text-gray-900">{{ $item['name'] }}</div>
-                            <div class="text-sm text-gray-500">Qty: {{ $item['quantity'] }}</div>
+                            <div class="text-sm text-gray-500">{{ $item['label'] }} · Qty: {{ $item['quantity'] }}</div>
                         </div>
                         <div class="font-medium text-gray-900" data-price="{{ $item['price'] * $item['quantity'] }}">${{ number_format($item['price'] * $item['quantity'], 2) }}</div>
                     </div>
@@ -200,12 +215,18 @@
                         <span class="text-gray-600">Tax</span>
                         <span class="font-medium">$0.00</span>
                     </div>
-                    <!-- <template x-if="memberDiscount() > 0">
-                        <div class="flex justify-between text-sm text-green-600">
-                            <span>Member Discount</span>
-                            <span x-text="'-' + currency(memberDiscount())"></span>
-                        </div>
-                    </template> -->
+                    @if(($memberDiscount ?? 0) > 0)
+                    <div class="flex justify-between text-green-600">
+                        <span>Member Discount ({{ ucfirst(strtolower(auth()->user()->plan_name ?? '')) }})</span>
+                        <span class="font-medium">-${{ number_format($memberDiscount, 2) }}</span>
+                    </div>
+                    @endif
+                    @if(($subscriptionDiscount ?? 0) > 0)
+                    <div class="flex justify-between text-green-600">
+                        <span>Subscription Discount</span>
+                        <span class="font-medium">-${{ number_format($subscriptionDiscount, 2) }}</span>
+                    </div>
+                    @endif
                 </div>
                 <div class="border-t border-gray-200 pt-4 mt-4">
                     <div class="flex justify-between text-lg font-bold">
@@ -222,6 +243,9 @@
 // Real shipping costs from backend
 const realShippingCosts = @json(isset($shippingRates) ? $shippingRates : []);
 const totalShippingCost = @json(isset($totalShippingCost) ? $totalShippingCost : 0);
+// Server-computed discounts (fixed for the cart; independent of the shipping method).
+const memberDiscount = {{ $memberDiscount ?? 0 }};
+const subscriptionDiscount = {{ $subscriptionDiscount ?? 0 }};
 
 // Fallback costs
 const defaultShippingCost = {
@@ -258,7 +282,8 @@ function updateSummary(method){
     });
 
     document.getElementById('shipping-cost').textContent = '$' + shipping.toFixed(2);
-    let total = subtotal + shipping;
+    let total = subtotal + shipping - memberDiscount - subscriptionDiscount;
+    if (total < 0) total = 0;
     document.getElementById('total-cost').textContent = '$' + total.toFixed(2);
 }
 

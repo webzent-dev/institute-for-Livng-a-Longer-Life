@@ -177,20 +177,22 @@
                 </div>
                 <div class="space-y-3 mb-4">
                     @php $cart = session('cart', []); @endphp
-                    @foreach($cart as $productId => $quantity)
-                    @php 
-                    $product = App\Models\Product::find($productId);
+                    @foreach($cart as $lineKey => $quantity)
+                    @php
+                    $product = App\Models\Product::find(App\Support\CartLine::productId($lineKey));
+                    if (!$product) { continue; }
+                    $meta = App\Support\CartLine::meta($lineKey);
                     $item = [
-                    'id' => $product->id,
                     'name' => $product->name,
                     'price' => $product->price,
-                    'quantity' => $quantity
+                    'quantity' => $quantity,
+                    'label' => App\Support\CartLine::label($meta['purchase_type'], $meta['plan']),
                     ];
                     @endphp
                     <div class="flex justify-between items-center">
                         <div class="flex-1">
                             <div class="font-medium text-gray-900">{{ $item['name'] }}</div>
-                            <div class="text-sm text-gray-500">Qty: {{ $item['quantity'] }}</div>
+                            <div class="text-sm text-gray-500">{{ $item['label'] }} · Qty: {{ $item['quantity'] }}</div>
                         </div>
                         <div class="font-medium text-gray-900">${{ number_format($item['price'] * $item['quantity'], 2) }}</div>
                     </div>
@@ -210,12 +212,18 @@
                         <span class="text-gray-600">Tax</span>
                         <span class="font-medium">$0.00</span>
                     </div>
-                    <!-- <template x-if="memberDiscount() > 0">
-                        <div class="flex justify-between text-sm text-green-600">
-                            <span>Member Discount</span>
-                            <span x-text="'-' + currency(memberDiscount())"></span>
-                        </div>
-                    </template> -->
+                    @if(($memberDiscount ?? 0) > 0)
+                    <div class="flex justify-between text-green-600">
+                        <span>Member Discount ({{ ucfirst(strtolower(auth()->user()->plan_name ?? '')) }})</span>
+                        <span class="font-medium">-${{ number_format($memberDiscount, 2) }}</span>
+                    </div>
+                    @endif
+                    @if(($subscriptionDiscount ?? 0) > 0)
+                    <div class="flex justify-between text-green-600">
+                        <span>Subscription Discount</span>
+                        <span class="font-medium">-${{ number_format($subscriptionDiscount, 2) }}</span>
+                    </div>
+                    @endif
                 </div>
                 <div class="border-t border-gray-200 pt-4 mt-4">
                     <div class="flex justify-between text-lg font-bold">
@@ -296,6 +304,7 @@ function cartState() {
         items: cartItems.map(item => ({
             ...item,
             id: item.id,
+            line_key: item.line_key,
             name: item.name,
             vendor: item.vendor,
             quantity: Number(item.quantity),
@@ -303,10 +312,10 @@ function cartState() {
             originalPrice: item.originalPrice,
             image: item.image
         })),
-        updateQuantity(id, qty) {
+        updateQuantity(lineKey, qty) {
             if (qty < 1) return;
             this.items = this.items.map(item => {
-                if (item.id === id) item.quantity = qty; 
+                if (item.line_key === lineKey) item.quantity = qty;
                 return item;
             });
 
@@ -314,25 +323,25 @@ function cartState() {
                 $.ajax({
                     url: baseurl+'/cart/update',
                     type: 'POST',
-                    data: {product_id: id, quantity: qty},
+                    data: {line_key: lineKey, quantity: qty},
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    success: function (data) { 
-                        if (data.status == true) { 
-                            toastr.success(data.message); 
-                            $('#cart_count').html(data.cartCount); 
-                        } else { 
-                            toastr.error(data.message); 
-                        } 
-                    } 
+                    success: function (data) {
+                        if (data.status == true) {
+                            toastr.success(data.message);
+                            $('#cart_count').html(data.cartCount);
+                        } else {
+                            toastr.error(data.message);
+                        }
+                    }
                 });
             }
         },
-        removeFromCart(id) {
-            this.items = this.items.filter(item => item.id !== id);
+        removeFromCart(lineKey) {
+            this.items = this.items.filter(item => item.line_key !== lineKey);
             var r = confirm('Are you sure want to remove this product from cart?');
-            if(id != '' && r){
+            if(lineKey != '' && r){
                 $.ajax({
                     url: baseurl+"/cart/remove",
                     type: "post",
@@ -341,7 +350,7 @@ function cartState() {
                     },
                     cache: false,
                     async: false,
-                    data: { product_id: id},
+                    data: { line_key: lineKey },
                     success: function (response) {
                         if (response.status == true) {
                             toastr.success(response.message);
@@ -356,14 +365,17 @@ function cartState() {
         subtotal() {
             return this.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
         },
+        // Server-computed discounts (fixed for the cart; independent of payment method).
         memberDiscount() {
-            return this.subtotal() * 0.2;
+            return {{ $memberDiscount ?? 0 }};
+        },
+        subscriptionDiscount() {
+            return {{ $subscriptionDiscount ?? 0 }};
         },
         total() {
             let shipping = parseFloat($('#shipping_cost').val()) || 0;
-            //alert(shipping);
-            //return this.subtotal() - this.memberDiscount();
-            return this.subtotal() + shipping;
+            let total = this.subtotal() + shipping - this.memberDiscount() - this.subscriptionDiscount();
+            return total < 0 ? 0 : total;
         },
         proceedToCheckout() {
             window.location.href = baseurl+'/checkout/shipping';

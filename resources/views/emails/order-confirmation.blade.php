@@ -47,8 +47,12 @@
         </thead>
         <tbody>
             @forelse($orderItems as $item)
+                @php $purchaseLabel = \App\Support\CartLine::label($item->purchase_type, $item->subscription_plan); @endphp
                 <tr>
-                    <td align="left"   style="padding:12px; border-bottom:1px solid #e5e7eb; color:#1f2937;">{{ $item->product_name }}</td>
+                    <td align="left"   style="padding:12px; border-bottom:1px solid #e5e7eb; color:#1f2937;">
+                        {{ $item->product_name }}
+                        <span style="display:inline-block; margin-top:4px; font-size:12px; color:{{ $item->purchase_type === 'subscription' ? '#0f766e' : '#6b7280' }};">{{ $purchaseLabel }}</span>
+                    </td>
                     <td align="center" style="padding:12px; border-bottom:1px solid #e5e7eb; color:#374151;">{{ $item->quantity }}</td>
                     <td align="right"  style="padding:12px; border-bottom:1px solid #e5e7eb; color:#374151;">${{ number_format($item->price, 2) }}</td>
                     <td align="right"  style="padding:12px; border-bottom:1px solid #e5e7eb; color:#1f2937;">${{ number_format($item->price * $item->quantity, 2) }}</td>
@@ -71,6 +75,29 @@
             <td align="right" style="padding:6px 12px; color:#6b7280;">Shipping ({{ ucfirst($order->shipping_method) }})</td>
             <td align="right" style="padding:6px 12px; color:#374151;">${{ number_format($order->shipping_cost, 2) }}</td>
         </tr>
+        @php
+            $membershipDiscount = $order->membership_discount ?? 0;
+            $subscriptionDiscount = $order->subscription_discount ?? 0;
+            $planName = $order->membership_plan_name ?? ($order->user->plan_name ?? null);
+        @endphp
+        @if($membershipDiscount > 0)
+        <tr>
+            <td align="right" style="padding:6px 12px; color:#6b7280;">Membership Discount{{ $planName ? ' ('.$planName.')' : '' }}</td>
+            <td align="right" style="padding:6px 12px; color:#059669;">- ${{ number_format($membershipDiscount, 2) }}</td>
+        </tr>
+        @endif
+        @if($subscriptionDiscount > 0)
+        <tr>
+            <td align="right" style="padding:6px 12px; color:#6b7280;">Subscription Discount</td>
+            <td align="right" style="padding:6px 12px; color:#059669;">- ${{ number_format($subscriptionDiscount, 2) }}</td>
+        </tr>
+        @endif
+        @if($membershipDiscount <= 0 && $subscriptionDiscount <= 0 && ($order->discount ?? 0) > 0)
+        <tr>
+            <td align="right" style="padding:6px 12px; color:#6b7280;">Discount</td>
+            <td align="right" style="padding:6px 12px; color:#059669;">- ${{ number_format($order->discount, 2) }}</td>
+        </tr>
+        @endif
         <tr>
             <td align="right" style="padding:10px 12px; border-top:2px solid #e5e7eb; font-weight:600; color:#1f2937;">Total</td>
             <td align="right" style="padding:10px 12px; border-top:2px solid #e5e7eb; font-weight:700; color:#065f46; font-size:16px;">${{ number_format($order->total, 2) }}</td>

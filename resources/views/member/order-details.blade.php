@@ -46,7 +46,9 @@
                     <div class="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0">
                         <div class="flex-1">
                             <h3 class="text-sm font-medium text-gray-900">{{ $item->product_name }}</h3>
-                            <p class="text-sm text-gray-600">Quantity: {{ $item->quantity }}</p>
+                            @php $purchaseLabel = \App\Support\CartLine::label($item->purchase_type, $item->subscription_plan); @endphp
+                            <span class="inline-block mt-1 rounded-full text-[11px] font-semibold px-2 py-0.5 {{ $item->purchase_type === 'subscription' ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-600' }}">{{ $purchaseLabel }}</span>
+                            <p class="text-sm text-gray-600 mt-1">Quantity: {{ $item->quantity }}</p>
                         </div>
                         <div class="text-right">
                             <p class="text-sm font-medium text-gray-900">${{ number_format($item->price, 2) }}</p>

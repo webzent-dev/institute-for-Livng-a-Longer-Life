@@ -89,8 +89,8 @@
 @endphp
 <div class="min-h-screen flex flex-col">
     <main>
-        @if(!empty($product))
-        {{-- Hero Section --}}
+        {{-- Hero Section — product purchase moved to the shop (/shop). This page is
+             informational only; the Vital Boost product is bought from the store. --}}
         <section class="gradient-subtle py-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
@@ -99,9 +99,9 @@
                             <i data-lucide="zap" class="w-5 h-5 text-primary"></i>
                             <span class="text-sm font-semibold text-primary">{{ $heroMeta['badge_text'] ?? 'Premium Wellness Formula' }}</span>
                         </div>
-                        <h1 class="text-4xl lg:text-6xl font-bold text-foreground text-left">{{ $hero->heading ?? $product->name ?? 'Vital Boost' }}</h1>
+                        <h1 class="text-4xl lg:text-6xl font-bold text-foreground text-left">{{ $hero->heading ?? 'Vital Boost' }}</h1>
                         <p class="text-2xl text-muted-foreground">{{ $hero->subheading ?? 'The finest supplement for the way we live today' }}</p>
-                        <p class="text-lg text-muted-foreground">{{ $hero->body ?? $product->description ?? 'Premium wellness formula designed to support your daily health and longevity needs.' }}</p>
+                        <p class="text-lg text-muted-foreground">{{ $hero->body ?? 'Premium wellness formula designed to support your daily health and longevity needs.' }}</p>
                         @if(!empty($heroMeta['note']) || !$hero)
                         <div class="p-4 bg-secondary/50 rounded-lg border-l-4 border-primary">
                             <p class="text-sm text-muted-foreground italic">
@@ -110,22 +110,14 @@
                         </div>
                         @endif
                         <div class="flex flex-col sm:flex-row gap-4">
-                            @if($product)
-                                <x-button-use href="javascript:addToCart({{ $product->id }})" :label="$heroMeta['cta_label'] ?? 'Order Now'" variant="primary" icon="zap" />
-                            @else
-                                <x-button-use href="#" label="Coming Soon" variant="outline" icon="clock" disabled />
-                            @endif
+                            <x-button-use href="{{ url('/shop') }}" :label="$heroMeta['cta_label'] ?? 'Shop Now'" variant="primary" icon="shopping-cart" />
                         </div>
                     </div>
                     <div class="relative">
                         <div class="rounded-lg bg-card text-card-foreground shadow-sm shadow-strong border-2 border-primary/20">
                             <div class="p-8">
                                 <div class="aspect-square rounded-2xl overflow-hidden">
-                                    @if($product && !empty($product->image) && file_exists(public_path('product_images/'.$product->image)))
-                                        <img src="{{ asset('product_images/'.$product->image) }}" alt="Vital Boost - Premium Longevity Formula" class="w-full h-full object-cover"/>
-                                    @else
-                                        <img src="{{asset('/assets/placeholder.svg')}}" alt="Vital Boost - Premium Longevity Formula" class="w-full h-full object-cover"/>
-                                    @endif
+                                    <img src="{{asset('/assets/vitalboost.webp')}}" alt="Vital Boost - Premium Longevity Formula" class="w-full h-full object-cover"/>
                                 </div>
                             </div>
                         </div>
@@ -133,7 +125,6 @@
                 </div>
             </div>
         </section>
-        @endif
 
         {{-- Benefits Section --}}
         <section class="container-base py-20 bg-background">
@@ -296,5 +287,4 @@
         </section>
     </main>
 </div>
-<script src="{{ asset('js/cart.js') }}"></script>
 @endsection

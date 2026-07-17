@@ -143,20 +143,22 @@
                             <h3 class="font-medium text-gray-900 mb-2">Order Items</h3>
                             <div class="space-y-3">
                             @php $cart = session('cart', []); @endphp
-                            @foreach($cart as $productId => $quantity)
-                                @php 
-                                $product = App\Models\Product::find($productId);
+                            @foreach($cart as $lineKey => $quantity)
+                                @php
+                                $product = App\Models\Product::find(App\Support\CartLine::productId($lineKey));
+                                if (!$product) { continue; }
+                                $meta = App\Support\CartLine::meta($lineKey);
                                 $item = [
-                                    'id' => $product->id,
                                     'name' => $product->name,
                                     'price' => $product->price,
-                                    'quantity' => $quantity
+                                    'quantity' => $quantity,
+                                    'label' => App\Support\CartLine::label($meta['purchase_type'], $meta['plan']),
                                 ];
                                 @endphp
                                 <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
                                     <div class="flex-1">
                                         <div class="font-medium text-gray-900">{{ $item['name'] }}</div>
-                                        <div class="text-sm text-gray-500">Qty: {{ $item['quantity'] }}</div>
+                                        <div class="text-sm text-gray-500">{{ $item['label'] }} · Qty: {{ $item['quantity'] }}</div>
                                     </div>
                                     <div class="font-medium text-gray-900">${{ number_format($item['price'] * $item['quantity'], 2) }}</div>
                                 </div>
@@ -198,23 +200,25 @@
                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 sticky top-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">Order Summary</h3>
                     <div class="space-y-3 mb-4">
-                        @php 
-                            $cart = session('cart', []); 
+                        @php
+                            $cart = session('cart', []);
                         @endphp
-                        @foreach($cart as $productId => $quantity)
-                            @php 
-                                $product = App\Models\Product::find($productId);
+                        @foreach($cart as $lineKey => $quantity)
+                            @php
+                                $product = App\Models\Product::find(App\Support\CartLine::productId($lineKey));
+                                if (!$product) { continue; }
+                                $meta = App\Support\CartLine::meta($lineKey);
                                 $item = [
-                                    'id' => $product->id,
                                     'name' => $product->name,
                                     'price' => $product->price,
-                                    'quantity' => $quantity
+                                    'quantity' => $quantity,
+                                    'label' => App\Support\CartLine::label($meta['purchase_type'], $meta['plan']),
                                 ];
                             @endphp
                         <div class="flex justify-between items-center">
                             <div class="flex-1">
                                 <div class="font-medium text-gray-900">{{ $item['name'] }}</div>
-                                <div class="text-sm text-gray-500">Qty: {{ $item['quantity'] }}</div>
+                                <div class="text-sm text-gray-500">{{ $item['label'] }} · Qty: {{ $item['quantity'] }}</div>
                             </div>
                             <div class="font-medium text-gray-900">${{ number_format($item['price'] * $item['quantity'], 2) }}</div>
                         </div>
@@ -238,6 +242,12 @@
                         <div class="flex justify-between">
                             <span class="text-gray-600">Member Discount ({{ ucfirst(strtolower(auth()->user()->plan_name ?? '')) }})</span>
                             <span class="font-medium text-green-600">-${{ number_format($memberDiscount, 2) }}</span>
+                        </div>
+                        @endif
+                        @if(($subscriptionDiscount ?? 0) > 0)
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Subscription Discount</span>
+                            <span class="font-medium text-green-600">-${{ number_format($subscriptionDiscount, 2) }}</span>
                         </div>
                         @endif
                     </div>
@@ -269,6 +279,7 @@ document.getElementById('terms').addEventListener('change', function() {
 function cartState() {
     let cartItems = @json($cartItems);
     let serverMemberDiscount = {{ $memberDiscount ?? 0 }};
+    let serverSubscriptionDiscount = {{ $subscriptionDiscount ?? 0 }};
     return {
         items: cartItems.map(item => ({
             ...item,
@@ -336,9 +347,12 @@ function cartState() {
         memberDiscount() {
             return serverMemberDiscount;
         },
+        subscriptionDiscount() {
+            return serverSubscriptionDiscount;
+        },
         total() {
             let shipping = parseFloat($('#shipping_cost').val()) || 0;
-            return this.subtotal() + shipping - this.memberDiscount();
+            return this.subtotal() + shipping - this.memberDiscount() - this.subscriptionDiscount();
         },
         proceedToCheckout() {
             window.location.href = baseurl+'/checkout/shipping';

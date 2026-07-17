@@ -30,8 +30,9 @@ class CartController extends Controller
         $cartItems = [];
         $groupedItems = [];
 
-        foreach ($cart as $productId => $quantity) {
+        foreach ($cart as $lineKey => $quantity) {
             //Get product detail with user detail
+            $productId = \App\Support\CartLine::productId($lineKey);
             $product = Product::with('user')->find($productId);
             if ($product) {
                 if($product->user->role == 'collaborator'){
@@ -42,10 +43,15 @@ class CartController extends Controller
 
                 $itemTotal = $product->price * $quantity;
                 $total += $itemTotal;
-                
+
+                $meta = \App\Support\CartLine::meta($lineKey);
                 $cartItem = [
                     'id' => $product->id,
+                    'line_key' => (string) $lineKey,
                     'name' => $product->name,
+                    'purchase_type' => $meta['purchase_type'],
+                    'plan' => $meta['plan'],
+                    'purchase_label' => \App\Support\CartLine::label($meta['purchase_type'], $meta['plan']),
                     'vendor' => $vendorName,
                     'vendor_id' => $product->user->id,
                     'vendor_role' => $product->user->role,
@@ -57,9 +63,9 @@ class CartController extends Controller
                     'weight' => $product->weight ?? 0,
                     'requires_shipping' => $product->requires_shipping ?? true,
                 ];
-                
+
                 $cartItems[] = $cartItem;
-                
+
                 // Group by seller for split shipping display
                 $sellerId = $product->user->id;
                 if (!isset($groupedItems[$sellerId])) {
@@ -106,41 +112,62 @@ class CartController extends Controller
 
         //Get stock quantity from database
         $product = Product::with('user')->find($productId);
+
+        // Build the cart line key from the purchase choice. Only Vital Boost
+        // products support subscriptions; everything else is a one-time line.
+        // This lets the same product sit in the cart as several lines (one-time,
+        // monthly, yearly) instead of collapsing into one.
+        $purchaseType = $request->input('purchase_type', 'one_time');
+        $plan = $request->input('plan');
+        if ($product->product_type !== 'vital_boost') {
+            $purchaseType = 'one_time';
+            $plan = null;
+        }
+        $lineKey = \App\Support\CartLine::key((int) $productId, $purchaseType, $plan);
+
+        // Get current cart from session
+        $cart = Session::get('cart', []);
+
+        // Stock is shared across every line of the same product, so validate the
+        // requested quantity against the combined quantity already in the cart.
+        $existingProductQty = 0;
+        foreach ($cart as $key => $qty) {
+            if (\App\Support\CartLine::productId($key) === (int) $productId) {
+                $existingProductQty += $qty;
+            }
+        }
+
         $stockQuantity = $product->stock_quantity;
-        if ($stockQuantity < $quantity) {
+        if ($stockQuantity < $existingProductQty + $quantity) {
             return response()->json([
                 'status' => false,
                 'message' => 'Insufficient stock quantity/Out of stock.',
-                'cartCount' => 0,
-                'cartTotal' => 0
-            ], 200);
-        }else{
-            // Get current cart from session
-            $cart = Session::get('cart', []);
-
-            // Allow multi-seller carts for split shipping
-            // No longer restrict to single vendor
-
-            // Add or update product in cart
-            if (isset($cart[$productId])) {
-                $cart[$productId] += $quantity;
-                $message = $cart[$productId]. ' '. 'items in cart';
-            } else {
-                $cart[$productId] = $quantity;
-                $message = $quantity.' '.' item added to cart';
-            }
-
-            // Store updated cart in session
-            Session::put('cart', $cart);
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Product added to cart successfully',
                 'cartCount' => array_sum($cart),
-                'cartTotal' => $this->getCartTotal($cart),
-                'message' => $message
-            ]);
+                'cartTotal' => $this->getCartTotal($cart)
+            ], 200);
         }
+
+        // Allow multi-seller carts for split shipping
+        // No longer restrict to single vendor
+
+        // Add or update this specific line in the cart
+        if (isset($cart[$lineKey])) {
+            $cart[$lineKey] += $quantity;
+            $message = $cart[$lineKey]. ' '. 'items in cart';
+        } else {
+            $cart[$lineKey] = $quantity;
+            $message = $quantity.' '.' item added to cart';
+        }
+
+        // Store updated cart in session
+        Session::put('cart', $cart);
+
+        return response()->json([
+            'status' => true,
+            'cartCount' => array_sum($cart),
+            'cartTotal' => $this->getCartTotal($cart),
+            'message' => $message
+        ]);
     }
 
     /**
@@ -159,40 +186,51 @@ class CartController extends Controller
         $productId = $validated['product_id'];
         $quantity = $validated['quantity'];
         */
-        $productId = $request->input('product_id');
+        // A specific cart line is identified by its line_key (falls back to
+        // product_id for backwards compatibility / non-subscription lines).
+        $lineKey = $request->input('line_key', $request->input('product_id'));
         $quantity = $request->input('quantity');
-
-        //Get stock quantity from database
-        $product = Product::find($productId);
-        $stockQuantity = $product->stock_quantity;
-
-        if ($stockQuantity < $quantity) { 
-            return response()->json([ 
-                'status' => false, 
-                'message' => 'Insufficient stock quantity/Out of stock' 
-            ], 200); 
-        }  
 
         // Get current cart from session
         $cart = Session::get('cart', []);
 
-        // Update product quantity
-        if (isset($cart[$productId])) {
-            $cart[$productId] = $quantity;
-            Session::put('cart', $cart);
-
+        if (!isset($cart[$lineKey])) {
             return response()->json([
-                'status' => true,
-                'message' => 'Cart updated successfully',
-                'cartCount' => array_sum($cart),
-                'cartTotal' => $this->getCartTotal($cart)
-            ]);
+                'status' => false,
+                'message' => 'Product not found in cart'
+            ], 404);
         }
 
+        //Get stock quantity from database. Stock is shared across every line of
+        //the same product, so validate against the other lines' quantities too.
+        $productId = \App\Support\CartLine::productId($lineKey);
+        $product = Product::find($productId);
+        $stockQuantity = $product->stock_quantity;
+
+        $otherLinesQty = 0;
+        foreach ($cart as $key => $qty) {
+            if ($key != $lineKey && \App\Support\CartLine::productId($key) === $productId) {
+                $otherLinesQty += $qty;
+            }
+        }
+
+        if ($stockQuantity < $otherLinesQty + $quantity) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Insufficient stock quantity/Out of stock'
+            ], 200);
+        }
+
+        // Update this line's quantity
+        $cart[$lineKey] = $quantity;
+        Session::put('cart', $cart);
+
         return response()->json([
-            'status' => false,
-            'message' => 'Product not found in cart'
-        ], 404);
+            'status' => true,
+            'message' => 'Cart updated successfully',
+            'cartCount' => array_sum($cart),
+            'cartTotal' => $this->getCartTotal($cart)
+        ]);
     }
 
     /**
@@ -207,14 +245,15 @@ class CartController extends Controller
             'product_id' => 'required|exists:products,id'
         ]);*/
 
-        $productId = $request->input('product_id');
+        // Remove one specific cart line by its line_key (falls back to product_id).
+        $lineKey = $request->input('line_key', $request->input('product_id'));
 
         // Get current cart from session
         $cart = Session::get('cart', []);
 
-        // Remove product from cart
-        if (isset($cart[$productId])) {
-            unset($cart[$productId]);
+        // Remove the line from cart
+        if (isset($cart[$lineKey])) {
+            unset($cart[$lineKey]);
             Session::put('cart', $cart);
 
             return response()->json([
@@ -325,8 +364,8 @@ class CartController extends Controller
     {
         $total = 0;
 
-        foreach ($cart as $productId => $quantity) {
-            $product = Product::find($productId);
+        foreach ($cart as $lineKey => $quantity) {
+            $product = Product::find(\App\Support\CartLine::productId($lineKey));
             if ($product) {
                 $total += $product->price * $quantity;
             }

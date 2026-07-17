@@ -7,6 +7,7 @@
         ['title' => 'Profile', 'url' => route('member.profile'), 'icon' => 'user', 'active' => request()->routeIs('member.profile')],
         ['title' => 'Security', 'url' => route('member.security'), 'icon' => 'shield', 'active' => request()->routeIs('member.security')],
         ['title' => 'Subscription', 'url' => route('member.subscription'), 'icon' => 'credit-card', 'active' => request()->routeIs('member.subscription')],
+        ['title' => 'Vital Boost', 'url' => route('member.vital-boost-subscriptions'), 'icon' => 'repeat', 'active' => request()->routeIs('member.vital-boost-subscriptions')],
         ['title' => 'Orders', 'url' => route('member.orders'), 'icon' => 'package', 'active' => request()->routeIs('member.orders')],
         ['title' => 'Plans', 'url' => route('member.plans'), 'icon' => 'arrow-up-down', 'active' => request()->routeIs('member.plans')],
         ['title' => 'Payments', 'url' => route('member.payments'), 'icon' => 'receipt', 'active' => request()->routeIs('member.payments')],
@@ -22,6 +23,7 @@
         'package' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
         'arrow-up-down' => 'M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4',
         'receipt' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+        'repeat' => 'M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3',
     ];
 @endphp
 

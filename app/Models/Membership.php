@@ -9,6 +9,7 @@ class Membership extends Model
     protected $fillable = [
         'membership_name',
         'membership_price',
+        'discount_percent',
         'membership_period',
         'membership_description',
         'membership_features',
@@ -21,6 +22,7 @@ class Membership extends Model
         $membership = new Membership();
         $membership->membership_name = $request->membership_name;
         $membership->membership_price = $request->membership_price;
+        $membership->discount_percent = $request->discount_percent ?? 0;
         $membership->membership_period = $request->membership_period;
         $membership->membership_description = $request->membership_description;
         $membership->membership_features = $request->membership_features;
@@ -34,6 +36,7 @@ class Membership extends Model
 
         $membership->membership_name = $request->membership_name;
         $membership->membership_price = $request->membership_price;
+        $membership->discount_percent = $request->discount_percent ?? 0;
         $membership->membership_period = $request->membership_period;
         $membership->membership_description = $request->membership_description;
         $membership->membership_features = $request->membership_features;

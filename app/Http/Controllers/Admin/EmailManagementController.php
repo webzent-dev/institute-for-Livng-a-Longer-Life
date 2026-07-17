@@ -112,6 +112,11 @@ class EmailManagementController extends Controller
                 'name' => 'Membership Renewal Reminder',
                 'description' => 'Sent automatically to members 7 days and 1 day before their membership expires, and on the day it expires',
                 'enabled' => true
+            ],
+            'vital_boost_renewal_reminder' => [
+                'name' => 'Vital Boost Subscription Renewal Reminder',
+                'description' => 'Sent automatically to Vital Boost subscribers 7 days and 1 day before their subscription renews, and on the renewal day',
+                'enabled' => true
             ]
         ];
 
@@ -586,7 +591,7 @@ class EmailManagementController extends Controller
     public function editEmail(Request $request)
     {
         $request->validate([
-            'email_type' => 'required|in:admin_collaborator_notification,admin_member_notification,admin_order_notification,collaborator_active,collaborator_inactive,collaborator_login,collaborator_order_notification,member_active,member_inactive,member_signup,order_confirmation,order_status_update,renewal_reminder'
+            'email_type' => 'required|in:admin_collaborator_notification,admin_member_notification,admin_order_notification,collaborator_active,collaborator_inactive,collaborator_login,collaborator_order_notification,member_active,member_inactive,member_signup,order_confirmation,order_status_update,renewal_reminder,vital_boost_renewal_reminder'
         ]);
 
         $emailType = $request->email_type;
@@ -633,6 +638,9 @@ class EmailManagementController extends Controller
                     break;
                 case 'renewal_reminder':
                     $templatePath = resource_path('views/emails/membership-renewal-reminder.blade.php');
+                    break;
+                case 'vital_boost_renewal_reminder':
+                    $templatePath = resource_path('views/emails/vital-boost-renewal-reminder.blade.php');
                     break;
             }
 
@@ -699,7 +707,7 @@ class EmailManagementController extends Controller
     public function updateEmailTemplate(Request $request)
     {
         $request->validate([
-            'email_type' => 'required|in:admin_collaborator_notification,admin_member_notification,admin_order_notification,collaborator_active,collaborator_inactive,collaborator_login,collaborator_order_notification,member_active,member_inactive,member_signup,order_confirmation,order_status_update,renewal_reminder',
+            'email_type' => 'required|in:admin_collaborator_notification,admin_member_notification,admin_order_notification,collaborator_active,collaborator_inactive,collaborator_login,collaborator_order_notification,member_active,member_inactive,member_signup,order_confirmation,order_status_update,renewal_reminder,vital_boost_renewal_reminder',
             'content' => 'required|string'
         ]);
 
@@ -747,6 +755,9 @@ class EmailManagementController extends Controller
                     break;
                 case 'renewal_reminder':
                     $templatePath = resource_path('views/emails/membership-renewal-reminder.blade.php');
+                    break;
+                case 'vital_boost_renewal_reminder':
+                    $templatePath = resource_path('views/emails/vital-boost-renewal-reminder.blade.php');
                     break;
             }
 

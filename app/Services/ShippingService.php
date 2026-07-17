@@ -81,20 +81,27 @@ class ShippingService
     {
         $groupedItems = collect();
 
-        foreach ($cart as $productId => $quantity) {
-            $product = Product::with('user')->find($productId);
+        foreach ($cart as $lineKey => $quantity) {
+            $product = Product::with('user')->find(\App\Support\CartLine::productId($lineKey));
             if (!$product) continue;
 
             $sellerId = $product->user_id;
-            
+
             if (!$groupedItems->has($sellerId)) {
                 $groupedItems->put($sellerId, []);
             }
+
+            // Carry the line's purchase choice so downstream shipping rules (e.g.
+            // free shipping for yearly Vital Boost subscriptions) apply per line.
+            $meta = \App\Support\CartLine::meta($lineKey);
 
             $items = $groupedItems->get($sellerId);
             $items[] = [
                 'product' => $product,
                 'quantity' => $quantity,
+                'line_key' => (string) $lineKey,
+                'purchase_type' => $meta['purchase_type'],
+                'plan' => $meta['plan'],
             ];
             $groupedItems->put($sellerId, $items);
         }

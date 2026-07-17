@@ -405,6 +405,7 @@ Route::prefix('member')->middleware([RoleMiddleware::class.':user'])->group(func
     Route::get('/profile', [MemberController::class, 'member_profile'])->name('member.profile');
     Route::get('/security', [MemberController::class, 'member_security'])->name('member.security');
     Route::get('/subscription', [MemberController::class, 'member_subscription'])->name('member.subscription');
+    Route::get('/vital-boost-subscriptions', [MemberController::class, 'member_vitalBoostSubscriptions'])->name('member.vital-boost-subscriptions');
     Route::get('/orders', [MemberController::class, 'member_orders'])->name('member.orders');
     Route::get('/orders/{id}', [MemberController::class, 'member_order_details'])->name('member.order-details');
     Route::get('/plans', [MemberController::class, 'member_plans'])->name('member.plans');

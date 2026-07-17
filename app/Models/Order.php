@@ -26,6 +26,9 @@ class Order extends Model
         'shipping_cost',
         'tax',
         'discount',
+        'membership_discount',
+        'membership_plan_name',
+        'subscription_discount',
         'total',
         'status',
         'payment_status',
@@ -83,4 +86,9 @@ class Order extends Model
 
         return true;
     }
+    public function vitalBoostSubscriptions()
+    {
+        return $this->hasMany(VitalBoostSubscription::class);
+    }
+    
 }
