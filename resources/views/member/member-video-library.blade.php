@@ -110,11 +110,9 @@ use Illuminate\Support\Facades\DB;
             <div x-show="tab=='category'" class="mt-6 space-y-8">
                 @forelse($courseCategories as $key => $value)
                     @php
-                        //Count the number of courses in each category
-                        $count = App\Models\Course::where('category', $key)->count();
-
-                        $courses = App\Models\Course::with('user')->where('category', $key)->get();
-                       
+                        // Already filtered to active owners and grouped in the controller.
+                        $courses = $coursesByCategory[$key] ?? collect();
+                        $count = $courses->count();
                     @endphp
                     @if($count > 0)
                     <section>
