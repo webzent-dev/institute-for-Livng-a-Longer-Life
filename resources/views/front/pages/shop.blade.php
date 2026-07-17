@@ -165,6 +165,99 @@ document.addEventListener('DOMContentLoaded', function() {
     // Laravel products → JS
     const products = @json($products);
     const collaborators = @json($collaborators);
+    // Member-aware Vital Boost price breakdowns, keyed by product id (see ShopController).
+    const vitalBoostPricing = @json($vitalBoostPricing ?? (object)[]);
+
+    // Per-card selected purchase option (persists across filter/pagination re-renders).
+    window.vbState = window.vbState || {};
+    window.vbProducts = {};
+
+    const VB_OPTIONS = [
+        { key: 'one_time', label: 'One-time' },
+        { key: 'monthly',  label: 'Monthly'  },
+        { key: 'yearly',   label: 'Yearly'   },
+    ];
+
+    function vbMoney(v) { return Number(v).toFixed(2); }
+
+    function vbButtonLabel(key) {
+        if (key === 'monthly') return 'Subscribe Monthly';
+        if (key === 'yearly')  return 'Subscribe Yearly';
+        return 'Add to Cart';
+    }
+
+    const vbCartIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>';
+
+    // Purchase-type selector for a Vital Boost card. Re-buildable in place so option
+    // switches don't require re-rendering the whole grid.
+    function vitalBoostSelector(product) {
+        const pricing = vitalBoostPricing[product.id];
+        const sel = window.vbState[product.id] || 'one_time';
+
+        const optionsHtml = VB_OPTIONS.map(o => {
+            const active = o.key === sel;
+            const price = vbMoney(pricing[o.key].subtotal_after_discounts);
+            return `<button type="button" onclick="vbSelect(${product.id}, '${o.key}')"
+                        class="rounded-md border px-1 py-1.5 text-center transition-all ${active ? 'border-primary bg-primary/5 ring-1 ring-primary/40' : 'border-gray-200 hover:border-primary/50'}">
+                        <span class="block text-[10px] font-semibold text-muted-foreground">${o.label}</span>
+                        <span class="block text-xs font-bold text-gray-800">$${price}</span>
+                    </button>`;
+        }).join('');
+
+        const current = pricing[sel];
+        let note = '';
+        if (sel === 'yearly') {
+            note = '<p class="text-[11px] text-primary font-medium text-center mb-2">Free shipping</p>';
+        } else if (current.subscription_percent > 0) {
+            note = `<p class="text-[11px] text-primary font-medium text-center mb-2">Save ${current.subscription_percent}% with a subscription</p>`;
+        }
+
+        return `<div id="vb_wrap_${product.id}">
+            <div class="grid grid-cols-3 gap-1.5 mb-2">${optionsHtml}</div>
+            ${note}
+            <button type="button" onclick="vbAdd(${product.id})"
+                class="rounded-md flex items-center justify-center font-semibold gap-2 transition-all duration-150 select-none px-5 py-2 text-base h-10 gradient-primary text-primary-foreground hover:opacity-90 shadow-medium w-full">
+                ${vbCartIcon}
+                <span id="add_to_cart_button_${product.id}">${vbButtonLabel(sel)}</span>
+            </button>
+        </div>`;
+    }
+
+    // Global handlers referenced from card markup (survive grid re-renders).
+    window.vbSelect = function(id, key) {
+        window.vbState[id] = key;
+        const wrap = document.getElementById('vb_wrap_' + id);
+        if (wrap && window.vbProducts[id]) {
+            wrap.outerHTML = vitalBoostSelector(window.vbProducts[id]);
+            if (window.lucide) lucide.createIcons();
+        }
+    };
+
+    window.vbAdd = function(id) {
+        const key = window.vbState[id] || 'one_time';
+        if (key === 'one_time') addToCart(id, 'one_time', '');
+        else addToCart(id, 'subscription', key);
+    };
+
+    // Chooses the card's call-to-action: Vital Boost gets the purchase-type selector
+    // (when pricing is available), every other product keeps the plain Add-to-Cart button.
+    function renderCardAction(product, qty) {
+        if (product.product_type === 'vital_boost' && vitalBoostPricing[product.id]) {
+            window.vbProducts[product.id] = product;
+            return vitalBoostSelector(product);
+        }
+        return normalCartButton(product, qty);
+    }
+
+    function normalCartButton(product, qty) {
+        const label = qty > 0
+            ? `${qty} ${qty == 1 ? 'item' : 'items'} in cart`
+            : 'Add to Cart';
+        return `<button class="rounded-md flex items-center justify-center font-semibold gap-2 transition-all duration-150 select-none px-5 py-2 text-base h-10 gradient-primary text-primary-foreground hover:opacity-90 shadow-medium w-full" onclick="addToCart(${product.id})">
+                    ${vbCartIcon}
+                    <span id="add_to_cart_button_${product.id}">${label}</span>
+               </button>`;
+    }
 
     // Log products to console for debugging
     //console.log('Products:', products);
@@ -211,7 +304,8 @@ document.addEventListener('DOMContentLoaded', function() {
         uniqueCategories.forEach(category => {
             const option = document.createElement('option');
             option.value = category;
-            option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+            // Underscores → spaces, Title Case: "vital_boost" → "Vital Boost".
+            option.textContent = String(category).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
             categoryFilter.appendChild(option);
         });
 
@@ -610,18 +704,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
                 <div class="py-4 pt-0 justify-self-center w-full px-4">
-                    ${
-                        qty > 0
-                        ? `<button class="rounded-md flex items-center justify-center font-semibold gap-2 transition-all duration-150 select-none px-5 py-2 text-base h-10 gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold h-10 px-4 py-2  w-full" onclick="addToCart(${product.id})">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shopping-cart" aria-hidden="true" class="lucide lucide-shopping-cart w-5 h-5 mr-2"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
-                                <span id="add_to_cart_button_${product.id}">${qty} ${qty == 1 ? 'item' : 'items'} in cart</span>
-                           </button>`
-                        : `<button class="rounded-md flex items-center justify-center font-semibold gap-2 transition-all duration-150 select-none px-5 py-2 text-base h-10 gradient-primary text-primary-foreground hover:opacity-90 shadow-medium font-semibold h-10 px-4 py-2  w-full"
-                                onclick="addToCart(${product.id})">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shopping-cart" aria-hidden="true" class="lucide lucide-shopping-cart w-5 h-5 mr-2"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
-                                <span id="add_to_cart_button_${product.id}">Add to Cart</span>
-                           </button>`
-                    }
+                    ${ renderCardAction(product, qty) }
                 </div>
             </div>`;
         }).join('');

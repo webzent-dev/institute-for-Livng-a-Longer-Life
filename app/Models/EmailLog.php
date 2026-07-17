@@ -98,6 +98,7 @@ class EmailLog extends Model
             'member_signup' => 'Member Signup',
             'order_confirmation' => 'Order Confirmation',
             'renewal_reminder' => 'Membership Renewal Reminder',
+            'vital_boost_renewal_reminder' => 'Vital Boost Renewal Reminder',
             'custom' => 'Custom Email',
         ];
 

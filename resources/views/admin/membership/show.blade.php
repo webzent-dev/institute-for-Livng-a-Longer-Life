@@ -83,6 +83,10 @@
                                     <x-form.input label="Membership Period (e.g. 'year','month')" type="text" name="membership_period" id="membership_period" value="{{ $membershipDetail->membership_period }}" autocomplete="off" placeholder="Enter Membership Period*" required />
                                 </div>
                             </div>
+                            <div class="space-y-2 mt-3">
+                                <x-form.input label="Member Discount (%)" type="number" name="discount_percent" id="discount_percent" value="{{ $membershipDetail->discount_percent }}" autocomplete="off" placeholder="e.g. 10 for 10% off Vital Boost" />
+                                <p class="text-xs text-muted-foreground">Exclusive percentage discount members on this plan get on Vital Boost. 0 = no discount.</p>
+                            </div>
                             <div class="space-y-2">
                                 <x-form.input label="Membership Description" type="text" name="membership_description" id="membership_description" value="{{ $membershipDetail->membership_description }}" autocomplete="off" placeholder="Enter Membership Description*" required />
                             </div>                            

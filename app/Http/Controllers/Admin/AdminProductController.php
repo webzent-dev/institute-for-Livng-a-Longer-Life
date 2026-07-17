@@ -17,10 +17,24 @@ use App\Models\User;
 
 class AdminProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         //Institute products with pagination and select and alias fields
-        $instituteProducts = Product::with('user')->selectRaw('products.id as product_id, products.*')->join('users', 'products.user_id', '=', 'users.id')->where('users.role', 'admin')->whereIn('products.category',['institute', 'vital_boost'])->paginate(10);
+        $instituteFilter = $request->input('institute_filter');
+        $instituteQuery = Product::with('user')->selectRaw('products.id as product_id, products.*')->join('users', 'products.user_id', '=', 'users.id')->where('users.role', 'admin')->whereIn('products.category',['institute', 'vital_boost']);
+
+        // "Vital Boost only" filter for the Institute list.
+        if ($instituteFilter === 'vital_boost') {
+            $instituteQuery->where('products.product_type', 'vital_boost');
+        }
+
+        $instituteProducts = $instituteQuery->paginate(10)->withQueryString();
+
+        // Multi-active guard: the public /vital-boost page shows only the first active
+        // Vital Boost product, so surface a warning when more than one is active.
+        $activeVitalBoostProducts = Product::where('product_type', 'vital_boost')->where('status', 'active')->get(['id', 'name']);
+        $activeVitalBoostCount = $activeVitalBoostProducts->count();
+        $activeVitalBoostNames = $activeVitalBoostProducts->pluck('name')->implode(', ');
 
         //Collaborator products wtih select and alias fields 
         $collaboratorProducts = Product::with('user')->selectRaw('products.id as product_id, products.*')->join('users', 'products.user_id', '=', 'users.id')->where('users.role', 'collaborator')->where('products.category','collaborator')->paginate(10);
@@ -32,12 +46,31 @@ class AdminProductController extends Controller
         $users = User::whereIn('role', ['admin', 'collaborator'])->get();
 
 
-        return view('admin.product.index', compact('instituteProducts', 'collaboratorProducts', 'memberProducts', 'users'));
+        return view('admin.product.index', compact('instituteProducts', 'collaboratorProducts', 'memberProducts', 'users', 'instituteFilter', 'activeVitalBoostCount', 'activeVitalBoostNames'));
     }
 
     public function create()
     {
-        
+
+    }
+
+    /**
+     * Keep Vital Boost product type and category locked together: a Vital Boost
+     * type forces the Vital Boost category and vice-versa. This is the server-side
+     * guarantee behind the coupled dropdowns, so the invariant holds even if the
+     * form is bypassed.
+     *
+     * @return array{0:?string,1:?string} [product_type, category]
+     */
+    private function coupleVitalBoost(?string $productType, ?string $category): array
+    {
+        if ($productType === 'vital_boost') {
+            $category = 'vital_boost';
+        } elseif ($category === 'vital_boost') {
+            $productType = 'vital_boost';
+        }
+
+        return [$productType, $category];
     }
 
     public function store(Request $request)
@@ -64,11 +97,12 @@ class AdminProductController extends Controller
         }
         
         if($slugCount == 0 && $skuCount == 0){
+            [$productType, $category] = $this->coupleVitalBoost($request->product_type, $request->category);
             $product = Product::create([
                 'user_id' => $request->user_id,
                 'sku' => $request->sku,
-                'product_type' => $request->product_type,
-                'category' => $request->category,
+                'product_type' => $productType,
+                'category' => $category,
                 'name' => $request->product_name,
                 'slug' => $slug,
                 'description' => $request->description,
@@ -182,12 +216,13 @@ class AdminProductController extends Controller
         }
         
         if($slugCount == 0 && $skuCount == 0){
+            [$productType, $category] = $this->coupleVitalBoost($request->product_type, $request->category);
             //Update product
             $product->update([
                 'user_id' => $request->user_id,
                 'sku' => $request->sku,
-                'product_type' => $request->product_type,
-                'category' => $request->category,
+                'product_type' => $productType,
+                'category' => $category,
                 'name' => $request->product_name,
                 'slug' => $slug,
                 'description' => $request->description,
@@ -252,7 +287,21 @@ class AdminProductController extends Controller
         $product = Product::findOrFail($id);
         $product->status = $request->status;
         $product->save();
-        return response()->json(['success' => true]);
+
+        // Multi-active guard: warn when activating a Vital Boost product while another
+        // Vital Boost product is already active (the public page shows only the first).
+        $warning = null;
+        if ($request->status === 'active' && $product->product_type === 'vital_boost') {
+            $otherActive = Product::where('product_type', 'vital_boost')
+                ->where('status', 'active')
+                ->where('id', '!=', $product->id)
+                ->count();
+            if ($otherActive > 0) {
+                $warning = 'There are now ' . ($otherActive + 1) . ' active Vital Boost products. The public Vital Boost page shows only the first active one — keep just one active to avoid confusion.';
+            }
+        }
+
+        return response()->json(['success' => true, 'warning' => $warning]);
     }
 
     public function removeImage(Request $request)

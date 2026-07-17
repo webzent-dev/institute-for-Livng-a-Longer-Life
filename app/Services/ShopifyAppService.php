@@ -91,15 +91,13 @@ class ShopifyAppService
 
     /**
      * Map a plan/tier name to its discount percentage.
+     *
+     * Delegates to the single source of truth (config/vital_boost.php via
+     * MembershipDiscount). Kept as an int for the Shopify discount-code API.
      */
     public static function discountPercentFor(?string $planName): int
     {
-        return match (strtolower($planName ?? '')) {
-            'standard' => 5,
-            'premium' => 10,
-            'lifetime' => 20,
-            default => 0,
-        };
+        return (int) round(\App\Support\MembershipDiscount::percentFor($planName));
     }
 
     /**
