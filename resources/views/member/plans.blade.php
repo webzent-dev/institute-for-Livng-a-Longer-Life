@@ -10,7 +10,18 @@
             @foreach($memberships as $plan)
                 @php
                     $isPopular = ($plan->popular == 'yes') ? true : false;
-                    $isCurrentPlan = (auth()->user()->plan_id == $plan->id) ? true : false;
+
+                    // current | upgrade | downgrade | switch | choose
+                    $planComparison = $plan->comparedTo($currentPlan ?? null);
+                    $isCurrentPlan = $planComparison === 'current';
+
+                    $planActionLabel = match ($planComparison) {
+                        'current'   => 'Current Plan',
+                        'upgrade'   => 'Upgrade to ' . $plan->membership_name,
+                        'downgrade' => 'Downgrade to ' . $plan->membership_name,
+                        'switch'    => 'Switch to ' . $plan->membership_name,
+                        default     => 'Choose ' . $plan->membership_name,
+                    };
 
                     $membership_features = explode(",", $plan->membership_features);
                     $membership_benefits = explode(",", $plan->membership_benefits);
@@ -88,11 +99,7 @@
                         data-plan-period="{{ $plan['membership_period'] }}"
                         onclick="openPlanModal(this)"
                         @if($isCurrentPlan) disabled @endif>
-                            @if($isCurrentPlan)
-                                Current Plan
-                            @else
-                                Upgrade to {{ $plan->membership_name }}
-                            @endif
+                            {{ $planActionLabel }}
                         </button>
                         {{-- The membership-card component emits the three closing </div>
                              tags for the content, card and wrapper above (shared contract

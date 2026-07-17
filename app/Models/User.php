@@ -3,6 +3,7 @@
 namespace App\Models;
 
  
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -32,6 +33,8 @@ class User extends Authenticatable
         'plan_price',
         'plan_period',
         'plan_expiry',
+        'auto_renew',
+        'membership_cancelled_at',
         'membership_number',
         'status',
         'stripe_customer_id'
@@ -49,7 +52,47 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'auto_renew' => 'boolean',
+            'membership_cancelled_at' => 'datetime',
         ];
+    }
+
+    /**
+     * A lifetime plan is stored 100 years out and never renews.
+     */
+    public function hasLifetimeMembership(): bool
+    {
+        return strtolower((string) $this->plan_period) === 'lifetime'
+            || (!empty($this->plan_expiry) && Carbon::parse($this->plan_expiry)->gt(Carbon::now()->addYears(50)));
+    }
+
+    /**
+     * Benefits run until plan_expiry, even after cancelling.
+     */
+    public function membershipIsActive(): bool
+    {
+        return $this->plan_id > 0
+            && !empty($this->plan_expiry)
+            && Carbon::parse($this->plan_expiry)->isFuture();
+    }
+
+    public function membershipIsCancelled(): bool
+    {
+        return $this->membership_cancelled_at !== null;
+    }
+
+    /**
+     * Whether the nightly job should charge this member's card.
+     *
+     * Cancelling only clears auto_renew, but both are checked: it keeps a stray
+     * auto_renew from ever charging someone who cancelled.
+     */
+    public function shouldAutoRenew(): bool
+    {
+        return $this->plan_id > 0
+            && $this->auto_renew
+            && !$this->membershipIsCancelled()
+            && !$this->hasLifetimeMembership();
     }
 
     /**

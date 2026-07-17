@@ -303,6 +303,10 @@ class IndexController extends Controller
                     'plan_period' => $planDetail->membership_period,
                     'plan_expiry' => $plan_expiry,
                     'stripe_customer_id' => $user->stripe_customer_id ?? $session->customer,
+                    // Paying again undoes a cancellation — otherwise the member would
+                    // sit on a fresh period still labelled "Cancelled". Automatic
+                    // renewal stays off until they ask for it.
+                    'membership_cancelled_at' => null,
                 ];
 
                 // A guest signup's account is only activated once payment completes.

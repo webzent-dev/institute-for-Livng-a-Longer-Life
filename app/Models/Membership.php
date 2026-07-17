@@ -52,4 +52,49 @@ class Membership extends Model
         return true;
     }
 
+    /**
+     * Price normalised to a yearly figure, so plans billed over different periods
+     * can be ranked against each other.
+     *
+     * Comparing the raw price would rank a $20/month plan below a $150/year one,
+     * when it actually costs $240 a year. Lifetime outranks everything.
+     */
+    public function annualisedPrice(): float
+    {
+        return match (strtolower((string) $this->membership_period)) {
+            'month'    => (float) $this->membership_price * 12,
+            'lifetime' => INF,
+            default    => (float) $this->membership_price,
+        };
+    }
+
+    /**
+     * How this plan compares to the one a member currently holds.
+     *
+     * @return string One of: current, upgrade, downgrade, switch, choose.
+     */
+    public function comparedTo(?Membership $currentPlan): string
+    {
+        if (!$currentPlan) {
+            return 'choose';
+        }
+
+        if ((int) $currentPlan->id === (int) $this->id) {
+            return 'current';
+        }
+
+        $mine = $this->annualisedPrice();
+        $theirs = $currentPlan->annualisedPrice();
+
+        if ($mine > $theirs) {
+            return 'upgrade';
+        }
+
+        if ($mine < $theirs) {
+            return 'downgrade';
+        }
+
+        // Same yearly cost on a different plan — neither up nor down.
+        return 'switch';
+    }
 }
