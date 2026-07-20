@@ -116,4 +116,51 @@ class VitalBoostPricingTest extends TestCase
         $this->assertSame(150.0, $b->base);
         $this->assertSame(150.0, $b->total);
     }
+
+    /**
+     * The shop page builds its perk line from these two payload keys, so a
+     * yearly plan has to advertise the discount AND the free shipping together
+     * — showing only one of them understates the offer.
+     */
+    public function test_yearly_payload_exposes_both_the_discount_and_free_shipping(): void
+    {
+        config()->set('vital_boost.subscription_discounts', ['monthly' => 2, 'yearly' => 5]);
+        config()->set('vital_boost.shipping.free_for_yearly', true);
+
+        $yearly = $this->svc->calculate(100, 1, VitalBoostPricingService::TYPE_SUBSCRIPTION, VitalBoostPricingService::PLAN_YEARLY, 0.0, 9.99)->toArray();
+
+        $this->assertSame(5.0, $yearly['subscription_percent']);
+        $this->assertTrue($yearly['shipping_waived']);
+        $this->assertSame(95.0, $yearly['total']);
+
+        $monthly = $this->svc->calculate(100, 1, VitalBoostPricingService::TYPE_SUBSCRIPTION, VitalBoostPricingService::PLAN_MONTHLY, 0.0, 9.99)->toArray();
+
+        $this->assertSame(2.0, $monthly['subscription_percent']);
+        $this->assertFalse($monthly['shipping_waived']);
+    }
+
+    public function test_a_member_sees_free_shipping_on_yearly_but_no_subscription_percent(): void
+    {
+        config()->set('vital_boost.subscription_discounts', ['monthly' => 2, 'yearly' => 5]);
+        config()->set('vital_boost.shipping.free_for_yearly', true);
+
+        $yearly = $this->svc->calculate(100, 1, VitalBoostPricingService::TYPE_SUBSCRIPTION, VitalBoostPricingService::PLAN_YEARLY, 10.0, 9.99)->toArray();
+
+        // Discounts are not clubbed, so the perk line must not promise a 5% saving
+        // a member does not actually receive.
+        $this->assertSame(0.0, $yearly['subscription_percent']);
+        $this->assertTrue($yearly['shipping_waived']);
+        $this->assertSame(90.0, $yearly['total']);
+    }
+
+    public function test_free_shipping_can_be_switched_off_for_yearly(): void
+    {
+        config()->set('vital_boost.shipping.free_for_yearly', false);
+
+        $yearly = $this->svc->calculate(100, 1, VitalBoostPricingService::TYPE_SUBSCRIPTION, VitalBoostPricingService::PLAN_YEARLY, 0.0, 9.99)->toArray();
+
+        // The perk line reads shipping_waived rather than assuming yearly is
+        // always free, so turning the rule off removes the claim too.
+        $this->assertFalse($yearly['shipping_waived']);
+    }
 }

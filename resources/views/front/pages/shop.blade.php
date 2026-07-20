@@ -205,12 +205,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }).join('');
 
         const current = pricing[sel];
-        let note = '';
-        if (sel === 'yearly') {
-            note = '<p class="text-[11px] text-primary font-medium text-center mb-2">Free shipping</p>';
-        } else if (current.subscription_percent > 0) {
-            note = `<p class="text-[11px] text-primary font-medium text-center mb-2">Save ${current.subscription_percent}% with a subscription</p>`;
-        }
+
+        // The caption is worked out server-side (App\Support\VitalBoostPerks) so
+        // this page and the product detail page word the same offer identically.
+        //
+        // Always rendered, even when empty: One Time has no perks, and letting the
+        // line collapse would shift the button as the shopper compares plans. The
+        // height is an inline style, not an arbitrary Tailwind class, so it holds
+        // even if the CSS bundle has not been rebuilt.
+        const note = `<p class="text-[11px] text-primary font-medium text-center mb-2" style="min-height:1rem;line-height:1rem;">${current.perk_label ?? ''}</p>`;
 
         return `<div id="vb_wrap_${product.id}">
             <div class="grid grid-cols-3 gap-1.5 mb-2">${optionsHtml}</div>
@@ -671,9 +674,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const vendorName = product.user?.first_name && product.user?.last_name? `${product.user.first_name} ${product.user.last_name}`: 'N/A';
             const userRole = product.user?.role ?? 'N/A';
 
-            return `<div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition transform hover:-translate-y-1">
+            return `<div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition transform hover:-translate-y-1 flex flex-col">
                 <a href="${baseurl}/products/${product.slug}">
-                    <div class="aspect-square bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center rounded-t-lg relative">
+                    <div class="aspect-[4/3] bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center rounded-t-lg relative">
                         <div class="text-center p-6 relative">
                                 ${ product.image
                                     ? `<img src="${imageUrl}" alt="${product.name ?? ''}" class="max-h-48 mx-auto object-contain" loading="lazy">`
@@ -691,19 +694,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     : ``
                 }
 
-                <div class="p-5">
+                {{-- Only the text grows. Whatever slack a stretched grid cell has
+                     collects under the description, where cards already differ,
+                     rather than opening a gap between the price and the button. --}}
+                <div class="px-5 pt-5 flex-grow">
                     <a href="${baseurl}/products/${product.slug}">
                         <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">${product.name}</h3>
                     </a>
-                    <p class="text-sm text-primary mb-1">by ${userRole === 'collaborator' ? vendorName : 'Institute'}</p>
-                    <p class="text-sm text-muted-foreground line-clamp-2 mb-3">${product.description}</p>
-                    <div class="flex items-baseline space-x-2">
+                    <p class="text-sm text-primary mb-1 line-clamp-1">by ${userRole === 'collaborator' ? vendorName : 'Institute'}</p>
+                    <p class="text-sm text-muted-foreground line-clamp-1">${product.description}</p>
+                </div>
+                {{-- Price and call-to-action stay glued together at the bottom of the
+                     card, so buttons line up across the row without stranding the
+                     price halfway up a plain product card. --}}
+                <div class="px-5 pt-3 pb-5 w-full mt-auto">
+                    <div class="flex items-baseline space-x-2 mb-2">
                         <span class="text-2xl font-bold">
                             $${Number(product.price).toFixed(2)}
                         </span>
                     </div>
-                </div>
-                <div class="py-4 pt-0 justify-self-center w-full px-4">
                     ${ renderCardAction(product, qty) }
                 </div>
             </div>`;
@@ -748,6 +757,12 @@ document.addEventListener('DOMContentLoaded', function() {
     transition: all 0.3s ease;
 }
 /* Line clamp for text */
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -772,6 +787,12 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 .mt-auto {
     margin-top: auto;
+}
+/* Product image ratio. Declared here as well as through Tailwind because
+   aspect-[4/3] is an arbitrary value that only exists once the CSS bundle is
+   rebuilt — without this the cards would fall back to auto height. */
+#productsGrid .aspect-\[4\/3\] {
+    aspect-ratio: 4 / 3;
 }
 
 /* Active filter chips */
@@ -867,6 +888,13 @@ document.addEventListener('DOMContentLoaded', function() {
         -webkit-line-clamp: 2 !important;
         -webkit-box-orient: vertical !important;
     }
+
+    /* Single-line paragraphs must stay single-line on mobile too — the rule above
+       pins every p.text-sm to a two-line box, which would silently undo the clamp. */
+    #productsGrid p.line-clamp-1 {
+        height: 1.2em !important;
+        -webkit-line-clamp: 1 !important;
+    }
     
     #productsGrid .text-2xl {
         font-size: 14px !important;
@@ -880,9 +908,9 @@ document.addEventListener('DOMContentLoaded', function() {
         min-height: 32px !important;
     }
     
-    #productsGrid .aspect-square {
-        aspect-ratio: 1 !important;
-        min-height: 100px !important;
+    #productsGrid .aspect-\[4\/3\] {
+        aspect-ratio: 4 / 3 !important;
+        min-height: 90px !important;
     }
     
     #productsGrid img {
@@ -890,13 +918,24 @@ document.addEventListener('DOMContentLoaded', function() {
         width: auto !important;
     }
     
-    #productsGrid .p-5 {
-        padding: 8px !important;
+    /* Card padding on mobile. Keyed to the individual padding utilities the card
+       actually uses — it previously targeted .p-5/.py-4, which the card no longer
+       carries, so the tight mobile spacing was being lost. */
+    #productsGrid .px-5 {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
     }
-    
-    #productsGrid .py-4 {
+
+    #productsGrid .pt-5 {
+        padding-top: 8px !important;
+    }
+
+    #productsGrid .pt-3 {
         padding-top: 6px !important;
-        padding-bottom: 6px !important;
+    }
+
+    #productsGrid .pb-5 {
+        padding-bottom: 8px !important;
     }
     
     /* Members Save More section mobile adjustments */
