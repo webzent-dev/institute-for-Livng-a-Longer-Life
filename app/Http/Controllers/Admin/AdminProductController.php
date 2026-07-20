@@ -73,6 +73,29 @@ class AdminProductController extends Controller
         return [$productType, $category];
     }
 
+    /**
+     * The owner a Vital Boost product must have.
+     *
+     * The Institute list on this screen joins users with role = admin, so a
+     * Vital Boost product owned by a collaborator would not appear under any tab
+     * — it would simply vanish from the admin panel. The form locks the User
+     * field for Vital Boost, and this keeps the rule true for whatever actually
+     * reaches the controller.
+     */
+    private function vitalBoostOwner(?string $userId, ?string $category): ?string
+    {
+        if ($category !== 'vital_boost') {
+            return $userId;
+        }
+
+        if ($userId && User::where('id', $userId)->where('role', 'admin')->exists()) {
+            return $userId;
+        }
+
+        // These routes are admin-only, so the acting user is a safe fallback.
+        return (string) Auth::id();
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -99,7 +122,7 @@ class AdminProductController extends Controller
         if($slugCount == 0 && $skuCount == 0){
             [$productType, $category] = $this->coupleVitalBoost($request->product_type, $request->category);
             $product = Product::create([
-                'user_id' => $request->user_id,
+                'user_id' => $this->vitalBoostOwner($request->user_id, $category),
                 'sku' => $request->sku,
                 'product_type' => $productType,
                 'category' => $category,
@@ -219,7 +242,7 @@ class AdminProductController extends Controller
             [$productType, $category] = $this->coupleVitalBoost($request->product_type, $request->category);
             //Update product
             $product->update([
-                'user_id' => $request->user_id,
+                'user_id' => $this->vitalBoostOwner($request->user_id, $category),
                 'sku' => $request->sku,
                 'product_type' => $productType,
                 'category' => $category,

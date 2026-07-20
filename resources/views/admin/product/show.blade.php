@@ -97,12 +97,15 @@
                             </div>
                             <div class="space-y-2">
                                 <label class="text-sm font-medium leading-none">User <span class="required" style="color: red;">*</span></label>
-                                <select name="user_id" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" required>
+                                <select name="user_id" class="vb-couple-user flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-70" required>
                                     <option value="">Select User</option>
                                     @foreach ($users as $user)
-                                        <option value="{{ $user->id }}" @if($user->id == $productDetail->user_id) selected @endif>{{ $user->first_name }} {{ $user->last_name }} - ({{ ucfirst($user->role) }})</option>
+                                        <option value="{{ $user->id }}" data-role="{{ $user->role }}" @if($user->id == $productDetail->user_id) selected @endif>{{ $user->first_name }} {{ $user->last_name }} - ({{ ucfirst($user->role) }})</option>
                                     @endforeach
                                 </select>
+                                <p class="vb-couple-user-note hidden text-xs text-muted-foreground">
+                                    Vital Boost products are sold by the Institute, so the owner is fixed to an admin.
+                                </p>
                             </div>
                             <x-form.input label="SKU" type="text" name="sku" value="{{ $productDetail->sku }}" placeholder="Enter product SKU*" autocomplete="off" required />
                             <x-form.input label="Product Name" type="text" name="product_name" value="{{ $productDetail->name }}" placeholder="Enter product name*" autocomplete="off" required />
@@ -279,32 +282,9 @@
             }
         }
         </script>
-        {{-- Vital Boost couples Product Type and Category: choosing Vital Boost on either
-             forces the other to Vital Boost and locks the remaining options. --}}
-        <script>
-        (function () {
-            function initVbCouple() {
-                var cat = document.querySelector('.vb-couple-category');
-                var type = document.querySelector('.vb-couple-type');
-                if (!cat || !type) return;
-
-                // Keep the pair consistent without ever locking a field: choosing Vital Boost
-                // on one forces it on the other, and choosing a non-Vital-Boost value on one
-                // (while the other is Vital Boost) resets that other to a sensible default, so
-                // the user can always switch back freely — no page reload needed.
-                type.addEventListener('change', function () {
-                    if (type.value === 'vital_boost') { cat.value = 'vital_boost'; }
-                    else if (cat.value === 'vital_boost') { cat.value = 'institute'; }
-                });
-                cat.addEventListener('change', function () {
-                    if (cat.value === 'vital_boost') { type.value = 'vital_boost'; }
-                    else if (type.value === 'vital_boost') { type.value = 'supplement'; }
-                });
-            }
-            if (document.readyState !== 'loading') { initVbCouple(); }
-            else { document.addEventListener('DOMContentLoaded', initVbCouple); }
-        })();
-        </script>
+        {{-- Couples Product Type, Category and the owner for Vital Boost.
+             Shared with the add-product modal on the products index. --}}
+        <script src="{{asset('js/vital-boost-coupling.js')}}"></script>
         <script src="{{asset('js/constraint.js')}}"></script>
         <script src="{{asset('js/common.js')}}"></script>
     </body>
