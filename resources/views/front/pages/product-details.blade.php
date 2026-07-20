@@ -244,21 +244,24 @@
                 <div class="mb-6">
                     <div class="flex items-center mb-4">
                         @if($product->compare_price || $product->originalPrice)
-                            <span class="text-gray-500 line-through text-xl mr-3">₹{{ number_format($product->compare_price ?? $product->originalPrice, 2) }}</span>
+                            <span class="text-gray-500 line-through text-xl mr-3">${{ number_format($product->compare_price ?? $product->originalPrice, 2) }}</span>
                         @endif
-                        <span class="text-3xl font-bold text-red-600">₹{{ number_format($product->price, 2) }}</span>
+                        <span class="text-3xl font-bold text-gray-900">${{ number_format($product->price, 2) }}</span>
                         @if($product->compare_price || $product->originalPrice)
-                            <span class="ml-3 bg-green-500 text-white text-sm font-semibold px-2 py-1 rounded">Save {{ round((($product->compare_price ?? $product->originalPrice - $product->price) / ($product->compare_price ?? $product->originalPrice)) * 100) }}%</span>
+                            <span class="ml-3 bg-primary text-primary-foreground text-sm font-semibold px-2 py-1 rounded">Save {{ round((($product->compare_price ?? $product->originalPrice - $product->price) / ($product->compare_price ?? $product->originalPrice)) * 100) }}%</span>
                         @endif
                     </div>
-                    
+
                     <!-- Stock Status & View Count -->
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center text-sm text-gray-600">
-                            <i data-lucide="eye" class="h-4 w-4 mr-1"></i> 
+                            <i data-lucide="eye" class="h-4 w-4 mr-1"></i>
                             <span data-viewing-count data-current-count="20">20 people are viewing this right now</span>
                         </div>
-                        <div class="flex items-center text-sm text-green-600 font-medium">
+                        {{-- Hidden while a subscription plan is selected: a recurring plan
+                             ships on a schedule, so today's shelf count says nothing useful
+                             and reads as urgency that does not apply. --}}
+                        <div id="stock_status" class="flex items-center text-sm text-primary font-medium">
                             <i data-lucide="check-circle" class="h-4 w-4 mr-1"></i> {{ $product->stock_quantity ?? 20 }} left in stock
                         </div>
                     </div>
@@ -267,7 +270,7 @@
                     @if($product->user)
                     <div class="flex items-center text-sm text-gray-600">
                         <span class="font-medium">Vendor:</span>
-                        <span class="ml-2 font-semibold text-blue-600">{{ $product->user->first_name }} {{ $product->user->last_name }}</span>
+                        <span class="ml-2 font-semibold text-primary">{{ $product->user->first_name }} {{ $product->user->last_name }}</span>
                     </div>
                     @endif
                 </div>
@@ -382,37 +385,90 @@
                 
                 <!-- Quantity Selection -->
                 <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Quantity:</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
                     <div class="flex items-center space-x-4">
-                        <div class="flex items-center border border-gray-300 rounded-lg">
-                            <button type="button" onclick="decreaseQuantity()" class="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100">
+                        <div class="flex items-center border-2 border-gray-200 rounded-lg overflow-hidden">
+                            <button type="button" onclick="decreaseQuantity()" aria-label="Decrease quantity" class="px-3 py-2 text-gray-600 hover:text-primary hover:bg-primary/5 transition-colors">
                                 <i data-lucide="minus" class="h-4 w-4"></i>
                             </button>
-                            <input type="number" id="quantity" value="1" min="1" max="{{ $product->stock_quantity ?? 99 }}" class="w-16 text-center border-0 focus:ring-0">
-                            <button type="button" onclick="increaseQuantity()" class="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100">
+                            <input type="number" id="quantity" value="1" min="1" max="{{ $product->stock_quantity ?? 99 }}" class="w-16 text-center border-0 focus:ring-0 font-semibold">
+                            <button type="button" onclick="increaseQuantity()" aria-label="Increase quantity" class="px-3 py-2 text-gray-600 hover:text-primary hover:bg-primary/5 transition-colors">
                                 <i data-lucide="plus" class="h-4 w-4"></i>
                             </button>
                         </div>
-                        <span class="text-sm text-gray-500">Max: {{ $product->stock_quantity ?? 99 }} items</span>
+                        <span class="text-sm text-muted-foreground">Max: {{ $product->stock_quantity ?? 99 }} items</span>
                     </div>
                 </div>
                 
                 @php ($cartVal = Session::get('cart', [])) @endphp
-                <!-- Action Buttons -->
-                <div class="flex mb-12">
-                    <button id="add_to_cart_button_{{$product->id}}" onclick="addToCart({{$product->id}})" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg flex items-center justify-center transition duration-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart w-5 h-5 mr-2">
-                            <circle cx="8" cy="21" r="1"></circle>
-                            <circle cx="19" cy="21" r="1"></circle>
-                            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-                        </svg> 
-                        @if(array_key_exists($product->id, $cartVal))
-                            {{ $cartVal[$product->id] }} {{ Str::plural('item', $cartVal[$product->id]) }} in Cart
-                        @else
-                            Add to Cart
-                        @endif
-                    </button>
-                </div>
+
+                @php
+                    // Vital Boost sells on three plans. The priced options come from the
+                    // same service the shop grid uses, so both pages quote the same
+                    // figures and the same perk wording.
+                    $vbPricing = ($vitalBoostPricing ?? [])[$product->id] ?? null;
+                    $vbOptions = [
+                        'one_time' => ['label' => 'One Time',  'cta' => 'Add to Cart'],
+                        'monthly'  => ['label' => 'Monthly',   'cta' => 'Subscribe Monthly'],
+                        'yearly'   => ['label' => 'Yearly',    'cta' => 'Subscribe Yearly'],
+                    ];
+                @endphp
+
+                @php
+                    // The cart icon and button styling mirror the shop grid so a product
+                    // looks the same wherever it is bought from.
+                    $cartIconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>';
+                    $ctaClasses = 'rounded-md flex items-center justify-center font-semibold gap-2 transition-all duration-150 select-none px-8 py-3 text-base gradient-primary text-primary-foreground hover:opacity-90 shadow-medium';
+                @endphp
+
+                @if($vbPricing)
+                    <!-- Vital Boost purchase options -->
+                    <div class="mb-12 max-w-md" id="vb_details_{{ $product->id }}">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Purchase option</label>
+                        <div class="grid grid-cols-3 gap-3 mb-3">
+                            @foreach($vbOptions as $key => $option)
+                                @php $breakdown = $vbPricing[$key] ?? null; @endphp
+                                @if($breakdown)
+                                    <button type="button"
+                                            data-vb-option="{{ $key }}"
+                                            data-vb-cta="{{ $option['cta'] }}"
+                                            data-vb-perk="{{ $breakdown['perk_label'] ?? '' }}"
+                                            class="vb-option rounded-lg border-2 px-2 py-3 text-center transition-all {{ $key === 'one_time' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50' }}">
+                                        <span class="block text-xs font-semibold text-muted-foreground">{{ $option['label'] }}</span>
+                                        <span class="block text-base font-bold text-gray-900">
+                                            ${{ number_format($breakdown['subtotal_after_discounts'] ?? 0, 2) }}
+                                        </span>
+                                    </button>
+                                @endif
+                            @endforeach
+                        </div>
+
+                        {{-- Reserved height so switching plans does not shift the button. --}}
+                        <p id="vb_perk_note" class="text-sm text-primary font-medium mb-4"
+                           style="min-height:1.25rem;line-height:1.25rem;">{{ $vbPricing['one_time']['perk_label'] ?? '' }}</p>
+
+                        <button id="add_to_cart_button_{{$product->id}}"
+                                onclick="vbDetailsAdd({{ $product->id }})"
+                                class="{{ $ctaClasses }} w-full">
+                            {!! $cartIconSvg !!}
+                            <span id="vb_cta_label">Add to Cart</span>
+                        </button>
+                    </div>
+                @else
+                    <!-- Action Buttons -->
+                    <div class="flex mb-12 max-w-md">
+                        <button id="add_to_cart_button_{{$product->id}}"
+                                onclick="detailsAddToCart({{$product->id}})"
+                                class="{{ $ctaClasses }} w-full">
+                            {!! $cartIconSvg !!}
+                            @if(array_key_exists($product->id, $cartVal))
+                                {{ $cartVal[$product->id] }} {{ Str::plural('item', $cartVal[$product->id]) }} in Cart
+                            @else
+                                Add to Cart
+                            @endif
+                        </button>
+                    </div>
+                @endif
             </div>
         </div>
         <!-- <div class="mt-10">
@@ -840,40 +896,16 @@
             }
         }
         
-        // Override addToCart to use selected quantity
-        function addToCart(productId) {
-            const quantity = parseInt(document.getElementById('quantity').value);
-            
-            $('#add_to_cart_button_' + productId).html('Adding...');
-            $('#add_to_cart_button_' + productId).attr('disabled', true);
-            
-            $.ajax({
-                method: "POST",
-                url: baseurl + "/addtocart",
-                data: {quantity: quantity, product_id: productId},
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (data) {
-                    if (data.status == true) {
-                        toastr.success(data.message);
-                        $('#cart_count').html(data.cartCount);
-                        $('#add_to_cart_button_' + productId).html(data.message);
-                        $('#add_to_cart_button_' + productId).attr('disabled', false);
-                    } else {
-                        toastr.error(data.message);
-                        $('#add_to_cart_button_' + productId).html('Add to Cart');
-                        $('#add_to_cart_button_' + productId).attr('disabled', false);
-                    }
-                },
-                error: function() {
-                    toastr.error('Error adding product to cart');
-                    $('#add_to_cart_button_' + productId).html('Add to Cart');
-                    $('#add_to_cart_button_' + productId).attr('disabled', false);
-                }
-            });
+        // Adding from this page goes through the shared addToCart in cart.js.
+        // A local copy used to live here, but it took only a product id, so the
+        // Vital Boost plan was silently dropped and a subscription was added as a
+        // one-time purchase. This wrapper only supplies the page's quantity.
+        function detailsAddToCart(productId, purchaseType, plan) {
+            const input = document.getElementById('quantity');
+            const quantity = input ? parseInt(input.value, 10) : 1;
+
+            addToCart(productId, purchaseType || 'one_time', plan || '', quantity);
         }
-        
         // Auto update viewing count
         function updateViewingCount() {
             const viewingElement = document.querySelector('[data-viewing-count]');
@@ -892,5 +924,64 @@
             // Start automatic count updates every 3-7 seconds
             setInterval(updateViewingCount, Math.random() * 4000 + 3000);
         });
+    </script>
+
+    {{-- Vital Boost purchase options. The prices and perk captions are rendered
+         server-side; this only tracks which option is selected and hands the
+         choice to the shared addToCart(id, purchase_type, plan). --}}
+    <script>
+    (function () {
+        var options = document.querySelectorAll('.vb-option');
+        if (!options.length) {
+            return;
+        }
+
+        var note = document.getElementById('vb_perk_note');
+        var ctaLabel = document.getElementById('vb_cta_label');
+        var stockStatus = document.getElementById('stock_status');
+        var selected = 'one_time';
+
+        function select(button) {
+            selected = button.dataset.vbOption;
+
+            options.forEach(function (other) {
+                var isActive = other === button;
+                other.classList.toggle('border-primary', isActive);
+                other.classList.toggle('bg-primary/5', isActive);
+                other.classList.toggle('border-gray-200', !isActive);
+                other.classList.toggle('hover:border-primary/50', !isActive);
+            });
+
+            if (note) {
+                note.textContent = button.dataset.vbPerk || '';
+            }
+            if (ctaLabel) {
+                ctaLabel.textContent = button.dataset.vbCta;
+            }
+
+            // A subscription ships on a schedule, so the current shelf count is
+            // not what the shopper is buying against.
+            if (stockStatus) {
+                stockStatus.style.visibility = selected === 'one_time' ? '' : 'hidden';
+            }
+        }
+
+        options.forEach(function (button) {
+            button.addEventListener('click', function () {
+                select(button);
+            });
+        });
+
+        // Named on window because the button uses an inline onclick, matching the
+        // rest of this page. Goes through detailsAddToCart so the chosen quantity
+        // travels with the plan.
+        window.vbDetailsAdd = function (productId) {
+            if (selected === 'one_time') {
+                detailsAddToCart(productId, 'one_time', '');
+            } else {
+                detailsAddToCart(productId, 'subscription', selected);
+            }
+        };
+    })();
     </script>
  @endsection

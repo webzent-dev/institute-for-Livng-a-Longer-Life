@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\PageContent;
 use App\Services\Pricing\VitalBoostPricingService;
 use App\Support\MembershipDiscount;
+use App\Support\VitalBoostPerks;
 
 class ShopController extends Controller
 {
@@ -99,19 +100,35 @@ class ShopController extends Controller
             }
 
             $map[$product->id] = [
-                'one_time' => $this->pricing->forProduct(
+                'one_time' => $this->withPerkLabel($this->pricing->forProduct(
                     $product, 1, VitalBoostPricingService::TYPE_ONE_TIME, null, $memberPercent, 0
-                )->toArray(),
-                'monthly' => $this->pricing->forProduct(
+                )->toArray()),
+                'monthly' => $this->withPerkLabel($this->pricing->forProduct(
                     $product, 1, VitalBoostPricingService::TYPE_SUBSCRIPTION, VitalBoostPricingService::PLAN_MONTHLY, $memberPercent, 0
-                )->toArray(),
-                'yearly' => $this->pricing->forProduct(
+                )->toArray()),
+                'yearly' => $this->withPerkLabel($this->pricing->forProduct(
                     $product, 1, VitalBoostPricingService::TYPE_SUBSCRIPTION, VitalBoostPricingService::PLAN_YEARLY, $memberPercent, 0
-                )->toArray(),
+                )->toArray()),
             ];
         }
 
         return $map;
+    }
+
+    /**
+     * Attach the shopper-facing perk caption to a pricing breakdown.
+     *
+     * Done server-side so the shop grid and the product detail page cannot word
+     * the same offer differently.
+     *
+     * @param  array<string, mixed> $breakdown
+     * @return array<string, mixed>
+     */
+    private function withPerkLabel(array $breakdown): array
+    {
+        $breakdown['perk_label'] = VitalBoostPerks::label($breakdown);
+
+        return $breakdown;
     }
 
     public function productDetails($slug)
@@ -120,7 +137,13 @@ class ShopController extends Controller
         if (!$product) {
             return redirect()->route('shop')->with('error', 'Product not found.');
         }
-        return view('front.pages.product-details', compact('product'));
+
+        // Vital Boost sells on three plans, so the detail page needs the same
+        // priced options the shop grid shows. Non-Vital-Boost products get an
+        // empty map and keep the plain Add to Cart button.
+        $vitalBoostPricing = $this->vitalBoostPricing(collect([$product]));
+
+        return view('front.pages.product-details', compact('product', 'vitalBoostPricing'));
     }
 
 }
