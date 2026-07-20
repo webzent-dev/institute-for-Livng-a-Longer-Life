@@ -372,6 +372,32 @@ class AdminMemberProfileTest extends TestCase
             ->assertRedirect(route('admin.members.show', $this->member->id));
     }
 
+    public function test_users_list_links_every_tab_to_its_profile(): void
+    {
+        // Guarantees the collaborators tab is not empty on a clean database.
+        User::create([
+            'first_name' => 'Listed',
+            'last_name'  => 'Collaborator',
+            'email'      => 'collab-' . Str::random(10) . '@example.test',
+            'password'   => bcrypt(Str::random(16)),
+            'role'       => 'collaborator',
+            'status'     => 'active',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get('/admin/users');
+        $response->assertOk();
+
+        // The list paginates at 10 per tab, so assert against whoever actually
+        // lands on page one rather than the rows this test happened to create.
+        $firstOnPage = fn (string $role) => User::where('role', $role)->paginate(10)->first();
+
+        // Each tab needs its own View target: members and collaborators have
+        // full profiles, admins fall back to the plain account view.
+        $response->assertSee(route('admin.members.show', $firstOnPage('user')->id), false);
+        $response->assertSee(route('collaborators.show', $firstOnPage('collaborator')->id), false);
+        $response->assertSee(route('users.show', $firstOnPage('admin')->id), false);
+    }
+
     public function test_viewing_a_collaborator_through_the_users_route_still_works(): void
     {
         $collaborator = User::create([

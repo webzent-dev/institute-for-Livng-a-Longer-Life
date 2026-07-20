@@ -302,6 +302,9 @@
                                                 <td class="px-4 py-3">{{$collaborator->created_at}}</td>
                                                 <td class="px-4 py-3">
                                                     <div class="flex gap-2">
+                                                        <a href="{{ route('collaborators.show', $collaborator->id) }}" title="View full collaborator profile" class="h-9 flex items-center rounded-md px-3 hover:bg-accent">
+                                                            <i data-lucide="eye" class="w-4 h-4"></i>
+                                                        </a>
                                                         <button class="h-9 rounded-md px-3 hover:bg-accent text-destructive" onclick="openEditModal({{ $collaborator->id }}, '{{ $collaborator->first_name }}', '{{ $collaborator->last_name }}', '{{ $collaborator->status }}', 'collaborators')">
                                                             <i data-lucide="pencil" class="w-4 h-4"></i>
                                                         </button>
@@ -318,7 +321,7 @@
                                             @empty
                                                 <tr>
                                                     <td colspan="5" class="text-center py-4 text-muted-foreground">
-                                                        No members found
+                                                        No collaborators found
                                                     </td>
                                                 </tr>
                                             @endforelse
@@ -391,9 +394,9 @@
                                                 <td class="px-4 py-3">{{$admin->created_at}}</td>
                                                 <td class="px-4 py-3">
                                                     <div class="flex gap-2">
-                                                        <!-- <button class="flex gap-2 items-center h-9 rounded-md border-2 border-primary px-3 text-primary hover:bg-primary hover:text-white">
-                                                            <i data-lucide="eye" class="w-4 h-4"></i> View
-                                                        </button> -->
+                                                        <a href="{{ route('users.show', $admin->id) }}" title="View admin account" class="h-9 flex items-center rounded-md px-3 hover:bg-accent">
+                                                            <i data-lucide="eye" class="w-4 h-4"></i>
+                                                        </a>
                                                         <button class="h-9 rounded-md px-3 hover:bg-accent text-destructive" onclick="openEditModal({{ $admin->id }}, '{{ $admin->first_name }}', '{{ $admin->last_name }}', '{{ $admin->status }}', 'admins')">
                                                             <i data-lucide="pencil" class="w-4 h-4"></i>
                                                         </button>
@@ -410,7 +413,7 @@
                                             @empty
                                                 <tr>
                                                     <td colspan="5" class="text-center py-4 text-muted-foreground">
-                                                        No members found
+                                                        No admins found
                                                     </td>
                                                 </tr>
                                             @endforelse
