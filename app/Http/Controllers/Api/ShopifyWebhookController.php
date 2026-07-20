@@ -42,12 +42,6 @@ class ShopifyWebhookController extends Controller
             'payload' => $payload,
         ]);
 
-        Log::info('Shopify redemption recorded', [
-            'redemption_id' => $redemption->id,
-            'membership_number' => $membershipNumber,
-            'user_id' => $user?->id,
-            'order_amount' => $redemption->order_amount,
-        ]);
 
         return response()->json(['received' => true, 'id' => $redemption->id]);
     }

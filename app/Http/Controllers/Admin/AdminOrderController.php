@@ -10,24 +10,24 @@ use App\Models\User;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\SubOrder;
-use App\Mail\OrderStatusNotification;
+use App\Services\OrderStatusService;
 use App\Services\ShippingLabelService;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class AdminOrderController extends Controller
 {
     /**
      * Statuses an order or sub-order can be moved to.
+     *
+     * Defined on OrderStatusService so the member profile screen validates
+     * against the same list.
      */
-    private const STATUSES = [
-        'pending',
-        'confirmed',
-        'processing',
-        'shipped',
-        'delivered',
-        'cancelled',
-    ];
+    private const STATUSES = OrderStatusService::STATUSES;
+
+    public function __construct(
+        private OrderStatusService $orderStatus,
+    ) {
+    }
 
     /**
      * Display a listing of the resource.
@@ -159,23 +159,10 @@ class AdminOrderController extends Controller
         ]);
 
         $subOrder = SubOrder::with('order')->findOrFail($id);
-        $subOrder->status = $validated['status'];
-        $subOrder->save();
 
-        // The parent order only follows once every seller agrees — one seller
-        // shipping their parcel doesn't make the whole order shipped.
-        $order = $subOrder->order;
+        $result = $this->orderStatus->updateSubOrder($subOrder, $validated['status']);
 
-        if ($order->syncStatusFromSubOrders()) {
-            //Send email notification to user about order status update
-            if (!empty($order->email)) {
-                Mail::to($order->email)->send(
-                    new OrderStatusNotification($order)
-                );
-            }
-        }
-
-        return redirect()->back()->with('success', 'Sub-order status has been updated successfully.');
+        return redirect()->back()->with($result['ok'] ? 'success' : 'error', $result['message']);
     }
 
     /**
@@ -217,20 +204,15 @@ class AdminOrderController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $orderDetail = Order::with('subOrders')
-        ->where('id', $id)
-        ->first();
-        $orderDetail->status = $request->input('status');
-        $orderDetail->save();
+        $validated = $request->validate([
+            'status' => ['required', Rule::in(self::STATUSES)],
+        ]);
 
-        //Send email notification to user about order status update
-        if(!empty($orderDetail->email)) {
-            Mail::to($orderDetail->email)->send(
-                new OrderStatusNotification($orderDetail)
-            );
-        }
+        $orderDetail = Order::with('subOrders')->findOrFail($id);
 
-        return redirect()->back()->with('success', 'Order status has been updated successfully.');
+        $result = $this->orderStatus->updateOrder($orderDetail, $validated['status']);
+
+        return redirect()->back()->with($result['ok'] ? 'success' : 'error', $result['message']);
     }
 
     /**
