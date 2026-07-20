@@ -23,6 +23,7 @@ use App\Http\Controllers\Cart\CartController;
 use App\Http\Controllers\Admin\ManageMembershipController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\AdminMemberController;
 use App\Http\Controllers\Admin\AdminCollaboratorController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminCourseController;
@@ -75,6 +76,22 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
     Route::put('user/update', [UserController::class, 'updateUser'])->name('admin.users.update');
     Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
     //------------User management end here--------//
+
+    //------------Member profile & on-behalf-of actions start here--------//
+    // Every action delegates to the same service the member dashboard uses,
+    // so admin and member operations follow identical business rules.
+    Route::get('/members/{id}', [AdminMemberController::class, 'show'])->name('admin.members.show');
+    Route::put('/members/{id}/membership', [AdminMemberController::class, 'updateMembership'])->name('admin.members.membership.update');
+    Route::post('/members/{id}/membership/cancel', [AdminMemberController::class, 'cancelMembership'])->name('admin.members.membership.cancel');
+    Route::post('/members/{id}/membership/resume', [AdminMemberController::class, 'resumeMembership'])->name('admin.members.membership.resume');
+    Route::post('/members/{id}/membership/renew', [AdminMemberController::class, 'renewMembership'])->name('admin.members.membership.renew');
+    Route::post('/members/{id}/membership/auto-renew', [AdminMemberController::class, 'updateAutoRenew'])->name('admin.members.membership.auto-renew');
+    Route::post('/members/{id}/vital-boost/{subscriptionId}', [AdminMemberController::class, 'updateVitalBoostSubscription'])->name('admin.members.vital-boost.update');
+    Route::put('/members/{id}/orders/{orderId}/status', [AdminMemberController::class, 'updateOrderStatus'])->name('admin.members.orders.status');
+    Route::put('/members/{id}/sub-orders/{subOrderId}/status', [AdminMemberController::class, 'updateSubOrderStatus'])->name('admin.members.sub-orders.status');
+    Route::post('/members/{id}/payment-methods/default', [AdminMemberController::class, 'setDefaultPaymentMethod'])->name('admin.members.payment-methods.default');
+    Route::delete('/members/{id}/payment-methods', [AdminMemberController::class, 'deletePaymentMethod'])->name('admin.members.payment-methods.delete');
+    //------------Member profile & on-behalf-of actions end here--------//
 
     //------------Collaborator management start here--------//
     //Route::get('/collaborators', [AdminController::class, 'collaborators'])->name('collaborators.index');

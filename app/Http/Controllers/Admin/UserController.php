@@ -111,7 +111,14 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $userDetail = User::find($id);
+        $userDetail = User::findOrFail($id);
+
+        // Members get the full profile — membership, orders, subscriptions and
+        // saved cards. Collaborators and admins have none of that, so they keep
+        // the plain account view.
+        if ($userDetail->role === 'user') {
+            return redirect()->route('admin.members.show', $userDetail->id);
+        }
 
         //Payment History
         $paymentHistory = PaymentHistory::where('user_id', $userDetail->id)->where('payment_for', 'membership')->get();

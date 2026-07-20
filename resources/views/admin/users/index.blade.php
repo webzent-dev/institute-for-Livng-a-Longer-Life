@@ -210,6 +210,9 @@
                                                 <td class="px-4 py-3">{{$member->created_at}}</td>
                                                 <td class="justify-items-center">
                                                     <div class="flex gap-2">
+                                                        <a href="{{ route('admin.members.show', $member->id) }}" title="View full member profile" class="h-9 flex items-center rounded-md px-3 hover:bg-accent">
+                                                            <i data-lucide="eye" class="w-4 h-4"></i>
+                                                        </a>
                                                         <button class="h-9 rounded-md px-3 hover:bg-accent text-destructive" onclick="openEditModal({{ $member->id }}, '{{ $member->first_name }}', '{{ $member->last_name }}', '{{ $member->status }}', 'members')">
                                                             <i data-lucide="pencil" class="w-4 h-4"></i>
                                                         </button>

@@ -21,6 +21,8 @@ use App\Models\Course;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use App\Models\SiteSetting;
+use App\Services\MembershipService;
+use App\Services\PaymentMethodService;
 use App\Services\StripeService;
 
 class MemberController extends Controller
@@ -89,24 +91,16 @@ class MemberController extends Controller
      */
     public function cancelSubscription()
     {
-        $user = auth()->user();
+        $result = app(MembershipService::class)->cancel(auth()->user());
+        $expiry = $result['expiry'] ?? null;
 
-        if (!($user->plan_id > 0)) {
-            return back()->with('error', 'You do not have a membership to cancel.');
-        }
-
-        if ($user->membershipIsCancelled()) {
-            return back()->with('error', 'Your membership is already cancelled.');
-        }
-
-        $user->update([
-            'auto_renew' => false,
-            'membership_cancelled_at' => Carbon::now(),
+        return $this->flashMembershipResult($result, [
+            'no_plan'           => 'You do not have a membership to cancel.',
+            'already_cancelled' => 'Your membership is already cancelled.',
+            'cancelled'         => $expiry
+                ? "Your membership has been cancelled. You keep your benefits until {$expiry}, and you will not be charged again."
+                : 'Your membership has been cancelled, and you will not be charged again.',
         ]);
-
-        $expiry = Carbon::parse($user->plan_expiry)->format('M j, Y');
-
-        return back()->with('success', "Your membership has been cancelled. You keep your benefits until {$expiry}, and you will not be charged again.");
     }
 
     /**
@@ -114,22 +108,13 @@ class MemberController extends Controller
      */
     public function resumeSubscription()
     {
-        $user = auth()->user();
+        $result = app(MembershipService::class)->resume(auth()->user());
 
-        if (!$user->membershipIsCancelled()) {
-            return back()->with('error', 'Your membership is not cancelled.');
-        }
-
-        $user->update([
-            'membership_cancelled_at' => null,
-            'auto_renew' => true,
+        return $this->flashMembershipResult($result, [
+            'not_cancelled'   => 'Your membership is not cancelled.',
+            'resumed_no_card' => 'Your membership has been resumed. Add a card by renewing once manually, otherwise automatic renewal cannot charge you.',
+            'resumed'         => 'Your membership has been resumed and will renew automatically.',
         ]);
-
-        if (!$this->memberHasSavedCard($user)) {
-            return back()->with('success', 'Your membership has been resumed. Add a card by renewing once manually, otherwise automatic renewal cannot charge you.');
-        }
-
-        return back()->with('success', 'Your membership has been resumed and will renew automatically.');
     }
 
     /**
@@ -141,27 +126,32 @@ class MemberController extends Controller
             'auto_renew' => 'required|boolean',
         ]);
 
-        $user = auth()->user();
+        $result = app(MembershipService::class)
+            ->setAutoRenew(auth()->user(), (bool) $validated['auto_renew']);
 
-        if (!($user->plan_id > 0)) {
-            return back()->with('error', 'You do not have a membership to change.');
-        }
+        return $this->flashMembershipResult($result, [
+            'no_plan'               => 'You do not have a membership to change.',
+            'lifetime'              => 'Lifetime memberships never need renewing.',
+            'auto_renew_off'        => 'Automatic renewal is off. Your membership will simply end on its expiry date unless you renew.',
+            'auto_renew_on_no_card' => 'Automatic renewal is on. Renew once manually to save a card, otherwise there is nothing for us to charge.',
+            'auto_renew_on'         => 'Automatic renewal is on. We will charge your saved card before your membership expires.',
+        ]);
+    }
 
-        if ($user->hasLifetimeMembership()) {
-            return back()->with('error', 'Lifetime memberships never need renewing.');
-        }
+    /**
+     * Flash a MembershipService result using the member-facing wording.
+     *
+     * The service phrases its messages for the admin panel, so the dashboard
+     * maps each result code back to the second-person copy members already know.
+     *
+     * @param array{ok: bool, code: string, message: string} $result
+     * @param array<string, string> $messages Result code => member-facing copy.
+     */
+    private function flashMembershipResult(array $result, array $messages)
+    {
+        $message = $messages[$result['code']] ?? $result['message'];
 
-        $user->update(['auto_renew' => $validated['auto_renew']]);
-
-        if (!$validated['auto_renew']) {
-            return back()->with('success', 'Automatic renewal is off. Your membership will simply end on its expiry date unless you renew.');
-        }
-
-        if (!$this->memberHasSavedCard($user)) {
-            return back()->with('success', 'Automatic renewal is on. Renew once manually to save a card, otherwise there is nothing for us to charge.');
-        }
-
-        return back()->with('success', 'Automatic renewal is on. We will charge your saved card before your membership expires.');
+        return back()->with($result['ok'] ? 'success' : 'error', $message);
     }
 
     /**
@@ -169,23 +159,7 @@ class MemberController extends Controller
      */
     private function memberHasSavedCard(User $user): bool
     {
-        if (!$user->stripe_customer_id) {
-            return false;
-        }
-
-        try {
-            StripeService::configure();
-            $methods = \Stripe\PaymentMethod::all([
-                'customer' => $user->stripe_customer_id,
-                'type' => 'card',
-                'limit' => 1,
-            ]);
-
-            return count($methods->data) > 0;
-        } catch (\Exception $e) {
-            \Log::error('Could not check saved cards: ' . $e->getMessage(), ['user_id' => $user->id]);
-            return false;
-        }
+        return app(PaymentMethodService::class)->hasSavedCard($user);
     }
 
     public function member_vitalBoostSubscriptions()
@@ -244,227 +218,41 @@ class MemberController extends Controller
         return view('member.payments', compact('paymentHistory', 'savedCards'));
     }
 
+    /**
+     * The member's saved cards, brand and last four only.
+     */
     private function getSavedPaymentMethods()
     {
-        try {
-            //Stripe::setApiKey(config('services.stripe.secret'));
-            $this->getStripeSecret();
-            
-            $user = auth()->user();
-            
-            // If user doesn't have stripe_customer_id, try to find existing customer
-            if (!$user->stripe_customer_id) {
-                // Try to find customer by email
-                $customers = \Stripe\Customer::all(['email' => $user->email, 'limit' => 1]);
-                if ($customers->data) {
-                    $user->stripe_customer_id = $customers->data[0]->id;
-                    $user->save();
-                }
-            }
-            
-            // Get or create Stripe customer
-            $customer = $this->getOrCreateStripeCustomer($user);
-            
-            // Get all payment methods for this customer
-            $paymentMethods = \Stripe\PaymentMethod::all([
-                'customer' => $customer->id,
-                'type' => 'card',
-            ]);
-
-            // If no payment methods found, try to recover from recent payments
-            if (count($paymentMethods->data) === 0) {
-                \Log::info('No payment methods found, trying to recover from recent payments...');
-                
-                // Get recent payment history for this user
-                $recentPayments = PaymentHistory::where('user_id', $user->id)
-                    ->where('created_at', '>=', now()->subDays(7))
-                    ->orderBy('created_at', 'desc')
-                    ->get();
-                
-                foreach ($recentPayments as $payment) {
-                    $cardDetails = json_decode($payment->card_details, true);
-                    if ($cardDetails && isset($cardDetails['last4'])) {
-                        // Create a new payment method from the payment intent
-                        if (isset($payment->transaction_id)) {
-                            try {
-                                // Get the payment intent from the transaction
-                                $paymentIntent = \Stripe\PaymentIntent::retrieve($payment->transaction_id);
-                                
-                                if ($paymentIntent->payment_method) {
-                                    // Create a new payment method using the same card details
-                                    $newPaymentMethod = \Stripe\PaymentMethod::create([
-                                        'type' => 'card',
-                                        'card' => [
-                                            'number' => '4242424242424242', // This won't work - we need a different approach
-                                            'exp_month' => $cardDetails['exp_month'],
-                                            'exp_year' => $cardDetails['exp_year'],
-                                        ],
-                                        'customer' => $customer->id,
-                                    ]);
-                                    
-                                    break;
-                                }
-                            } catch (\Exception $e) {
-                                \Log::warning('Could not create payment method from intent: ' . $e->getMessage());
-                            }
-                        }
-                    }
-                }
-                
-                
-                // If recovery still failed, create a dummy entry for display
-                if (count($paymentMethods->data) === 0) {
-                    \Log::info('Recovery failed, creating display entry from payment history');
-                    
-                    $cards = [];
-                    foreach ($recentPayments as $payment) {
-                        $cardDetails = json_decode($payment->card_details, true);
-                        if ($cardDetails) {
-                            // Create a display-only card entry
-                            $cards[] = [
-                                'id' => 'display_' . $payment->id, // Display ID
-                                'brand' => $cardDetails['brand'],
-                                'last4' => $cardDetails['last4'],
-                                'exp_month' => $cardDetails['exp_month'],
-                                'exp_year' => $cardDetails['exp_year'],
-                                'is_default' => true,
-                                'is_display_only' => true // Flag for UI
-                            ];
-                            break; // Only show the most recent one
-                        }
-                    }
-                    
-                    return $cards; // Return early with display cards
-                }
-                
-                // Refresh payment methods after recovery attempt
-                $paymentMethods = \Stripe\PaymentMethod::all([
-                    'customer' => $customer->id,
-                    'type' => 'card',
-                ]);
-                
-                \Log::info('After recovery, found ' . count($paymentMethods->data) . ' payment methods');
-            }
-            
-            $cards = [];
-            foreach ($paymentMethods->data as $paymentMethod) {
-                $card = $paymentMethod->card;
-                $cards[] = [
-                    'id' => $paymentMethod->id,
-                    'brand' => $card->brand,
-                    'last4' => $card->last4,
-                    'exp_month' => $card->exp_month,
-                    'exp_year' => $card->exp_year,
-                    'is_default' => $paymentMethod->id === $customer->invoice_settings->default_payment_method
-                ];
-            }
-            
-            return $cards;
-            
-        } catch (\Exception $e) {
-            \Log::error('Error getting saved payment methods: ' . $e->getMessage());
-            return [];
-        }
+        return app(PaymentMethodService::class)->listCards(auth()->user());
     }
 
     private function getOrCreateStripeCustomer($user)
     {
-        try {
-            //Stripe::setApiKey(config('services.stripe.secret'));
-            $this->getStripeSecret();
-            
-            // If user already has stripe_customer_id, get existing customer
-            if ($user->stripe_customer_id) {
-                return \Stripe\Customer::retrieve($user->stripe_customer_id);
-            }
-            
-            // Create new customer
-            $customer = \Stripe\Customer::create([
-                'email' => $user->email,
-                'name' => $user->first_name . ' ' . $user->last_name,
-                'phone' => $user->phone,
-            ]);
-            
-            // Save customer ID to user
-            $user->stripe_customer_id = $customer->id;
-            $user->save();
-            
-            return $customer;
-            
-        } catch (\Exception $e) {
-            \Log::error('Error creating/retrieving Stripe customer: ' . $e->getMessage());
-            throw $e;
-        }
+        return app(PaymentMethodService::class)->getOrCreateCustomer($user);
     }
 
     public function deletePaymentMethod(Request $request)
     {
-        try {
-            $request->validate([
-                'payment_method_id' => 'required|string'
-            ]);
+        $request->validate([
+            'payment_method_id' => 'required|string'
+        ]);
 
-            //Stripe::setApiKey(config('services.stripe.secret'));
-            $this->getStripeSecret();
-            
-            $user = auth()->user();
-            $customer = $this->getOrCreateStripeCustomer($user);
-            
-            // Get the payment method
-            $paymentMethod = \Stripe\PaymentMethod::retrieve($request->payment_method_id);
-            
-            // Check if this payment method belongs to the current customer
-            if ($paymentMethod->customer !== $customer->id) {
-                return response()->json(['success' => false, 'message' => 'Payment method not found']);
-            }
-            
-            // Check if it's the default payment method
-            if ($paymentMethod->id === $customer->invoice_settings->default_payment_method) {
-                return response()->json(['success' => false, 'message' => 'Cannot delete default payment method']);
-            }
-            
-            // Detach the payment method
-            $paymentMethod->detach();
-            
-            return response()->json(['success' => true, 'message' => 'Payment method deleted successfully']);
-            
-        } catch (\Exception $e) {
-            \Log::error('Error deleting payment method: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Error deleting payment method']);
-        }
+        $result = app(PaymentMethodService::class)
+            ->detach(auth()->user(), $request->payment_method_id);
+
+        return response()->json($result);
     }
 
     public function setDefaultPaymentMethod(Request $request)
     {
-        try {
-            $request->validate([
-                'payment_method_id' => 'required|string'
-            ]);
+        $request->validate([
+            'payment_method_id' => 'required|string'
+        ]);
 
-            //Stripe::setApiKey(config('services.stripe.secret'));
-            $this->getStripeSecret();
-            
-            $user = auth()->user();
-            $customer = $this->getOrCreateStripeCustomer($user);
-            
-            // Get the payment method
-            $paymentMethod = \Stripe\PaymentMethod::retrieve($request->payment_method_id);
-            
-            // Check if this payment method belongs to the current customer
-            if ($paymentMethod->customer !== $customer->id) {
-                return response()->json(['success' => false, 'message' => 'Payment method not found']);
-            }
-            
-            // Update customer's default payment method
-            $customer->invoice_settings->default_payment_method = $paymentMethod->id;
-            $customer->save();
-            
-            return response()->json(['success' => true, 'message' => 'Default payment method updated successfully']);
-            
-        } catch (\Exception $e) {
-            \Log::error('Error setting default payment method: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Error updating default payment method']);
-        }
+        $result = app(PaymentMethodService::class)
+            ->setDefault(auth()->user(), $request->payment_method_id);
+
+        return response()->json($result);
     }
 
     public function addPaymentMethod(Request $request)
