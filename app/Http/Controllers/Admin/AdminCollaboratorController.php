@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\CollaboratorBusinessDetails;
-use App\Models\CollaboratorBankDetails;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use App\Mail\CollaboratorActiveMail;
 use App\Mail\CollaboratorLoginMail;
+use App\Models\AuditLog;
+use App\Services\CollaboratorProfileService;
+use App\Services\OrderStatusService;
 use Validator;
 use Illuminate\Database\UniqueConstraintViolationException;
 
@@ -149,18 +150,27 @@ class AdminCollaboratorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id, CollaboratorProfileService $profile)
     {
         $collaboratorDetail = User::findOrFail($id);
-        //Get collaborator products
-        $collaboratorProducts = $collaboratorDetail->products()->get();
-        //Get collaborator courses
-        $collaboratorCourses = $collaboratorDetail->courses()->get();
-        //Get business details
-        $businessDetails = CollaboratorBusinessDetails::where('user_id', $id)->first();
-        //Get bank details
-        $bankDetails = CollaboratorBankDetails::where('user_id', $id)->first();
-        return view('admin.collaborators.show', compact('collaboratorDetail', 'collaboratorProducts', 'collaboratorCourses', 'businessDetails', 'bankDetails'));
+
+        abort_unless($collaboratorDetail->role === 'collaborator', 404, 'Not a collaborator account.');
+
+        return view('admin.collaborators.show', [
+            'collaboratorDetail'   => $collaboratorDetail,
+            'collaboratorProducts' => $profile->products($collaboratorDetail),
+            'collaboratorCourses'  => $profile->courses($collaboratorDetail),
+            'businessDetails'      => $profile->businessDetails($collaboratorDetail),
+            // The raw record still drives the address blocks; account identifiers
+            // are read from the masked set so they cannot be printed in full.
+            'bankDetails'          => $profile->bankDetails($collaboratorDetail),
+            'maskedBankDetails'    => $profile->maskedBankDetails($collaboratorDetail),
+            'subOrders'            => $profile->subOrders($collaboratorDetail),
+            'shippingReadiness'    => $profile->shippingReadiness($collaboratorDetail),
+            'activity'             => $profile->activity($collaboratorDetail),
+            'summary'              => $profile->summary($collaboratorDetail),
+            'orderStatuses'        => OrderStatusService::STATUSES,
+        ]);
     }
 
     /**
@@ -287,6 +297,16 @@ class AdminCollaboratorController extends Controller
             }
         }
 
+        // Deactivating also takes the collaborator's videos out of the member
+        // library, so it is worth an audit entry either way.
+        AuditLog::record(
+            $collaborator->id,
+            'collaborator_status_changed',
+            'Account set to ' . $newStatus . ' by admin.',
+            'user',
+            $collaborator->id
+        );
+
         return response()->json([
             'status' => $newStatus
         ]);
@@ -343,6 +363,14 @@ class AdminCollaboratorController extends Controller
             'website' => $request->website,
             'collaborator_message' => $request->collaborator_message
         ]);
+
+        AuditLog::record(
+            $collaboratorDetail->id,
+            'collaborator_profile_updated',
+            'Profile details updated by admin.',
+            'user',
+            $collaboratorDetail->id
+        );
 
         return redirect()->back()->with('success', 'Collaborator has been updated successfully.');
     }
