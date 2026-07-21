@@ -521,7 +521,7 @@
                                             <tr class="border-b transition-colors data-[state=selected]:bg-muted hover:bg-muted/50">
                                                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Title</th>
                                                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Host</th>
-                                                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Date</th>
+                                                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Date &amp; Time</th>
                                                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Duration</th>
                                                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Recording</th>
                                                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
@@ -542,7 +542,7 @@
                                                         </div> -->
                                                     </div>
                                                 </td>
-                                                <td class="p-4 align-middle">{{$recording->zoomSession->date}}</td>
+                                                <td class="p-4 align-middle">{{ $recording->zoomSession->date . ' ' . $recording->zoomSession->time }}</td>
                                                 <td class="p-4 align-middle">{{$recording->zoomSession->duration}}</td>
                                                 <td class="p-4 align-middle">
                                                     {{-- Vimeo recordings are domain-restricted, so they must be embedded
@@ -648,7 +648,11 @@
         if (hm) hash = hm[1];
         if (!id) { const dm = url.match(/(\d{6,})/); if (dm) id = dm[1]; }
         if (!id) return url;
-        let embed = 'https://player.vimeo.com/video/' + id + '?autoplay=1';
+        // Strip the player chrome / interaction tools: title, byline, portrait,
+        // badge, and the Like / Watch Later / Share / Collections overlay; dnt=1
+        // disables tracking cookies.
+        let embed = 'https://player.vimeo.com/video/' + id
+            + '?autoplay=1&title=0&byline=0&portrait=0&badge=0&dnt=1';
         if (hash) embed += '&h=' + hash;
         return embed;
     }

@@ -341,7 +341,9 @@
                 // Convert a Vimeo link to its embed form; strip any query string
                 // (e.g. ?h=...) so the id is clean before adding autoplay.
                 const videoId = videoUrl.split('/').pop().split('?')[0];
-                iframe.src = `https://player.vimeo.com/video/${videoId}?autoplay=1`;
+                // Strip player chrome / interaction tools (title, byline, portrait,
+                // badge, and the Like / Watch Later / Share overlay); dnt=1 disables tracking.
+                iframe.src = `https://player.vimeo.com/video/${videoId}?autoplay=1&title=0&byline=0&portrait=0&badge=0&dnt=1`;
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
             });
