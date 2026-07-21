@@ -201,6 +201,8 @@
                         <div class="group rounded-xl bg-white border border-border/50 hover:border-primary/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
                             <!-- PRODUCT IMAGE AREA -->
                             <div class="relative aspect-square overflow-hidden">
+                                <!-- Clickable overlay linking to the product details page -->
+                                <a href="{{ route('product-details', $product->slug) }}" class="absolute inset-0 z-10" aria-label="View {{ $product->name }}"></a>
                                 @if(!empty($product->image) && file_exists(public_path('product_images/'.$product->image)))
                                     <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5">
                                         <img src="{{ asset('product_images/'.$product->image) }}" alt="{{$product->name}}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
@@ -229,7 +231,7 @@
                             <div class="p-6 space-y-4">
                                 <!-- Product Title & Author -->
                                 <div class="space-y-2">
-                                    <h3 class="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-200 line-clamp-2">{{$product->name}}</h3>
+                                    <a href="{{ route('product-details', $product->slug) }}"><h3 class="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-200 line-clamp-2">{{$product->name}}</h3></a>
                                     <p class="text-sm text-muted-foreground">by {{ucfirst($product->user->first_name)}} {{ucfirst($product->user->last_name)}}</p>
                                 </div>
                                 

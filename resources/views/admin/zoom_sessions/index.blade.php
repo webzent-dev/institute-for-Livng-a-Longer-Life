@@ -200,11 +200,44 @@
                 </div>
                 <!--Save Recording Session Modal End-->
 
+                <!--Edit Recording Session Modal Start-->
+                <div id="editRecordingSessionModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50">
+                    <div class="bg-white w-full max-w-3xl rounded-xl shadow-lg sticky top-20 relative">
+                        <button type="button" onclick="closeEditRecordingModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl">&times;</button>
+                        <div class="p-6 border-b">
+                            <h2 class="text-lg font-semibold leading-none tracking-tight text-left">Edit Recording URL</h2>
+                            <p class="text-gray-500 mt-1">Update the recording URL for this session.</p>
+                        </div>
+                        <!-- Modal Body -->
+                        <form method="POST" action="{{ route('admin.zoom-sessions.update-recording') }}" class="space-y-4 overflow-y-auto scrollbar-custom max-h-[60vh] scroll-smooth px-6 py-4">
+                            @csrf
+                            <input type="hidden" name="recording_id" id="edit_recording_id" value="">
+                            <!-- Recording URL Input -->
+                            <div class="space-y-2">
+                                <label for="edit_recorded_link" class="text-sm font-medium">Recording URL <span class="text-red-500">*</span></label>
+                                <input type="text" name="recorded_link" id="edit_recorded_link" placeholder="https://vimeo.com/..." class="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" required>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-accent transition flex items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 010 5.656l-2 2a4 4 0 01-5.656-5.656l1.414-1.414M10.172 13.828a4 4 0 010-5.656l2-2a4 4 0 115.656 5.656l-1.414 1.414"/>
+                                </svg>
+                                Update Recording
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <!--Edit Recording Session Modal End-->
+
                 <!-- Tabs -->
                 <div dir="ltr" data-orientation="horizontal" class="mt-6">
-                    <div role="tablist" aria-orientation="horizontal" class="grid h-10 w-full grid-cols-2 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground"tabindex="0">
+                    <div role="tablist" aria-orientation="horizontal" class="grid h-10 w-full grid-cols-3 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground"tabindex="0">
                         <button role="tab" aria-selected="true" data-state="active" data-tab="upcoming" aria-controls="members" type="button" class="inline-flex items-center justify-center rounded-sm px-3 py-1.5 text-sm font-medium transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
                             Upcoming Sessions ({{ $zoom_sessions->total() }})
+                        </button>
+                        <button role="tab" aria-selected="false" data-state="inactive" data-tab="past" aria-controls="past" type="button" class="inline-flex items-center justify-center rounded-sm px-3 py-1.5 text-sm font-medium transition-all">
+                            Past Sessions ({{ $past_sessions->total() }})
                         </button>
                         <button role="tab" aria-selected="false" data-state="inactive" data-tab="recordings" aria-controls="collaborators" type="button" class="inline-flex items-center justify-center rounded-sm px-3 py-1.5 text-sm font-medium transition-all">
                             Recordings ({{ $recordings->total() }})
@@ -338,6 +371,123 @@
                     </div>
                 </div>
 
+                <!-- PAST SESSIONS TAB -->
+                <div id="past" class="tab-content mt-2 hidden">
+                    <div class="rounded-lg border bg-card shadow-sm">
+                        <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+                            <div class="flex flex-col space-y-1.5 p-6">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h3 class="text-2xl font-semibold leading-none tracking-tight">Past Sessions</h3>
+                                    </div>
+                                    <div class="w-[220px]">
+                                        <input id="search_past_session" type="text" name="search_past_session" placeholder="Search sessions..." onkeyup="searchPastSession()" class="flex h-10 w-full rounded-md
+                                        border border-input
+                                        bg-background
+                                        px-3 py-2
+                                        text-[14px]
+                                        placeholder:text-[14px]
+                                        ring-offset-background
+                                        focus-visible:outline-none
+                                        focus-visible:ring-2
+                                        focus-visible:ring-ring
+                                        focus-visible:ring-offset-2
+                                        disabled:cursor-not-allowed
+                                        disabled:opacity-50">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Table Container -->
+                            <div class="p-6 pt-0">
+                                <div class="relative w-full overflow-auto">
+                                    <table class="w-full caption-bottom text-sm">
+                                        <thead class="[&_tr]:border-b">
+                                            <tr class="border-b transition-colors data-[state=selected]:bg-muted hover:bg-muted/50">
+                                                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Title</th>
+                                                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Host</th>
+                                                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Date &amp; Time</th>
+                                                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Duration</th>
+                                                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
+                                                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="[&_tr:last-child]:border-0">
+                                            @forelse($past_sessions as $key => $zoom_session)
+                                            <tr class="border-b transition-colors data-[state=selected]:bg-muted hover:bg-muted/50">
+                                                <td class="p-4 align-middle font-medium">{{ $zoom_session->session_title }}</td>
+                                                <td class="p-4 align-middle">
+                                                    <div class="flex items-center gap-2">
+                                                        @php
+                                                           $hostDetail = DB::table('users')->where('id', $zoom_session->host)->first();
+                                                        @endphp
+                                                        {{ $hostDetail->first_name ?? '' }} {{ $hostDetail->last_name ?? '' }}
+                                                    </div>
+                                                </td>
+                                                <td class="p-4 align-middle">{{ $zoom_session->date . ' ' . $zoom_session->time }}</td>
+                                                <td class="p-4 align-middle">{{ $zoom_session->duration }}</td>
+                                                <td class="p-4 align-middle">
+                                                    <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-gray-400 text-primary-foreground">
+                                                        Completed
+                                                    </div>
+                                                </td>
+                                                <td class="p-4 align-middle">
+                                                    <div class="flex gap-2">
+                                                        <x-button-use href="{{url('admin/zoom-sessions/'.$zoom_session->id)}}" label="View" variant="outline" icon="eye" class="pl-0 pr-0 w-24 h-10"/>
+                                                        <!-- Upload Recording -->
+                                                        <button class="inline-flex items-center justify-center h-9 px-3 rounded-md border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground" onclick="uploadRecordingSessionModal({{ $zoom_session->id}},'{{ $zoom_session->session_title }}')">
+                                                            <svg class="lucide lucide-upload h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                                                <polyline points="17 8 12 3 7 8"/>
+                                                                <line x1="12" y1="3" x2="12" y2="15"/>
+                                                            </svg>
+                                                        </button>
+                                                        <!-- Delete -->
+                                                        <button class="inline-flex items-center justify-center h-9 px-3 rounded-md hover:bg-accent" onclick="deleteFromList('{{$zoom_session->id}}','zoom_session')">
+                                                            <svg class="lucide lucide-trash2 h-4 w-4 text-destructive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                <path d="M3 6h18"/>
+                                                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                                                <line x1="10" y1="11" x2="10" y2="17"/>
+                                                                <line x1="14" y1="11" x2="14" y2="17"/>
+                                                            </svg>
+                                                        </button>
+                                                        <form id="zoom_session_delete_form_{{$zoom_session->id}}" action="{{url('admin/zoom-sessions/'.$zoom_session->id)}}" method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            @empty
+                                            <tr>
+                                                <td colspan="7" class="p-4 text-center text-muted-foreground">
+                                                    No past sessions found.
+                                                </td>
+                                            </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- PAGINATION UI -->
+                                @if($past_sessions->hasPages())
+                                    <div class="px-6 py-4 border-t border-gray-100">
+                                        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                                            <div class="text-sm text-gray-500">
+                                                Showing <span class="font-semibold text-gray-700">{{ $past_sessions->firstItem() }}</span>
+                                                to <span class="font-semibold text-gray-700">{{ $past_sessions->lastItem() }}</span>
+                                                of <span class="font-semibold text-gray-700">{{ $past_sessions->total() }}</span> sessions
+                                            </div>
+                                            <div class="custom-pagination">
+                                                {{ $past_sessions->links('pagination::tailwind') }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="recordings" class="tab-content mt-2 hidden">
                     <div class="rounded-lg border bg-card shadow-sm">
                         <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
@@ -372,7 +522,7 @@
                                                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Title</th>
                                                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Host</th>
                                                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Date</th>
-                                                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Attendees</th>
+                                                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Duration</th>
                                                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Recording</th>
                                                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
                                             </tr>
@@ -393,16 +543,27 @@
                                                     </div>
                                                 </td>
                                                 <td class="p-4 align-middle">{{$recording->zoomSession->date}}</td>
-                                                <td class="p-4 align-middle">0</td>
+                                                <td class="p-4 align-middle">{{$recording->zoomSession->duration}}</td>
                                                 <td class="p-4 align-middle">
-                                                    <a href="{{$recording->recorded_link}}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 text-primary hover:underline">
+                                                    {{-- Vimeo recordings are domain-restricted, so they must be embedded
+                                                         in an iframe on this domain rather than opened directly. --}}
+                                                    <button type="button" data-video="{{$recording->recorded_link}}" class="open-recording-btn flex items-center gap-1 text-primary hover:underline">
                                                         <svg class="lucide lucide-video h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                             <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"></path>
                                                             <rect x="2" y="6" width="14" height="12" rx="2"></rect>
                                                         </svg>View
-                                                    </a>
+                                                    </button>
                                                 </td>
                                                 <td class="p-4 align-middle">
+                                                    <div class="flex gap-2">
+                                                    <!-- Edit Recording -->
+                                                    <button type="button" class="edit-recording-btn inline-flex items-center justify-center h-9 px-3 rounded-md border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground" data-id="{{ $recording->id }}" data-link="{{ $recording->recorded_link }}">
+                                                        <svg class="lucide lucide-pencil h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>
+                                                            <path d="m15 5 4 4"/>
+                                                        </svg>
+                                                    </button>
+                                                    <!-- Delete Recording -->
                                                     <button class="inline-flex items-center justify-center h-9 px-3 rounded-md hover:bg-accent hover:text-accent-foreground" onclick="deleteFromList('{{$recording->id}}','zoom_session_recorded_links')">
                                                         <svg class="lucide lucide-trash2 h-4 w-4 text-destructive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                             <path d="M3 6h18"></path>
@@ -412,6 +573,7 @@
                                                             <line x1="14" y1="11" x2="14" y2="17"></line>
                                                         </svg>
                                                     </button>
+                                                    </div>
                                                     <form id="zoom_session_recorded_links_delete_form_{{$recording->id}}" action="{{url('admin/delete-recording-session/'.$recording->id)}}" method="POST">
                                                         @csrf
                                                         @method('DELETE')
@@ -452,6 +614,66 @@
         @yield('content')
     </div>
 </div>
+<!-- Recording Video Modal (recordings are Vimeo, domain-restricted → embed on this domain) -->
+<div id="recordingModal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
+    <div class="relative w-full max-w-4xl mx-auto px-4">
+        <button id="closeRecordingVideoModal" type="button" class="absolute -top-10 right-4 text-white text-2xl">✕</button>
+        <div class="aspect-w-16 aspect-h-9 bg-black">
+            <iframe
+                id="recordingVideoFrame"
+                src=""
+                frameborder="0"
+                allow="autoplay; fullscreen"
+                allowfullscreen
+                class="w-full h-[500px] rounded-lg">
+            </iframe>
+        </div>
+    </div>
+</div>
+<script>
+(function () {
+    const modal = document.getElementById('recordingModal');
+    const iframe = document.getElementById('recordingVideoFrame');
+    const closeBtn = document.getElementById('closeRecordingVideoModal');
+    if (!modal || !iframe) return;
+
+    // Build a Vimeo player embed URL from whatever form the stored link takes:
+    // vimeo.com/123, vimeo.com/video/123, vimeo.com/123/privacyhash, or a
+    // player.vimeo.com URL with ?h=hash. Falls back to the raw URL if no id found.
+    function vimeoEmbed(url) {
+        let id = null, hash = null;
+        const m = url.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/([0-9a-zA-Z]+))?/i);
+        if (m) { id = m[1]; hash = m[2] || null; }
+        const hm = url.match(/[?&]h=([0-9a-zA-Z]+)/i);
+        if (hm) hash = hm[1];
+        if (!id) { const dm = url.match(/(\d{6,})/); if (dm) id = dm[1]; }
+        if (!id) return url;
+        let embed = 'https://player.vimeo.com/video/' + id + '?autoplay=1';
+        if (hash) embed += '&h=' + hash;
+        return embed;
+    }
+
+    function closeRecordingVideo() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        iframe.src = ''; // stop playback
+    }
+
+    document.querySelectorAll('.open-recording-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const url = this.getAttribute('data-video');
+            if (!url) return;
+            iframe.src = vimeoEmbed(url);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeRecordingVideo);
+    modal.addEventListener('click', function (e) { if (e.target === modal) closeRecordingVideo(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeRecordingVideo(); });
+})();
+</script>
 <x-dashboard.sidebar.mobile-sidebar />
 <script>lucide.createIcons()</script>
 <script>
@@ -521,6 +743,39 @@ document.getElementById('uploadRecordingSessionModal').addEventListener('click',
     }
 });
 
+// ---- Edit recording modal ----
+function openEditRecordingModal(id, link) {
+    document.getElementById('edit_recording_id').value = id;
+    document.getElementById('edit_recorded_link').value = link;
+    const m = document.getElementById('editRecordingSessionModal');
+    m.classList.remove('hidden');
+    m.classList.add('flex');
+}
+
+function closeEditRecordingModal() {
+    const m = document.getElementById('editRecordingSessionModal');
+    m.classList.add('hidden');
+    m.classList.remove('flex');
+}
+
+document.querySelectorAll('.edit-recording-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        openEditRecordingModal(this.getAttribute('data-id'), this.getAttribute('data-link'));
+    });
+});
+
+// Close on outside click / ESC
+document.getElementById('editRecordingSessionModal').addEventListener('click', function (e) {
+    if (e.target === this) {
+        closeEditRecordingModal();
+    }
+});
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        closeEditRecordingModal();
+    }
+});
+
 // Close on ESC key
 document.addEventListener('keydown', function(e) {
     if (e.key === "Escape") {
@@ -533,6 +788,28 @@ function searchZoomSession() {
     const searchInput = document.getElementById('search_zoom_session');
     const filter = searchInput.value.toLowerCase();
     const table = document.querySelector('#upcoming table');
+    const rows = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < rows.length; i++) {
+        const cells = rows[i].getElementsByTagName('td');
+        let match = false;
+        for (let j = 0; j < cells.length; j++) {
+            if (cells[j]) {
+                const cellText = cells[j].textContent || cells[j].innerText;
+                if (cellText.toLowerCase().indexOf(filter) > -1) {
+                    match = true;
+                    break;
+                }
+            }
+        }
+        rows[i].style.display = match ? '' : 'none';
+    }
+}
+
+function searchPastSession() {
+    const searchInput = document.getElementById('search_past_session');
+    const filter = searchInput.value.toLowerCase();
+    const table = document.querySelector('#past table');
     const rows = table.getElementsByTagName('tr');
 
     for (let i = 1; i < rows.length; i++) {

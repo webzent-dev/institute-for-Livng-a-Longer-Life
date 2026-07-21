@@ -266,7 +266,7 @@
             <h2 class="font-display text-3xl md:text-4xl font-bold text-primary-foreground text-center mb-12">{{ $introVideo->heading ?? 'Get a quick look inside' }}</h2>
             {{-- Video placeholder --}}
             <div class="max-w-6xl mx-auto mb-16">
-                <a href="{{ $introVideoMeta['video_url'] ?? 'https://player.vimeo.com/video/817940268?h=5e53563' }}" target="_blank" class="relative aspect-video bg-foreground/20 rounded-2xl overflow-hidden group cursor-pointer shadow-strong">
+                <button type="button" data-video="{{ $introVideoMeta['video_url'] ?? 'https://player.vimeo.com/video/817940268?h=5e53563' }}" class="open-video-btn block w-full text-left relative aspect-video bg-foreground/20 rounded-2xl overflow-hidden group cursor-pointer shadow-strong">
                     <div class="relative aspect-video bg-cover bg-center rounded-2xl overflow-hidden group" style="background-image: url('{{ asset('assets/home-bg.png') }}');">
                         <div class="absolute inset-0 bg-gradient-to-br from-primary-dark/80 to-primary/80 flex items-center justify-center">
                             <div class="w-20 h-20 rounded-full bg-primary-foreground flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
@@ -278,7 +278,7 @@
                             <p class="text-lg font-display">{{ $introVideoMeta['video_title'] ?? 'HEALTHY LIFE VIDEO' }}</p>
                         </div>
                     </div>
-                </a>
+                </button>
             </div>
 
             {{-- Features --}}
@@ -301,7 +301,58 @@
                 <p class="font-display text-2xl text-primary-foreground italic">{{ $introVideoMeta['signature'] ?? 'Wishing you health and happiness, Victor Zeines' }}</p>
             </div>
         </div>
+
+        <!-- Video Modal (opens the intro video in an iframe, same as the intro-videos page) -->
+        <div id="videoModal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
+            <div class="relative w-full max-w-4xl mx-auto px-4">
+                <!-- Close Button -->
+                <button id="closeModal" type="button" class="absolute -top-10 right-4 text-white text-2xl">✕</button>
+                <!-- Video container -->
+                <div class="aspect-w-16 aspect-h-9 bg-black">
+                    <iframe
+                        id="videoFrame"
+                        src=""
+                        frameborder="0"
+                        allow="autoplay; fullscreen"
+                        allowfullscreen
+                        class="w-full h-[500px] rounded-lg">
+                    </iframe>
+                </div>
+            </div>
+        </div>
     </section>
+    <script>
+    (function () {
+        const modal = document.getElementById('videoModal');
+        const iframe = document.getElementById('videoFrame');
+        const closeBtn = document.getElementById('closeModal');
+        if (!modal || !iframe) return;
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            iframe.src = ''; // stop playback
+        }
+
+        document.querySelectorAll('.open-video-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const videoUrl = this.getAttribute('data-video');
+                if (!videoUrl) return;
+                // Convert a Vimeo link to its embed form; strip any query string
+                // (e.g. ?h=...) so the id is clean before adding autoplay.
+                const videoId = videoUrl.split('/').pop().split('?')[0];
+                iframe.src = `https://player.vimeo.com/video/${videoId}?autoplay=1`;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            });
+        });
+
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeModal();
+        });
+    })();
+    </script>
     @endif
 
     {{-- Join Our Community Section --}}

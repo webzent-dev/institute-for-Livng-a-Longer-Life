@@ -56,7 +56,7 @@
                                 <!-- Search Input inside Filter Card -->
                                 <div>
                                     <div class="relative">
-                                        <input type="text" id="searchInput" placeholder="Search by name, category, or description..." class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none text-base"/><i data-lucide="search" class="h-5 w-5 absolute text-semibold left-4 text-xl top-1/2 transform -translate-y-1/2"></i>
+                                        <input type="text" id="searchInput" placeholder="Search by name, vendor, category, or description..." class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none text-base"/><i data-lucide="search" class="h-5 w-5 absolute text-semibold left-4 text-xl top-1/2 transform -translate-y-1/2"></i>
                                         <button id="clearSearch" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 text-lg hidden">
                                         </button>
                                     </div>
@@ -427,7 +427,8 @@ document.addEventListener('DOMContentLoaded', function() {
         collaboratorFilter.value = '';
         collaboratorFilterContainer.classList.add('hidden');
         // vendorFilter.value = '';
-        document.querySelector('#rating-any').checked = true;
+        const ratingAny = document.querySelector('#rating-any');
+        if (ratingAny) ratingAny.checked = true;
         // Hide no results message
         noResults.classList.add('hidden');
         filterProducts();
@@ -461,11 +462,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (filters.search) {
             const searchLower = filters.search.toLowerCase();
             filtered = filtered.filter(p => {
+                // There is no `vendor` column on products — the vendor shown on the
+                // card is composed from the user relation (a collaborator's full
+                // "First Last" name), or "Institute" for institute-listed products.
+                // Search that composed label so a full multi-word vendor name matches.
+                const vendorName = (p.user && p.user.role === 'collaborator')
+                    ? `${p.user.first_name ?? ''} ${p.user.last_name ?? ''}`.trim()
+                    : 'Institute';
                 return (
                     (p.name && p.name.toLowerCase().includes(searchLower)) ||
                     (p.category && p.category.toLowerCase().includes(searchLower)) ||
                     (p.description && p.description.toLowerCase().includes(searchLower)) ||
-                    (p.vendor && p.vendor.toLowerCase().includes(searchLower))
+                    (vendorName && vendorName.toLowerCase().includes(searchLower))
                 );
             });
         }
@@ -547,6 +555,10 @@ document.addEventListener('DOMContentLoaded', function() {
    
     // Update results count
     function updateResultsCount(count) {
+        // The results-count element is optional — the current template does not
+        // render one. Bail out quietly instead of throwing on a null reference,
+        // which would abort the whole filter flow (no-results message, chips, etc.).
+        if (!resultsCount) return;
         const total = products.length;
         resultsCount.textContent = `Showing ${count} of ${total} products`;
     }
@@ -643,7 +655,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
    
     function clearRatingFilter() {
-        document.querySelector('#rating-any').checked = true;
+        const ratingAny = document.querySelector('#rating-any');
+        if (ratingAny) ratingAny.checked = true;
         filters.minRating = null;
         filterProducts();
         updateClearButton();
