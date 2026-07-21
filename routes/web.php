@@ -177,6 +177,7 @@ Route::prefix('admin')->middleware([RoleMiddleware::class.':admin'])->group(func
     //Route::put('zoom-sessions/update', [ZoomSessionController::class, 'updateZoomSession'])->name('admin.zoom-sessions.update');
     Route::put('/zoom-sessions/{id}/update', [ZoomSessionController::class, 'update'])->name('admin.zoom-sessions.update');
     Route::post('save-recording-session', [ZoomSessionController::class, 'saveRecording'])->name('admin.zoom-sessions.save-recording');
+    Route::post('update-recording-session', [ZoomSessionController::class, 'updateRecording'])->name('admin.zoom-sessions.update-recording');
     Route::delete('delete-recording-session/{id}', [ZoomSessionController::class, 'deleteRecording'])->name('admin.zoom-sessions.delete-recording');
     //------------Zoom Session management end here--------//
 
