@@ -230,12 +230,12 @@
                                              parent meeting's join_url, which only re-opens the ended meeting. --}}
                                         @php $recordingUrl = $session->recorded_link ?: null; @endphp
                                         @if($recordingUrl)
-                                            <a href="{{ $recordingUrl }}" target="_blank">
-                                                <button class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full shadow-sm">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"></path><rect x="2" y="6" width="14" height="12" rx="2"></rect></svg>
-                                                    Watch Recording
-                                                </button>
-                                            </a>
+                                            {{-- Recordings are Vimeo (domain-restricted), so open them in an
+                                                 on-page iframe modal rather than a new tab. --}}
+                                            <button type="button" data-video="{{ $recordingUrl }}" class="open-recording-btn inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"></path><rect x="2" y="6" width="14" height="12" rx="2"></rect></svg>
+                                                Watch Recording
+                                            </button>
                                         @else
                                             <button type="button" disabled title="The recording is not available yet."
                                                 class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground h-10 px-4 py-2 w-full shadow-sm">
@@ -336,4 +336,74 @@
         </div>
     </div>
 </main>
+
+<!-- Recording Video Modal (recordings are Vimeo, domain-restricted → embed on this domain) -->
+<div id="recordingModal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
+    <div class="relative w-full max-w-4xl mx-auto px-4">
+        <button id="closeRecordingVideoModal" type="button" class="absolute -top-10 right-4 text-white text-2xl">&times;</button>
+        <div class="aspect-w-16 aspect-h-9 bg-black relative">
+            <iframe
+                id="recordingVideoFrame"
+                src=""
+                frameborder="0"
+                allow="autoplay; fullscreen"
+                allowfullscreen
+                class="w-full h-[500px] rounded-lg">
+            </iframe>
+            {{-- Click shield over the Vimeo top bar so the Like / Watch Later / Share
+                 tools can't be opened. Playback controls sit at the bottom and stay
+                 usable. Note: this only blocks clicks — hiding the icons entirely
+                 requires disabling interaction tools in the video's Vimeo embed settings. --}}
+            <div class="absolute top-0 left-0 right-0 h-16 z-10"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function () {
+    const modal = document.getElementById('recordingModal');
+    const iframe = document.getElementById('recordingVideoFrame');
+    const closeBtn = document.getElementById('closeRecordingVideoModal');
+    if (!modal || !iframe) return;
+
+    // Build a Vimeo player embed URL from whatever form the stored link takes:
+    // vimeo.com/123, vimeo.com/video/123, vimeo.com/123/privacyhash, or a
+    // player.vimeo.com URL with ?h=hash. Falls back to the raw URL if no id found.
+    function vimeoEmbed(url) {
+        let id = null, hash = null;
+        const m = url.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/([0-9a-zA-Z]+))?/i);
+        if (m) { id = m[1]; hash = m[2] || null; }
+        const hm = url.match(/[?&]h=([0-9a-zA-Z]+)/i);
+        if (hm) hash = hm[1];
+        if (!id) { const dm = url.match(/(\d{6,})/); if (dm) id = dm[1]; }
+        if (!id) return url;
+        // Strip the player chrome / interaction tools: title, byline, portrait,
+        // badge, and the Like / Watch Later / Share / Collections overlay; dnt=1
+        // disables tracking cookies.
+        let embed = 'https://player.vimeo.com/video/' + id
+            + '?autoplay=1&title=0&byline=0&portrait=0&badge=0&dnt=1';
+        if (hash) embed += '&h=' + hash;
+        return embed;
+    }
+
+    function closeRecordingVideo() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        iframe.src = ''; // stop playback
+    }
+
+    document.querySelectorAll('.open-recording-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const url = this.getAttribute('data-video');
+            if (!url) return;
+            iframe.src = vimeoEmbed(url);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeRecordingVideo);
+    modal.addEventListener('click', function (e) { if (e.target === modal) closeRecordingVideo(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeRecordingVideo(); });
+})();
+</script>
 @endsection

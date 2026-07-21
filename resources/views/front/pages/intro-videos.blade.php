@@ -227,7 +227,9 @@ document.querySelectorAll('.open-video-btn').forEach(btn => {
 
         // Convert Vimeo link to embed format
         let videoId = videoUrl.split('/').pop();
-        let embedUrl = `https://player.vimeo.com/video/${videoId}?autoplay=1`;
+        // Strip player chrome / interaction tools (title, byline, portrait, badge,
+        // and the Like / Watch Later / Share overlay); dnt=1 disables tracking.
+        let embedUrl = `https://player.vimeo.com/video/${videoId}?autoplay=1&title=0&byline=0&portrait=0&badge=0&dnt=1`;
 
         iframe.src = embedUrl;
         modal.classList.remove('hidden');
