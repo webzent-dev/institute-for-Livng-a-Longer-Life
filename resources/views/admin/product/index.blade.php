@@ -86,7 +86,7 @@
                         </div>
                         <div class="grid grid-cols-2 gap-4 mt-3">
                             <div class="space-y-2">
-                                <x-form.input label="Price" type="number" name="price" placeholder="0.00" automcomplete="off" required  />
+                                <x-form.input label="Price" type="text" name="price" placeholder="0.00" automcomplete="off" required  />
                                 <p class="text-xs text-muted-foreground">Set to 0 for free items</p>
                             </div>
                             <div class="space-y-2">
