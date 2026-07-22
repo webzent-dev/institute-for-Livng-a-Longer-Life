@@ -49,6 +49,17 @@
                             @php $purchaseLabel = \App\Support\CartLine::label($item->purchase_type, $item->subscription_plan); @endphp
                             <span class="inline-block mt-1 rounded-full text-[11px] font-semibold px-2 py-0.5 {{ $item->purchase_type === 'subscription' ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-600' }}">{{ $purchaseLabel }}</span>
                             <p class="text-sm text-gray-600 mt-1">Quantity: {{ $item->quantity }}</p>
+                            @php $guideProduct = \App\Models\Product::find($item->product_id); @endphp
+                            @if($guideProduct && $guideProduct->product_type === 'guide' && $guideProduct->pdf_file && $order->payment_status === 'completed')
+                                <a href="{{ route('member.download-purchased-guide', $item->id) }}" class="inline-flex items-center gap-2 mt-2 text-sm font-medium text-primary hover:underline">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" x2="12" y1="15" y2="3"></line>
+                                    </svg>
+                                    Download PDF
+                                </a>
+                            @endif
                         </div>
                         <div class="text-right">
                             <p class="text-sm font-medium text-gray-900">${{ number_format($item->price, 2) }}</p>

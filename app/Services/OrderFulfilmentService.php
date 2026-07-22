@@ -14,6 +14,7 @@ use App\Models\VitalBoostSubscription;
 use App\Services\Pricing\VitalBoostPricingService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Stripe\Charge;
 use Stripe\Invoice;
 use Stripe\PaymentIntent;
@@ -51,9 +52,24 @@ class OrderFulfilmentService
             }
         }
 
-        // Customer confirmation email
+        // Guides on this order are downloadable PDFs. The confirmation email links
+        // to each one with a signed download URL rather than attaching the file —
+        // attachments bloat the message and get rejected as "too large". The signed
+        // link works for guests (who have no dashboard) as well as members.
+        $guideDownloads = [];
+        foreach ($orderItems as $item) {
+            $product = Product::find($item->product_id);
+            if ($product && $product->product_type === 'guide' && $product->pdfPath()) {
+                $guideDownloads[] = [
+                    'name' => $product->name,
+                    'url'  => URL::signedRoute('guide.download', ['orderItem' => $item->id]),
+                ];
+            }
+        }
+
+        // Customer confirmation email — includes any guide download links.
         if (!empty($order->email)) {
-            Mail::to($order->email)->send(new OrderConfirmationMail($order, $orderItems));
+            Mail::to($order->email)->send(new OrderConfirmationMail($order, $orderItems, $guideDownloads));
         }
 
         // Collaborator notification emails

@@ -117,7 +117,7 @@
                                 <div class="space-y-2">
                                     <x-form.input label="Price($)" type="number" name="price" value="{{ $productDetail->price }}" placeholder="0.00" automcomplete="off" required  />
                                 </div>
-                                <div class="space-y-2">
+                                <div class="space-y-2 hide-for-guide">
                                     <x-form.input label="Stock Quantity" type="number" name="stock_quantity" value="{{ $productDetail->stock_quantity }}" placeholder="0" automcomplete="off" required />
                                 </div>
                             </div>
@@ -125,6 +125,8 @@
                             <!-- Product Attributes Section -->
                             <div class="border-t pt-4 mt-4">
                                 <h4 class="text-lg font-semibold mb-3">Product Attributes</h4>
+                                {{-- Shipping details — hidden for downloadable guides --}}
+                                <div class="product-shipping-fields hide-for-guide">
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="space-y-2">
                                         <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Weight (lbs) <span class="required" style="color: red;">*</span></label>
@@ -156,6 +158,8 @@
                                     <input type="checkbox" name="requires_shipping" id="requires_shipping" {{ $productDetail->requires_shipping ? 'checked' : '' }} class="rounded border-gray-300">
                                     <label for="requires_shipping" class="text-sm font-medium">Requires Shipping</label>
                                 </div>
+                                </div>
+                                {{-- /shipping details --}}
                                 <!-- <div class="space-y-2">
                                     <x-form.input name="url" type="text" placeholder="/placeholder.svg" label="Image URL"  />
                                 </div>
@@ -197,6 +201,31 @@
                                         </div>
                                     </div>
                                 @endif
+
+                                {{-- Guide PDF: a guide is a downloadable PDF, not a physical product.
+                                     Shown only when Product Type = Guide (toggled by vital-boost-coupling.js). --}}
+                                <div class="space-y-2 mt-4 guide-pdf-field hidden">
+                                    <label class="text-sm font-medium leading-none">Guide PDF</label>
+                                    @if($productDetail->pdf_file)
+                                        <p class="text-xs text-muted-foreground">
+                                            Current file:
+                                            <a href="{{ route('member.download', $productDetail->id) }}" class="text-primary underline">{{ $productDetail->pdf_file }}</a>
+                                            — upload a new file to replace it.
+                                        </p>
+                                    @endif
+                                    <div class="rounded-lg border-2 border-dashed p-4">
+                                        <input type="file" id="edit-guide-pdf" name="pdf_file" accept="application/pdf" class="hidden" />
+                                        <div id="edit-pdf-name" class="text-sm text-primary mt-2 hidden"></div>
+                                        <label for="edit-guide-pdf" class="flex cursor-pointer flex-col items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mb-2 h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                                <polyline points="14 2 14 8 20 8" />
+                                            </svg>
+                                            <span class="text-sm text-muted-foreground">Click to upload the guide PDF</span>
+                                            <span class="text-xs text-muted-foreground">PDF up to 20MB. Emailed to buyers and available to members for download.</span>
+                                        </label>
+                                    </div>
+                                </div>
 
                             </div>
                         </form>
@@ -258,6 +287,27 @@
                 countDisplay.classList.add("hidden");
             }
         });
+
+        // Show the chosen guide PDF's file name (20MB guard).
+        const editGuidePdf = document.getElementById('edit-guide-pdf');
+        if (editGuidePdf) {
+            editGuidePdf.addEventListener('change', function () {
+                const nameDisplay = document.getElementById('edit-pdf-name');
+                const file = this.files[0];
+                if (file) {
+                    if (file.size > 20 * 1024 * 1024) {
+                        alert('The PDF must be less than 20MB.');
+                        this.value = '';
+                        nameDisplay.classList.add('hidden');
+                        return;
+                    }
+                    nameDisplay.innerText = file.name;
+                    nameDisplay.classList.remove('hidden');
+                } else {
+                    nameDisplay.classList.add('hidden');
+                }
+            });
+        }
 
         function removeImage(imageId) {
             let r = confirm("Are you sure you want to delete this image?");

@@ -494,6 +494,12 @@ class MemberController extends Controller
             abort(403, 'Active membership required to download this content.');
         }
 
+        // Prefer the admin-uploaded PDF when one exists; the on-the-fly generated
+        // document below stays as a fallback for older products without a file.
+        if ($product->pdfPath()) {
+            return $this->streamProductPdf($product);
+        }
+
         // Build the product image as a base64 data URI (if it exists on disk)
         $imageSrc = null;
         if ($product->image) {
@@ -533,6 +539,47 @@ class MemberController extends Controller
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
             ->header('Content-Length', strlen($pdfContent));
+    }
+
+    /**
+     * Stream the admin-uploaded guide PDF as a download. The file lives outside the
+     * public folder, so this is the only way to reach it — callers are responsible
+     * for the access check (active membership, or ownership of a paid order).
+     */
+    private function streamProductPdf(Product $product)
+    {
+        $path = $product->pdfPath();
+        abort_if(!$path, 404, 'The download for this product is not available.');
+
+        $filename = \Illuminate\Support\Str::slug($product->name) . '.pdf';
+
+        return response()->download($path, $filename, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
+    /**
+     * Download a guide the member has actually purchased. Gated on the order item
+     * belonging to an order owned by the signed-in user, so members can retrieve
+     * their bought guides from the dashboard without needing an active membership.
+     */
+    public function downloadPurchasedGuide($orderItemId)
+    {
+        $orderItem = \App\Models\OrderItem::findOrFail($orderItemId);
+
+        $order = Order::where('id', $orderItem->order_id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        // Only released once the order is paid for.
+        if ($order->payment_status !== 'completed') {
+            abort(403, 'This download becomes available once your payment is confirmed.');
+        }
+
+        $product = Product::findOrFail($orderItem->product_id);
+        abort_if($product->product_type !== 'guide' || !$product->pdfPath(), 404, 'This product does not have a downloadable file.');
+
+        return $this->streamProductPdf($product);
     }
 
     public function downloadReceipt($transactionId)

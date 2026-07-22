@@ -101,7 +101,21 @@
                                 <div>Phone: {{ session('checkout.shipping.phone') }}</div>
                             </div>
                         </div>
+                        @php
+                            // A downloadable-only order (e.g. guides) requires no shipping,
+                            // so the shipping address is skipped and the delivery section is
+                            // shown as digital delivery instead.
+                            $orderRequiresShipping = false;
+                            foreach(session('cart', []) as $reviewLineKey => $reviewQty){
+                                $reviewProduct = App\Models\Product::find(App\Support\CartLine::productId($reviewLineKey));
+                                if($reviewProduct && ($reviewProduct->requires_shipping ?? true)){
+                                    $orderRequiresShipping = true;
+                                    break;
+                                }
+                            }
+                        @endphp
                         <!-- Shipping Address -->
+                        @if($orderRequiresShipping)
                         <div>
                             <h3 class="font-medium text-gray-900 mb-2">Shipping Address</h3>
                             <div class="text-sm text-gray-600 bg-gray-50 p-3 rounded">
@@ -112,17 +126,23 @@
                                 {{ session('checkout.shipping.country') }}
                             </div>
                         </div>
+                        @endif
                         <!-- Delivery Method -->
                         <div>
                             <h3 class="font-medium text-gray-900 mb-2">Delivery Method</h3>
                             <div class="text-sm text-gray-600 bg-gray-50 p-3 rounded">
-                                @if(session('checkout.delivery.methods') !== null)
-                                    Multi-seller shipping
+                                @if(!$orderRequiresShipping)
+                                    Digital delivery - Free<br>
+                                    <span class="text-xs">Your download link will be emailed to you after purchase.</span>
                                 @else
-                                    {{ ucfirst(session('checkout.delivery.method') ?? 'standard') }} Delivery
+                                    @if(session('checkout.delivery.methods') !== null)
+                                        Multi-seller shipping
+                                    @else
+                                        {{ ucfirst(session('checkout.delivery.method') ?? 'standard') }} Delivery
+                                    @endif
+                                    - ${{ number_format(session('checkout.delivery.total_charge') ?? session('checkout.delivery.charge', 0), 2) }}<br>
+                                    <span class="text-xs">Estimated delivery: 5-7 business days</span>
                                 @endif
-                                - ${{ number_format(session('checkout.delivery.total_charge') ?? session('checkout.delivery.charge', 0), 2) }}<br>
-                                <span class="text-xs">Estimated delivery: 5-7 business days</span>
                                 @if(session('checkout.delivery.delivery_instructions'))
                                 <br><strong>Instructions:</strong> {{ session('checkout.delivery.delivery_instructions') }}
                                 @endif

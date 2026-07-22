@@ -134,9 +134,21 @@
                     </div>
                 </div>
                 <!-- Navigation -->
+                @php
+                    // Downloadable-only carts skip the delivery step, so the back
+                    // link returns to the contact/shipping step instead.
+                    $paymentRequiresShipping = false;
+                    foreach(session('cart', []) as $payLineKey => $payQty){
+                        $payProduct = App\Models\Product::find(App\Support\CartLine::productId($payLineKey));
+                        if($payProduct && ($payProduct->requires_shipping ?? true)){
+                            $paymentRequiresShipping = true;
+                            break;
+                        }
+                    }
+                @endphp
                 <div class="flex justify-between">
-                    <a href="{{ route('checkout.delivery') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back to Delivery
+                    <a href="{{ $paymentRequiresShipping ? route('checkout.delivery') : route('checkout.shipping') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> {{ $paymentRequiresShipping ? 'Back to Delivery' : 'Back to Details' }}
                     </a>
                     <button type="submit" class="btn btn-primary">
                         Continue to Review <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>

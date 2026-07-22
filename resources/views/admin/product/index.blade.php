@@ -89,13 +89,13 @@
                                 <x-form.input label="Price" type="text" name="price" placeholder="0.00" automcomplete="off" required  />
                                 <p class="text-xs text-muted-foreground">Set to 0 for free items</p>
                             </div>
-                            <div class="space-y-2">
+                            <div class="space-y-2 hide-for-guide">
                                 <x-form.input label="Stock Quantity" type="number" name="stock_quantity" placeholder="0" automcomplete="off" required  />
                             </div>
                         </div>
                         
-                        <!-- Product Attributes Section -->
-                        <div class="border-t pt-4 mt-4">
+                        <!-- Product Attributes Section (shipping details — hidden for downloadable guides) -->
+                        <div class="border-t pt-4 mt-4 product-shipping-fields hide-for-guide">
                             <h4 class="text-lg font-semibold mb-3">Product Attributes</h4>
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="space-y-2">
@@ -142,6 +142,23 @@
                                     </svg>
                                     <span class="text-sm text-muted-foreground">Click to upload images</span>
                                     <span class="text-xs text-muted-foreground">PNG, JPG up to 5MB each</span>
+                                </label>
+                            </div>
+                        </div>
+                        {{-- Guide PDF: a guide is a downloadable PDF, not a physical product.
+                             Shown only when Product Type = Guide (toggled by vital-boost-coupling.js). --}}
+                        <div class="space-y-2 guide-pdf-field hidden">
+                            <label class="text-sm font-medium leading-none">Guide PDF <span class="required" style="color: red;">*</span></label>
+                            <div class="rounded-lg border-2 border-dashed p-4">
+                                <input type="file" id="create-guide-pdf" name="pdf_file" accept="application/pdf" class="hidden" />
+                                <div id="create-pdf-name" class="text-sm text-primary mt-2 hidden"></div>
+                                <label for="create-guide-pdf" class="flex cursor-pointer flex-col items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="mb-2 h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                        <polyline points="14 2 14 8 20 8" />
+                                    </svg>
+                                    <span class="text-sm text-muted-foreground">Click to upload the guide PDF</span>
+                                    <span class="text-xs text-muted-foreground">PDF up to 20MB. Emailed to buyers and available to members for download.</span>
                                 </label>
                             </div>
                         </div>
@@ -660,6 +677,27 @@
             }
         });
         
+        // Show the chosen guide PDF's file name (20MB guard).
+        const createGuidePdf = document.getElementById('create-guide-pdf');
+        if (createGuidePdf) {
+            createGuidePdf.addEventListener('change', function () {
+                const nameDisplay = document.getElementById('create-pdf-name');
+                const file = this.files[0];
+                if (file) {
+                    if (file.size > 20 * 1024 * 1024) {
+                        alert('The PDF must be less than 20MB.');
+                        this.value = '';
+                        nameDisplay.classList.add('hidden');
+                        return;
+                    }
+                    nameDisplay.innerText = file.name;
+                    nameDisplay.classList.remove('hidden');
+                } else {
+                    nameDisplay.classList.add('hidden');
+                }
+            });
+        }
+
         function searchInstituteProducts() {
             const searchInput = document.getElementById('search_institute_products');
             const filter = searchInput.value.toLowerCase();

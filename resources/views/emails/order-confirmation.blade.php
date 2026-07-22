@@ -18,6 +18,27 @@
         We have received your order and it is now confirmed. Here is a summary for your records.
     </p>
 
+    {{-- Downloadable guides: delivered as signed download links (not attachments) --}}
+    @if(!empty($guideDownloads) && count($guideDownloads))
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0; background-color:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px;">
+            <tr>
+                <td style="padding:16px 18px; font-size:14px; color:#065f46;">
+                    <strong style="display:block; margin-bottom:10px; font-size:15px;">Your download{{ count($guideDownloads) > 1 ? 's are' : ' is' }} ready</strong>
+                    @foreach($guideDownloads as $download)
+                        <div style="margin:0 0 12px 0;">
+                            <div style="margin-bottom:6px;">📄 {{ $download['name'] }}</div>
+                            <a href="{{ $download['url'] }}" style="display:inline-block; background-color:#059669; color:#ffffff; text-decoration:none; font-weight:600; font-size:14px; padding:9px 18px; border-radius:6px;">Download PDF</a>
+                        </div>
+                    @endforeach
+                    <div style="margin-top:6px; font-size:12px; color:#047857;">This link is unique to your order — please keep this email.</div>
+                    @if($order->belongsToMember())
+                        <div style="margin-top:6px; font-size:12px; color:#047857;">You can also download any time from your <a href="{{ url('/member/orders') }}" style="color:#047857;">orders page</a>.</div>
+                    @endif
+                </td>
+            </tr>
+        </table>
+    @endif
+
     {{-- Order meta --}}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0; border:1px solid #e5e7eb; border-radius:8px;">
         <tr>

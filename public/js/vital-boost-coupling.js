@@ -84,6 +84,44 @@
             hidden.value = user.value;
         }
 
+        // A guide is a downloadable PDF, so the PDF upload field is only relevant
+        // — and only shown — when Product Type = Guide.
+        function syncGuidePdf() {
+            var field = document.querySelector('.guide-pdf-field');
+            if (!field) {
+                return;
+            }
+            field.classList.toggle('hidden', type.value !== 'guide');
+        }
+
+        // A guide is a downloadable PDF, so fields that only make sense for a
+        // physical product — shipping details (weight / dimensions / shipping
+        // template / requires-shipping) and stock quantity — are hidden for
+        // guides. Any `.hide-for-guide` block is toggled here. Their required
+        // attributes must be relaxed too: the browser cannot validate a required
+        // field that is hidden, and would otherwise block submission.
+        function syncGuideHiddenSections() {
+            var sections = document.querySelectorAll('.hide-for-guide');
+            if (!sections.length) {
+                return;
+            }
+
+            var isGuide = type.value === 'guide';
+            Array.prototype.forEach.call(sections, function (section) {
+                section.classList.toggle('hidden', isGuide);
+
+                var inputs = section.querySelectorAll('input, select, textarea');
+                Array.prototype.forEach.call(inputs, function (input) {
+                    // Remember each field's original required state once, so it can
+                    // be restored when switching back away from Guide.
+                    if (input.dataset.origRequired === undefined) {
+                        input.dataset.origRequired = input.required ? '1' : '0';
+                    }
+                    input.required = isGuide ? false : input.dataset.origRequired === '1';
+                });
+            });
+        }
+
         type.addEventListener('change', function () {
             if (type.value === 'vital_boost') {
                 category.value = 'vital_boost';
@@ -91,6 +129,8 @@
                 category.value = 'institute';
             }
             syncUserLock();
+            syncGuidePdf();
+            syncGuideHiddenSections();
         });
 
         category.addEventListener('change', function () {
@@ -100,11 +140,15 @@
                 type.value = 'supplement';
             }
             syncUserLock();
+            syncGuidePdf();
+            syncGuideHiddenSections();
         });
 
         // Run once so a saved Vital Boost product, or a form redisplayed with old
         // input, opens already locked.
         syncUserLock();
+        syncGuidePdf();
+        syncGuideHiddenSections();
     }
 
     if (document.readyState !== 'loading') {
