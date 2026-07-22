@@ -113,6 +113,69 @@ class CheckoutController extends Controller
         return true;
     }
     
+    /**
+     * Whether the cart contains anything that physically ships. A cart made up
+     * entirely of downloadable products (e.g. guides) has nothing to ship, so the
+     * shipping-address and delivery-method steps are skipped for it.
+     */
+    private function cartRequiresShipping(array $cart): bool
+    {
+        foreach ($cart as $lineKey => $qty) {
+            $product = Product::find(\App\Support\CartLine::productId($lineKey));
+            if ($product && ($product->requires_shipping ?? true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Collect just the buyer's contact details for a downloadable-only order and
+     * jump straight to payment. A zero-cost delivery is recorded so the payment,
+     * review and order-placement steps still have consistent shipping data.
+     */
+    private function storeDigitalContact(Request $request)
+    {
+        if (Auth::check()) {
+            $user = auth()->user();
+            $data = [
+                'first_name' => $user->first_name,
+                'last_name'  => $user->last_name,
+                'email'      => $user->email,
+                'phone'      => $request->phone ?: $user->phone,
+            ];
+        } else {
+            $data = $request->validate([
+                'first_name' => 'required|string|max:255',
+                'last_name'  => 'required|string|max:255',
+                'email'      => 'required|email|max:255',
+                'phone'      => 'required|string|max:20',
+            ]);
+        }
+
+        // Downloadable products have no shipping address; store blanks so every
+        // downstream step (order creation stores these directly) has the keys.
+        $data = array_merge($data, [
+            'address_line_1' => '',
+            'address_line_2' => '',
+            'city'           => '',
+            'state'          => '',
+            'zip_code'       => '',
+            'country'        => '',
+        ]);
+
+        session(['checkout.shipping' => $data]);
+        session(['checkout.delivery' => [
+            'methods'               => [],
+            'total_charge'          => 0,
+            'delivery_instructions' => null,
+            'shipping_rates'        => [],
+        ]]);
+
+        return redirect()->route('checkout.payment');
+    }
+
     public function shipping()
     {
         //Add check if cart is empty then redirect to cart page
@@ -121,12 +184,19 @@ class CheckoutController extends Controller
             return redirect()->route('shop')->with('error', 'Your cart is empty. Please add products to cart before proceeding to checkout.');
         }
 
+        $cartItems = $this->getCartTotal();
+
+        // Downloadable-only carts skip the shipping-address step and collect only
+        // contact details.
+        if (!$this->cartRequiresShipping($cart)) {
+            return view('front.checkout.shipping-digital', compact('cartItems'));
+        }
+
         $addresses = [];
         if(Auth::check()){
             $addresses = auth()->user()->addresses()->get();
             session('addresses', $addresses);
         }
-        $cartItems = $this->getCartTotal();
 
         $countries = Country::all();
         return view('front.checkout.shipping', compact('addresses', 'cartItems', 'countries'));
@@ -138,6 +208,11 @@ class CheckoutController extends Controller
         $cart = session('cart', []);
         if(empty($cart)){
             return redirect()->route('shop')->with('error', 'Your cart is empty. Please add products to cart before proceeding to checkout.');
+        }
+
+        // Downloadable-only carts capture just contact details and skip to payment.
+        if (!$this->cartRequiresShipping($cart)) {
+            return $this->storeDigitalContact($request);
         }
 
         if(!Auth::check()){
@@ -508,13 +583,19 @@ class CheckoutController extends Controller
             return redirect()->route('shop')->with('error', 'Your cart is empty. Please add products to cart before proceeding to checkout.');
         }
 
+        // Downloadable-only carts have no delivery step; jump forward to payment
+        // (covers back-button / direct navigation to this URL).
+        if (!$this->cartRequiresShipping($cart)) {
+            return redirect()->route('checkout.payment');
+        }
+
         $shipping = session('checkout.shipping');
         if (!$shipping) {
             return redirect()->route('checkout.shipping')->with('error', 'Please enter shipping information first.');
         }
 
         $cartItems = $this->getCartTotal();
-        
+
         // Calculate shipping rates using ShippingService
         try {
             // Prepare destination address for shipping service

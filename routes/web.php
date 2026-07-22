@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\ZoomSessionController;
 use App\Http\Controllers\Front\CheckoutController;
+use App\Http\Controllers\Front\GuideDownloadController;
 use App\Http\Controllers\Front\StripeWebhookController;
 use App\Http\Controllers\Front\MemberController;
 use App\Http\Controllers\Admin\AdminOrderController;
@@ -416,6 +417,12 @@ Route::post('/checkout/order', [CheckoutController::class, 'placeOrder'])->name(
 Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.payment.success');
 Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.payment.cancel');
 
+// Signed, public download link for a purchased guide PDF (emailed on the order
+// confirmation). The 'signed' middleware validates the URL signature.
+Route::get('/guide/download/{orderItem}', [GuideDownloadController::class, 'download'])
+    ->name('guide.download')
+    ->middleware('signed');
+
 //------------Member routes start here--------//
 Route::prefix('member')->middleware([RoleMiddleware::class.':user'])->group(function () {
 //Route::prefix('member')->group(function () {
@@ -432,6 +439,7 @@ Route::prefix('member')->middleware([RoleMiddleware::class.':user'])->group(func
     Route::get('/video-library/collaborator/{id}', [MemberController::class, 'collaboratorVideos'])->name('member.video-library.collaborator');
     Route::get('/store', [MemberController::class, 'member_store'])->name('member.store');
     Route::get('/download/{id}', [MemberController::class, 'download'])->name('member.download');
+    Route::get('/orders/guide/{orderItem}/download', [MemberController::class, 'downloadPurchasedGuide'])->name('member.download-purchased-guide');
     Route::get('/download-receipt/{transactionId}', [MemberController::class, 'downloadReceipt'])->name('member.download-receipt');
     Route::post('/saveProfile', [MemberController::class, 'saveProfile'])->name('member.saveProfile');
     Route::post('/update-password', [MemberController::class, 'updatePassword'])->name('member.updatepassword');

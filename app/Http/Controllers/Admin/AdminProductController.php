@@ -96,14 +96,43 @@ class AdminProductController extends Controller
         return (string) Auth::id();
     }
 
+    /**
+     * Store an uploaded guide PDF under storage/app/product_pdfs and return its
+     * generated file name. Kept out of the public folder so paid guide downloads
+     * are only reachable through a gated controller action.
+     */
+    private function storePdfFile(Request $request): ?string
+    {
+        if (!$request->hasFile('pdf_file')) {
+            return null;
+        }
+
+        $directory = storage_path('app/product_pdfs');
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        $file = $request->file('pdf_file');
+        $pdfName = time() . '_' . Str::random(10) . '.' . $file->extension();
+        $file->move($directory, $pdfName);
+
+        return $pdfName;
+    }
+
     public function store(Request $request)
     {
+        // A guide is a downloadable PDF with no physical stock, so its quantity is
+        // optional (the form hides that field for guides).
+        $isGuideType = $request->product_type === 'guide';
+
         $request->validate([
             'product_name'     => 'required|string|max:255',
             'product_type'     => 'required|string',
             'price'            => 'required|numeric|min:0',
-            'stock_quantity'   => 'required|integer|min:0',
+            'stock_quantity'   => ($isGuideType ? 'nullable' : 'required') . '|integer|min:0',
             'product_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            // A guide is a downloadable PDF, so it must ship with its file.
+            'pdf_file'         => [$isGuideType ? 'required' : 'nullable', 'file', 'mimes:pdf', 'max:20480'],
         ]);
 
         //Add validation for check slug
@@ -121,6 +150,8 @@ class AdminProductController extends Controller
         
         if($slugCount == 0 && $skuCount == 0){
             [$productType, $category] = $this->coupleVitalBoost($request->product_type, $request->category);
+            // A guide is a downloadable PDF, never a physical shipment.
+            $isGuide = $productType === 'guide';
             $product = Product::create([
                 'user_id' => $this->vitalBoostOwner($request->user_id, $category),
                 'sku' => $request->sku,
@@ -130,13 +161,14 @@ class AdminProductController extends Controller
                 'slug' => $slug,
                 'description' => $request->description,
                 'price' => $request->price,
-                'stock_quantity' => $request->stock_quantity,
+                'stock_quantity' => $request->stock_quantity ?? 0,
                 'weight' => $request->weight ?? 0,
                 'length' => $request->length,
                 'width' => $request->width,
                 'height' => $request->height,
                 'shipping_template' => $request->shipping_template,
-                'requires_shipping' => $request->has('requires_shipping') ? 1 : 0,
+                'requires_shipping' => $isGuide ? 0 : ($request->has('requires_shipping') ? 1 : 0),
+                'pdf_file' => $this->storePdfFile($request),
                 'status' => 'active'
             ]);
 
@@ -201,6 +233,12 @@ class AdminProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
+        // A guide is a downloadable PDF, not a physical shipment, so its shipping
+        // dimensions and stock quantity are optional (the edit form hides those
+        // fields for guides).
+        $isGuideType = $request->product_type === 'guide';
+        $shippingRule = $isGuideType ? 'nullable|numeric|min:0' : 'required|numeric|min:0';
+
         $request->validate([
             'sku'              => 'required|string|unique:products,sku,'.$id,
             'category'         => 'required',
@@ -208,12 +246,15 @@ class AdminProductController extends Controller
             'product_name'     => 'required|string|max:255',
             'description'      => 'required',
             'price'            => 'required|numeric|min:0',
-            'stock_quantity'   => 'required|integer|min:0',
-            'weight'           => 'required|numeric|min:0',
-            'length'           => 'required|numeric|min:0',
-            'width'            => 'required|numeric|min:0',
-            'height'           => 'required|numeric|min:0',
+            'stock_quantity'   => ($isGuideType ? 'nullable' : 'required') . '|integer|min:0',
+            'weight'           => $shippingRule,
+            'length'           => $shippingRule,
+            'width'            => $shippingRule,
+            'height'           => $shippingRule,
             'product_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            // On edit the PDF is optional — keep the existing file if none is sent —
+            // but a guide with no file at all is not downloadable.
+            'pdf_file'         => [($request->product_type === 'guide' && empty($product->pdf_file)) ? 'required' : 'nullable', 'file', 'mimes:pdf', 'max:20480'],
         ]);
 
         /*if ($request->hasFile('image')) {
@@ -240,6 +281,20 @@ class AdminProductController extends Controller
         
         if($slugCount == 0 && $skuCount == 0){
             [$productType, $category] = $this->coupleVitalBoost($request->product_type, $request->category);
+            // A guide is a downloadable PDF, never a physical shipment.
+            $isGuide = $productType === 'guide';
+
+            // Keep the current PDF unless a new one is uploaded (and remove the old
+            // file from disk when it is replaced).
+            $pdfFile = $product->pdf_file;
+            if ($request->hasFile('pdf_file')) {
+                $existingPath = $product->pdfPath();
+                if ($existingPath) {
+                    unlink($existingPath);
+                }
+                $pdfFile = $this->storePdfFile($request);
+            }
+
             //Update product
             $product->update([
                 'user_id' => $this->vitalBoostOwner($request->user_id, $category),
@@ -250,13 +305,14 @@ class AdminProductController extends Controller
                 'slug' => $slug,
                 'description' => $request->description,
                 'price' => $request->price,
-                'stock_quantity' => $request->stock_quantity,
+                'stock_quantity' => $request->stock_quantity ?? 0,
                 'weight' => $request->weight ?? 0,
                 'length' => $request->length,
                 'width' => $request->width,
                 'height' => $request->height,
                 'shipping_template' => $request->shipping_template,
-                'requires_shipping' => $request->has('requires_shipping') ? 1 : 0
+                'requires_shipping' => $isGuide ? 0 : ($request->has('requires_shipping') ? 1 : 0),
+                'pdf_file' => $pdfFile
             ]);
 
             // Check if images exist
@@ -296,6 +352,12 @@ class AdminProductController extends Controller
         //Delete image from product_images folder
         if ($product->image && file_exists(public_path('product_images/'.$product->image))) {
             unlink(public_path('product_images/'.$product->image));
+        }
+
+        //Delete the guide PDF from storage, if any
+        $pdfPath = $product->pdfPath();
+        if ($pdfPath) {
+            unlink($pdfPath);
         }
 
         $product->delete();

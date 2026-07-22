@@ -66,8 +66,11 @@ class ShippingService
                 'default_rate_key' => $defaultRateKey,
                 'selected_rate_key' => $defaultRateKey,
                 'selected_rate' => $defaultRateKey ? $rates[$defaultRateKey] : null,
-                // No rate means nothing is shipped for this seller, so nothing is charged.
-                'handling_fee' => $defaultRateKey ? $this->getSellerHandlingFee($seller) : 0,
+                'requires_shipping' => $packageDetails['requires_shipping'],
+                // Digital-only groups (e.g. downloadable guides) ship nothing, so no
+                // handling fee applies even though a zero-cost "Digital Product" rate
+                // exists. A missing rate also means nothing is charged.
+                'handling_fee' => ($packageDetails['requires_shipping'] && $defaultRateKey) ? $this->getSellerHandlingFee($seller) : 0,
             ];
         }
 

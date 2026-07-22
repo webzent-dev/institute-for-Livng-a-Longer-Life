@@ -137,8 +137,10 @@ class CartController extends Controller
             }
         }
 
+        // Guides are downloadable PDFs with unlimited supply, so they are never
+        // stock-limited; every physical product still is.
         $stockQuantity = $product->stock_quantity;
-        if ($stockQuantity < $existingProductQty + $quantity) {
+        if ($product->product_type !== 'guide' && $stockQuantity < $existingProductQty + $quantity) {
             return response()->json([
                 'status' => false,
                 'message' => 'Insufficient stock quantity/Out of stock.',
@@ -214,7 +216,8 @@ class CartController extends Controller
             }
         }
 
-        if ($stockQuantity < $otherLinesQty + $quantity) {
+        // Guides are downloadable PDFs with unlimited supply; skip the stock cap.
+        if ($product->product_type !== 'guide' && $stockQuantity < $otherLinesQty + $quantity) {
             return response()->json([
                 'status' => false,
                 'message' => 'Insufficient stock quantity/Out of stock'
